@@ -1,0 +1,96 @@
+[tool.poetry]
+name = "MrfmSim"
+version = "0.0.1"
+description = "Simulate magnetic resonance force microscopy experiments"
+authors = ["Peter Sun <hs859@cornell.edu>", "John Marohn <jam99@cornell.edu>"]
+maintainers = ["Peter Sun <hs859@cornell.edu>"]
+repository = "https://www.github.edu/Marohn-Group/mrfmsim"
+# adds all subpackages and the units.yaml file
+packages = [{ include = "mrfmsim/*.py" }, { include = "mrfmsim/**/*.py" }]
+readme = "README.rst"
+
+[tool.poetry.dependencies]
+python = ">=3.8"
+numpy = ">=1.18,<1.22" # conflict with numba 0.55.1 for 1.22 above
+numba = ">=0.56"
+pyyaml = "^6.0"
+mmodel = ">=0.3.1"
+click = ">=8.1.0"
+tox = { version = ">=3.25.0", optional = true }
+pytest = { version = ">=7.1.1", optional = true }
+pytest-cov = { version = ">=3.0.0", optional = true }
+sphinx = { version = "^4.4.0", optional = true }
+sphinx-book-theme = { version = "^0.3.2", optional = true }
+nbsphinx = { version = "^0.8.8", optional = true }
+
+[tool.poetry.scripts]
+mrfmsim = "mrfmsim.cli:cli"
+
+[build-system]
+requires = ["poetry_core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.dev-dependencies]
+tox = ">=3.24.5"
+pytest = ">=7.1.1"
+pytest-cov = ">=3.0.0"
+sphinx = "^4.4.0"
+sphinx-book-theme = "^0.3.2"
+nbsphinx = "^0.8.8"
+
+[tool.poetry.extras]
+test = ["tox", "pytest", "pytest-cov"]
+docs = ["nbsphinx", "sphinx", "sphinx_book_theme"]
+
+[tool.pytest.ini_options]
+filterwarnings = [
+    # note the use of single quote below to denote "raw" strings in TOML
+    # the escape sequence is necessary in graphviz dot string
+    # used to left align node text
+    'ignore:invalid escape sequence \\l:DeprecationWarning',
+    # The parallel method of numba might not be used in test
+    # ignore the warning
+    'ignore::numba.NumbaPerformanceWarning' 
+]
+
+[tool.coverage.run]
+# pytest coverage
+source_pkgs = [
+    'mrfmsim'
+]
+omit = ['tests/*']
+
+[tool.tox]
+# for testing different python environments
+# somehow poetry, tox and python3.10 don't work
+legacy_tox_ini = """
+[tox]
+envlist = py38, py39, coverage, docs
+isolated_build = True
+ 
+[testenv:py38]
+deps = pytest >= 7.1.1
+commands = pytest
+
+[testenv:py39]
+deps = pytest >= 7.1.1
+commands = pytest
+
+[testenv:coverage]
+deps = 
+    pytest >= 7.1.1
+    pytest-cov >= 3.0.0
+commands =
+    coverage run --source=tests -m pytest
+    coverage html
+    coverage report
+
+[testenv:docs]
+deps = 
+    sphinx == 4.4.0
+    sphinx-book-theme == 0.3.2
+    nbsphinx == 0.8.8
+commands =
+    # sphinx-build -W -b html ./docs ./docs/_build/html
+    sphinx-build -W -b html -d "{toxworkdir}/docs" docs "{toxinidir}/docs/_build/html"
+"""
