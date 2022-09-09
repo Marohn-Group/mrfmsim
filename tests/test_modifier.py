@@ -1,0 +1,104 @@
+from mrfmsim.modifier import component_modifier, printout_modifier
+import inspect
+import pytest
+from types import SimpleNamespace
+
+
+class TestComponentModifier:
+    @pytest.fixture
+    def comp_mod_func(self):
+        """Return a component modified function"""
+
+        def func(a, b, c, d, e, f):
+            return a * b * c * d * e * f
+
+        return component_modifier(func, {"obj1": ["a", "b"], "obj2": ["c", "d"]})
+
+    def test_signature(self, comp_mod_func):
+        """Test component modified function has the correct signature and order"""
+
+        sig_parameters = list(inspect.signature(comp_mod_func).parameters.keys())
+        assert sig_parameters == ["e", "f", "obj1", "obj2"]
+
+    def test_execution(self, comp_mod_func):
+        """Test component modified function process the correct input"""
+
+        obj1 = SimpleNamespace(a=1, b=2)
+        obj2 = SimpleNamespace(c=3, d=4)
+
+        assert comp_mod_func(e=5, f=6, obj1=obj1, obj2=obj2) == 720
+
+
+class TestPrintoutModifier:
+    @pytest.fixture
+    def func_b(self):
+        def b_tot(b1, b0, bz):
+            return b1 + b0 + bz
+
+        return b_tot
+
+    def test_incorrect_input(self, capsys, func_b, units):
+        """Test printout modified function has the correct output with multiple returns"""
+
+        with pytest.raises(
+            Exception, match="cannot modify b_tot, f_rf not in signature"
+        ):
+            printout_modifier(func_b, ["b1", "b0", "f_rf"], units)
+
+    def test_no_returns(self, capsys, func_b, units):
+        """Test printout modified function has the correct output
+
+        Test variables that is in the units.yaml file and variable
+        that is not. The function does not have a return parameter,
+        therefore the result does not have units
+        """
+
+        mod_func = printout_modifier(func_b, ["b1", "b0", "bz"], units)
+
+        mod_func(b1=1, b0=2, bz=3)
+        captured = capsys.readouterr()
+        assert captured.out == "0 | b1 1.000 [mT] | b0 2.000e+00 [mT] | bz 3 | 6\n"
+
+        # test that the counter is increased
+        mod_func(b1=2, b0=1, bz=0)
+        captured = capsys.readouterr()
+        assert captured.out == "1 | b1 2.000 [mT] | b0 1.000e+00 [mT] | bz 0 | 3\n"
+
+    def test_single_return(self, capsys, func_b, units):
+        """Test printout modified function has the correct output with one returns"""
+
+        func_b.returns = ["b_tot"]
+
+        mod_func = printout_modifier(func_b, [], units)
+
+        mod_func(b1=1, b0=2, bz=3)
+
+        captured = capsys.readouterr()
+        assert captured.out == "0 | b_tot 6.0 [mT]\n"
+
+    def test_multiple_returns(self, capsys, units):
+        """Test printout modified function has the correct output with multiple returns"""
+
+        def func(a, b):
+            return a, b
+
+        func.returns = ["b1", "b0"]
+
+        mod_func = printout_modifier(func, [], units)
+
+        mod_func(a=1, b=2)
+
+        captured = capsys.readouterr()
+        assert captured.out == "0 | b1 1.000 [mT], b0 2.000e+00 [mT]\n"
+
+        def func(a, b):
+            return a, b
+
+        func.returns = ["bz", "b0"]
+
+        mod_func = printout_modifier(func, [], units)
+
+        mod_func(a=1, b=2)
+
+        captured = capsys.readouterr()
+        assert captured.out == "0 | bz 1 , b0 2.000e+00 [mT]\n"
