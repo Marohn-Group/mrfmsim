@@ -16,6 +16,7 @@ def component_obj(units):
 
     obj = ComponentBase()
     obj._units = units
+    # obj._parameters = ('b0', 'b1', 'b_tot', 'list', 'str', 'tuple')
 
     obj.b0 = 100.0  # float
     obj.b1 = np.array([1, 2, 3])  # int

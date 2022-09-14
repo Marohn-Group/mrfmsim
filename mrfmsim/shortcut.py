@@ -21,15 +21,15 @@ def loop_shortcut(model, parameter: str):
 
     # check if the parameter is in the signature
     if parameter not in model.__signature__.parameters:
-        raise Exception(f"'{parameter}' is not in model parameter")
+        raise Exception(f"'{parameter}' is not a model parameter")
 
     subgraph = subgraph_by_parameters(graph, [parameter])
 
     ModelClass = type(model)  # works for both mmodel.Model and mrfmsim.Experiment
 
     if nodes_equal(graph.nodes, subgraph.nodes):
-        model_mod_list.append(loop_mod)
-        looped_model = ModelClass(graph, handler, model_mod_list)
+        model_mod_list = model_mod_list + [loop_mod]
+        looped_model = ModelClass(graph, handler, modifiers=model_mod_list)
 
     else:
         # create the model and substitute the subgraph

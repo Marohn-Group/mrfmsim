@@ -6,13 +6,14 @@ import pytest
 
 def test_loop_shortcut(model):
     """Test loop shortcut
-    
+
     The resulting value should create a looped model of d
     """
 
     loop_model = loop_shortcut(model, "d")
 
     assert loop_model(a=2, b=2, d=[1, 2, 3], f=2) == ([24, 16, 8], 2.0)
+
 
 def test_loop_shortcut_top_level(model):
     """Test loop shortcut when the parameter is used at the top level
@@ -28,11 +29,9 @@ def test_loop_shortcut_top_level(model):
 
 def test_loop_shortcut_incorrect_parameter(model):
     """Test loop shortcut when the parameter is not in model parameter
-    
+
     If a wrong parameter is chosen, an exception should be raised
     """
 
-    with pytest.raises(Exception, match="'c' is not in model parameter"):
+    with pytest.raises(Exception, match="'c' is not a model parameter"):
         loop_shortcut(model, "c")
-
-    

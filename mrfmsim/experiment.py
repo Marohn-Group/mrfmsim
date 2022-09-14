@@ -34,3 +34,17 @@ class Experiment(Model):
     def draw(self, method: callable = draw_graph):
         """Add the default drawing method to experiment"""
         return super().draw(method)
+
+
+class Job:
+    """Create Experiment execution job.
+
+    :param str name: name of the job
+    :param dict inputs: input needed for model
+    :param list shortcuts: additional shortcut modification of the model
+    """
+
+    def __init__(self, name, inputs, shortcuts: list = []):
+        self.name = name
+        self.shortcuts = shortcuts
+        self.inputs = inputs

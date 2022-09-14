@@ -2,19 +2,17 @@
 
 The configuration file provides several default graph fixtures
 and test functions
-
-1. `standard_G` - test graph generated using DiGraph, scope: function
-2. `mmodel_G` - test graph generated using ModelGraph. scope: function
 """
 
 
 import pytest
 import math
 from mmodel import Model, PlainHandler, ModelGraph
+from networkx.utils import nodes_equal, edges_equal
 
 
-@pytest.fixture()
-def model():
+@pytest.fixture
+def model(scope="Function"):
     """Mock test graph generated using ModelGraph
 
     The result is:
@@ -37,8 +35,6 @@ def model():
     def logarithm(c, b):
         return math.log(c, b)
 
-    doc = "test object\n\nlong description"
-
     grouped_edges = [
         ("add", ["subtract", "multiply", "log"]),
         (["subtract", "multiply"], "poly"),
@@ -52,11 +48,11 @@ def model():
         ("log", logarithm, ["m"]),
     ]
 
-    G = ModelGraph(name="test", doc=doc)
+    G = ModelGraph(name="test")
     G.add_grouped_edges_from(grouped_edges)
     G.set_node_objects_from(node_objects)
 
-    model = Model(G, (PlainHandler, {}))
+    model = Model(G, (PlainHandler, {}), description="test model")
 
     return model
 
@@ -81,3 +77,19 @@ def units():
         }
         # 'bz': {'unit': '[mT]', "format": ":.3f"}, # comment the entry for testing
     }
+
+
+def graph_equal(G1, G2):
+    """Test if graphs have the same nodes, edges and attributes"""
+
+    assert nodes_equal(G1._node, G2._node)
+    assert edges_equal(G1._adj, G2._adj)
+
+    assert G1._pred == G2._pred
+    assert G1._succ == G2._succ
+
+    # test graph attributes
+    assert G1.graph == G2.graph
+    assert G1.name == G2.name
+
+    return True

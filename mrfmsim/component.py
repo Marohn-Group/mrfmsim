@@ -6,6 +6,7 @@ class ComponentBase:
     """The base component class defines the __repr__ method"""
 
     _units = {}
+    # _parameters = () # list the accessible parameters
 
     def attrs_to_dict(self):
         """Output attributes to dictionary format"""
@@ -17,6 +18,8 @@ class ComponentBase:
             )
             if not key.startswith("_")
         }
+
+        # return {key: getattr(self, key) for key in self._parameters}
 
     def __str__(self):
         """Modify the string representation of Components
