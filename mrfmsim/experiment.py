@@ -16,20 +16,22 @@ class Experiment(Model):
 
     def __init__(
         self,
+        name,
         graph,
         handler=(MemHandler, {}),
-        description: str = "",
         component_substitutes: dict = {},
-        modifiers: list = [],
+        modifiers=None,
+        description: str = "",
     ):
         # add component modification to modifiers
         component_mod = (
             component_modifier,
             {"component_substitutes": component_substitutes},
         )
+        modifiers = modifiers or list() # change non to list
         modifiers = [component_mod] + modifiers
 
-        super().__init__(graph, handler, description, modifiers)
+        super().__init__(name, graph, handler, modifiers, description)
 
     def draw(self, method: callable = draw_graph):
         """Add the default drawing method to experiment"""

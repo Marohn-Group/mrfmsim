@@ -7,7 +7,7 @@ and test functions
 
 import pytest
 import math
-from mmodel import Model, PlainHandler, ModelGraph
+from mmodel import Model, BasicHandler, ModelGraph
 from networkx.utils import nodes_equal, edges_equal
 
 
@@ -52,7 +52,7 @@ def model(scope="Function"):
     G.add_grouped_edges_from(grouped_edges)
     G.set_node_objects_from(node_objects)
 
-    model = Model(G, (PlainHandler, {}), description="test model")
+    model = Model('test model', G, (BasicHandler, {}), description="test model")
 
     return model
 

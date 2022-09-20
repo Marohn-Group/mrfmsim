@@ -106,7 +106,7 @@ def test_graph_constructor(model, user_module):
     load_module("user_module", user_module)
     graph = yaml.load(GRAPH_YAML, MrfmsimLoader)
 
-    assert graph_equal(graph, model._graph)
+    assert graph_equal(graph, model.graph)
 
 
 EXPT_YAML = """
@@ -114,6 +114,7 @@ EXPT_YAML = """
 user_module:
     !Module
     user_m: {user_module_path}
+name: test_experiment
 graph:
     !Graph
     name: test
@@ -143,8 +144,7 @@ modifiers:
     - [!Func mmodel.loop_modifier, {{'parameter': 'd'}}]
 """
 
-EXPT_STR = """test model
-  signature: component, d, f
+EXPT_STR = """test_experiment(component, d, f)
   returns: k, m
   handler: MemHandler, {}
   modifiers: [component_modifier, {'component_substitutes': \

@@ -109,7 +109,9 @@ def experiment_constructor(loader, node):
     param_dict = loader.construct_mapping(node)
 
     expt_params = {}
+    expt_params['name'] = param_dict['name']
     expt_params["graph"] = param_dict["graph"]
+
 
     for param in ["handler", "description", "component_substitutes", "modifiers"]:
         if param in param_dict:
@@ -122,9 +124,9 @@ def experiment_constructor(loader, node):
 #     """Parse experiment object to yaml string"""
 
 #     experiment_dict = {
-#         "graph": experiment._graph,
+#         "graph": experiment.graph,
 #         "description": experiment.description,
-#         "modifiers": experiment._modifiers,
+#         "modifiers": experiment.modifiers,
 #     }
 
 #     return dumper.represent_mapping("!Experiment", experiment_dict)

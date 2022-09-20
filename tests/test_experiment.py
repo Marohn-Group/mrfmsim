@@ -8,7 +8,7 @@ from types import SimpleNamespace
 
 @pytest.fixture
 def expt_a(model):
-    return Experiment(model._graph)
+    return Experiment("test_experiment_a", model.graph)
 
 
 @pytest.fixture
@@ -18,21 +18,20 @@ def expt_b(model):
     component_sub = {"component": ["a", "b"]}
 
     return Experiment(
-        model._graph,
-        description="test experiment",
+        "test_experiment_b",
+        model.graph,
         component_substitutes=component_sub,
         modifiers=[(loop_modifier, {"parameter": "d"})],
+        description="test experiment",
     )
 
 
-EXPT_A_STR = """test model
-  signature: a, d, f, b=2
+EXPT_A_STR = """test_experiment_a(a, d, f, b=2)
   returns: k, m
   handler: MemHandler, {}
   modifiers: [component_modifier, {'component_substitutes': {}}]"""
 
-EXPT_B_STR = """test model
-  signature: component, d, f
+EXPT_B_STR = """test_experiment_b(component, d, f)
   returns: k, m
   handler: MemHandler, {}
   modifiers: [component_modifier, {'component_substitutes': \
@@ -63,8 +62,7 @@ def test_experiment_execution_modifier(expt_a, expt_b):
 
 dot_source = """digraph test {
 graph [label="\
-test model\
-   signature: a, d, f, b=2\
+test_experiment_a(a, d, f, b=2)\
    returns: k, m\
    handler: MemHandler, {}\
    modifiers: [component_modifier, {'component_substitutes': {}}] " 

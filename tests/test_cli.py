@@ -30,6 +30,7 @@ EXPT_YAML = """
 user_module:
     !Module
     user_m: {user_module_path}
+name: test_experiment
 graph:
     !Graph
     name: test
@@ -100,8 +101,7 @@ def job_file(tmp_path):
 
 dot_source = """digraph test {
 graph [label="\
-test model\
-   signature: a, d, f, b=2\
+test_experiment(a, d, f, b=2)\
    returns: k, m\
    handler: MemHandler, {}\
    modifiers: [component_modifier, {'component_substitutes': {}}] 

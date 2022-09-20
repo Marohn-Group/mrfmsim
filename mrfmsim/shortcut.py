@@ -13,9 +13,10 @@ def loop_shortcut(model, parameter: str):
     """
 
     loop_mod = loop_modifier, {"parameter": parameter}
-    handler = model._handler
-    graph = model._graph
-    model_mod_list = model._modifiers
+    name = model.__name__
+    handler = model.handler
+    graph = model.graph
+    modifiers = model.modifiers
     node_name = f'"{parameter}" loop node'
     description = model.description
 
@@ -28,13 +29,16 @@ def loop_shortcut(model, parameter: str):
     ModelClass = type(model)  # works for both mmodel.Model and mrfmsim.Experiment
 
     if nodes_equal(graph.nodes, subgraph.nodes):
-        model_mod_list = model_mod_list + [loop_mod]
-        looped_model = ModelClass(graph, handler, modifiers=model_mod_list)
+        modifiers = modifiers + [loop_mod]
+        looped_model = ModelClass(name, graph, handler, modifiers, description)
 
     else:
+        sub_model_name = f'"{parameter}" looped sub model'
         # create the model and substitute the subgraph
-        looped_node = ModelClass(subgraph, handler, modifiers=[loop_mod])
+        looped_node = ModelClass(
+            sub_model_name, subgraph, handler, modifiers=[loop_mod]
+        )
         looped_graph = modify_subgraph(graph, subgraph, node_name, looped_node)
-        looped_model = ModelClass(looped_graph, handler, description, model_mod_list)
+        looped_model = ModelClass(name, looped_graph, handler, modifiers, description)
 
     return looped_model
