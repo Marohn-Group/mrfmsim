@@ -1,90 +1,63 @@
-"""Test Experiment Class by creating the modifiers, shortcuts and component"""
-import pytest
-from mrfmsim.experiment import Experiment
-from mmodel.modifier import loop_modifier
-from mmodel import MemHandler
+"""Test Experiment Class"""
+
 from types import SimpleNamespace
 
 
-@pytest.fixture
-def expt_a(model):
-    return Experiment("test_experiment_a", model.graph)
-
-
-@pytest.fixture
-def expt_b(model):
-    """The handler should default to MemHandler"""
-
-    component_sub = {"component": ["a", "b"]}
-
-    return Experiment(
-        "test_experiment_b",
-        model.graph,
-        component_substitutes=component_sub,
-        modifiers=[(loop_modifier, {"parameter": "d"})],
-        description="test experiment",
-    )
-
-
-EXPT_A_STR = """test_experiment_a(a, d, f, b=2)
-  returns: k, m
+EXPT_STR = """test_experiment(component, d, f)
+  returns: k, m, p
   handler: MemHandler, {}
-  modifiers: [component_modifier, {'component_substitutes': {}}]"""
+  modifiers: [loop_modifier, {'parameter': 'd'}, \
+component_modifier, {'component_substitutes': {'component': ['a', 'b']}}]
+test experiment with components"""
 
-EXPT_B_STR = """test_experiment_b(component, d, f)
-  returns: k, m
+
+EXPT_PLAIN_STR = """test_experiment_plain(a, d, f, b=2)
+  returns: k, m, p
   handler: MemHandler, {}
-  modifiers: [component_modifier, {'component_substitutes': \
-{'component': ['a', 'b']}}, loop_modifier, {'parameter': 'd'}]
-test experiment"""
+  modifiers: []"""
 
 
-def test_experiment_str(expt_a, expt_b):
+def test_experiment_str(expt, expt_plain):
     """Test if the experiment have the correct output"""
 
-    assert str(expt_a) == EXPT_A_STR
-    assert str(expt_b) == EXPT_B_STR
+    assert str(expt) == EXPT_STR
+    assert str(expt_plain) == EXPT_PLAIN_STR
 
 
-def test_experiment_execution(expt_a, expt_b):
+def test_experiment_execution(expt, expt_plain):
     """Test the experiment execute correctly"""
 
-    assert expt_a(0, 2, 2) == (0, 1)
+    assert expt_plain(0, 1, 3, 2) == (8, 1, 9)
 
-
-def test_experiment_execution_modifier(expt_a, expt_b):
-    """Test the experiment execute correctly"""
-
-    component = SimpleNamespace(a=0, b=2)
-
-    assert expt_b(component, d=[2, 4], f=2) == [(0, 1), (-8, 1)]
+    comp = SimpleNamespace(a=0, b=2)
+    assert expt(comp, d=[1, 2], f=3) == [(8, 1, 9), (0, 1, 9)]
 
 
 dot_source = """digraph test {
 graph [label="\
-test_experiment_a(a, d, f, b=2)\
-   returns: k, m\
+test_experiment_plain(a, d, f, b=2)\
+   returns: k, m, p
    handler: MemHandler, {}\
-   modifiers: [component_modifier, {'component_substitutes': {}}] " 
+   modifiers: [] " 
 labeljust=l labelloc=t ordering=out splines=ortho]
 node [shape=box]
 add [label="add addition(a, b=2) return c "]
 subtract [label="subtract subtraction(c, d) return e "]
-multiply [label="multiply multiplication(c, f) return g "]
+poly [label="poly polynomial(c, f) return g, p "]
 log [label="log logarithm(c, b) return m "]
-poly [label="poly polynomial(e, g) return k "]
+multiply [label="multiply multiplication(e, g) return k "]
 add -> subtract [xlabel=c]
-add -> multiply [xlabel=c]
+add -> poly [xlabel=c]
 add -> log [xlabel=c]
-subtract -> poly [xlabel=e]
-multiply -> poly [xlabel=g]
+subtract -> multiply [xlabel=e]
+poly -> multiply [xlabel=g]
 }"""
 
 
-def test_experiment_default_draw(expt_a):
+def test_experiment_default_draw(expt_plain):
     """Test the default graph drawing method"""
 
-    dot_graph = expt_a.draw()
+    dot_graph = expt_plain.draw()
 
     dot_graph_source = (
         dot_graph.source.replace("\t", "").replace("\l", " ").replace("\n", "")

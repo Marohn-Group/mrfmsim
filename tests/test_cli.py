@@ -104,7 +104,7 @@ graph [label="\
 test_experiment(a, d, f, b=2)\
    returns: k, m\
    handler: MemHandler, {}\
-   modifiers: [component_modifier, {'component_substitutes': {}}] 
+   modifiers: [] 
 yaml test experiment " 
 labeljust=l labelloc=t ordering=out splines=ortho]
 node [shape=box]

@@ -23,13 +23,16 @@ class Experiment(Model):
         modifiers=None,
         description: str = "",
     ):
-        # add component modification to modifiers
-        component_mod = (
-            component_modifier,
-            {"component_substitutes": component_substitutes},
-        )
-        modifiers = modifiers or list() # change non to list
-        modifiers = [component_mod] + modifiers
+
+        modifiers = modifiers or list()  # change non to list
+        if component_substitutes:
+            # add component modification to modifiers
+            component_mod = (
+                component_modifier,
+                {"component_substitutes": component_substitutes},
+            )
+
+            modifiers = modifiers + [component_mod]
 
         super().__init__(name, graph, handler, modifiers, description)
 

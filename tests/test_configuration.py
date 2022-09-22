@@ -10,9 +10,7 @@ import pytest
 import yaml
 from tests.conftest import graph_equal
 from mrfmsim.shortcut import loop_shortcut
-from mrfmsim.modifier import component_modifier
-from mrfmsim.experiment import Experiment, Job
-from mmodel import ModelGraph, Model
+from mrfmsim.experiment import Job
 
 MODULE_STR = """
 # Test python script
@@ -25,15 +23,14 @@ def addition(a, b=2):
 def subtraction(c, d):
     return c - d
 
-def multiplication(c, f):
-    return c * f
+def polynomial(c, f):
+    return c**f, f**c
 
-def polynomial(e, g):
+def multiplication(e, g):
     return e * g
 
 def logarithm(c, b):
     return math.log(c, b)
-
 """
 
 
@@ -42,14 +39,17 @@ def user_module(tmp_path):
     """Create a custom module for testing"""
     module_path = tmp_path / "user_module.py"
     module_path.write_text(MODULE_STR)
-    return module_path
+
+    yield module_path
+    # runs after the test is complete
+    if "user_module" in sys.modules:
+        del sys.modules["user_module"]
 
 
 def test_load_module(user_module):
     """Test the user module in imported"""
     load_module("user_module", user_module)
     assert "user_module" in sys.modules
-    del sys.modules["user_module"]
 
 
 def test_load_func(user_module):
@@ -59,7 +59,6 @@ def test_load_func(user_module):
     func = load_func("user_module.addition")
     assert func.__name__ == "addition"
     assert func(1, 2) == 3
-    del sys.modules["user_module"]
 
 
 FUNC_YAML = """
@@ -80,8 +79,8 @@ GRAPH_YAML = """
 !Graph
 name: test
 grouped_edges:
-    - [add, [subtract, multiply, log]]
-    - [[subtract, multiply], poly]
+    - [add, [subtract, poly, log]]
+    - [[subtract, poly], multiply]
 node_objects:
     add:
         func: !Func user_module.addition
@@ -89,11 +88,11 @@ node_objects:
     subtract:
         func: !Func user_module.subtraction
         returns: [e]
-    multiply:
-        func: !Func user_module.multiplication
-        returns: [g]
     poly:
         func: !Func user_module.polynomial
+        returns: [g, p]
+    multiply:
+        func: !Func user_module.multiplication
         returns: [k]
     log:
         func: !Func user_module.logarithm
@@ -113,14 +112,14 @@ EXPT_YAML = """
 !Experiment
 user_module:
     !Module
-    user_m: {user_module_path}
+    user_module: {user_module_path}
 name: test_experiment
 graph:
     !Graph
     name: test
     grouped_edges:
-        - [add, [subtract, multiply, log]]
-        - [[subtract, multiply], poly]
+        - [add, [subtract, poly, log]]
+        - [[subtract, poly], multiply]
     node_objects:
         add:
             func: !Func user_module.addition
@@ -128,53 +127,29 @@ graph:
         subtract:
             func: !Func user_module.subtraction
             returns: [e]
-        multiply:
-            func: !Func user_module.multiplication
-            returns: [g]
         poly:
             func: !Func user_module.polynomial
+            returns: [g, p]
+        multiply:
+            func: !Func user_module.multiplication
             returns: [k]
         log:
             func: !Func user_module.logarithm
             returns: [m]
 component_substitutes:
     component: [a, b]
-description: yaml test experiment
+description: test experiment with components
 modifiers:
     - [!Func mmodel.loop_modifier, {{'parameter': 'd'}}]
 """
 
-EXPT_STR = """test_experiment(component, d, f)
-  returns: k, m
-  handler: MemHandler, {}
-  modifiers: [component_modifier, {'component_substitutes': \
-{'component': ['a', 'b']}}, loop_modifier, {'parameter': 'd'}]
-yaml test experiment"""
 
-
-def test_experiment_constructor(user_module):
+def test_experiment_constructor(user_module, expt):
     """Test experimental constructor"""
     expt_yaml = EXPT_YAML.format(user_module_path=user_module)
 
     yaml_expt = yaml.load(expt_yaml, MrfmsimLoader)
-    assert str(yaml_expt) == EXPT_STR
-
-
-# def test_experiment_representer(model):
-#     """Test experiment representer parse experiment object"""
-
-#     # turn the model into an experiment object
-
-#     model.modifier = [
-#         component_modifier,
-#         {"component_substitutes": {"component": ["a", "b"]}},
-#     ]
-
-#     experiment_dumper = yaml.Dumper
-#     experiment_dumper.add_representer(types.FunctionType, func_representer)
-#     experiment_dumper.add_representer(Model, experiment_representer)
-
-#     expt_yaml = yaml.dump(model, Dumper=experiment_dumper, sort_keys=False)
+    assert str(yaml_expt) == str(expt)
 
 
 def test_func_representer():
@@ -234,21 +209,3 @@ def test_job_constructor_no_shortcut():
     assert job.name == ""
     assert job.inputs == {}
     assert job.shortcuts == []
-
-
-# def test_mrfmsim_loader():
-#     """Test mrfmsim_loader loads the correct constructors"""
-#     loader = mrfmsim_loader("!Job", "!Graph")
-#     cons_dict = loader.yaml_constructors
-
-#     assert "!Job" in cons_dict and "!Graph" in cons_dict
-#     assert "!Experiment" not in cons_dict and "!Func" not in cons_dict
-#     loader = mrfmsim_loader()
-
-
-# def test_mrfmsim_dumper():
-#     """Test mrfmsim_loader loads the correct constructors"""
-#     dumper = mrfmsim_dumper("!Job")
-
-#     assert "!Job" in dumper.yaml_representers
-#     assert "!Func" not in dumper.yaml_representers

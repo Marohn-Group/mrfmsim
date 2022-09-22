@@ -1,4 +1,7 @@
-"""Shortcuts"""
+"""Shortcuts
+
+The shortcut should work for both Model and Experiment
+"""
 
 from mmodel import loop_modifier, subgraph_by_parameters, modify_subgraph
 from networkx.utils import nodes_equal
@@ -20,25 +23,35 @@ def loop_shortcut(model, parameter: str):
     node_name = f'"{parameter}" loop node'
     description = model.description
 
+    ModelClass = type(model)  # works for both mmodel.Model and mrfmsim.Experiment
+
     # check if the parameter is in the signature
     if parameter not in model.__signature__.parameters:
         raise Exception(f"'{parameter}' is not a model parameter")
 
-    subgraph = subgraph_by_parameters(graph, [parameter])
-
-    ModelClass = type(model)  # works for both mmodel.Model and mrfmsim.Experiment
-
-    if nodes_equal(graph.nodes, subgraph.nodes):
+    # this is case when the parameter is in signature but not in graph
+    # this is due to signature modifier on the model level
+    # therefore the whole model is looped.
+    elif parameter not in graph.nodes():
         modifiers = modifiers + [loop_mod]
-        looped_model = ModelClass(name, graph, handler, modifiers, description)
 
-    else:
-        sub_model_name = f'"{parameter}" looped sub model'
-        # create the model and substitute the subgraph
-        looped_node = ModelClass(
-            sub_model_name, subgraph, handler, modifiers=[loop_mod]
-        )
-        looped_graph = modify_subgraph(graph, subgraph, node_name, looped_node)
-        looped_model = ModelClass(name, looped_graph, handler, modifiers, description)
+    else:  # the parameter is within the graph
+        subgraph = subgraph_by_parameters(graph, [parameter])
+
+        if nodes_equal(graph.nodes, subgraph.nodes):
+            modifiers = modifiers + [loop_mod]
+
+        else:
+            sub_model_name = f'"{parameter}" looped sub model'
+            # create the model and substitute the subgraph
+            looped_node = ModelClass(
+                sub_model_name, subgraph, handler, modifiers=[loop_mod]
+            )
+            # create new graph
+            graph = modify_subgraph(graph, subgraph, node_name, looped_node)
+
+    looped_model = ModelClass(
+        name, graph, handler, modifiers=modifiers, description=description
+    )
 
     return looped_model

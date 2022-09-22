@@ -7,17 +7,21 @@ and test functions
 
 import pytest
 import math
-from mmodel import Model, BasicHandler, ModelGraph
+from mmodel import Model, MemHandler, ModelGraph, loop_modifier
+from mrfmsim.experiment import Experiment
+from mrfmsim.modifier import component_modifier
 from networkx.utils import nodes_equal, edges_equal
+from types import SimpleNamespace
 
 
 @pytest.fixture
-def model(scope="Function"):
-    """Mock test graph generated using ModelGraph
+def modelgraph():
+    """Model graph for creating experiment and model
 
-    The result is:
-    k = (a + b - d)(a + b)f
+    The results are:
+    k = (a + b - d)(a + b)^f
     m = log(a + b, b)
+    p = f^(a + b)
     """
 
     def addition(a, b=2):
@@ -26,25 +30,25 @@ def model(scope="Function"):
     def subtraction(c, d):
         return c - d
 
-    def multiplication(c, f):
-        return c * f
+    def polynomial(c, f):
+        return c**f, f**c
 
-    def polynomial(e, g):
+    def multiplication(e, g):
         return e * g
 
     def logarithm(c, b):
         return math.log(c, b)
 
     grouped_edges = [
-        ("add", ["subtract", "multiply", "log"]),
-        (["subtract", "multiply"], "poly"),
+        ("add", ["subtract", "poly", "log"]),
+        (["subtract", "poly"], "multiply"),
     ]
 
     node_objects = [
         ("add", addition, ["c"]),
         ("subtract", subtraction, ["e"]),
-        ("multiply", multiplication, ["g"]),
-        ("poly", polynomial, ["k"]),
+        ("poly", polynomial, ["g", "p"]),
+        ("multiply", multiplication, ["k"]),
         ("log", logarithm, ["m"]),
     ]
 
@@ -52,9 +56,40 @@ def model(scope="Function"):
     G.add_grouped_edges_from(grouped_edges)
     G.set_node_objects_from(node_objects)
 
-    model = Model('test model', G, (BasicHandler, {}), description="test model")
+    return G
+
+
+@pytest.fixture
+def model(modelgraph):
+    """Create model that mimic the behavior of an experiment instance"""
+
+    model = Model(
+        "test_model",
+        modelgraph,
+        (MemHandler, {}),
+        description="test_model",
+    )
 
     return model
+
+
+@pytest.fixture
+def expt_plain(modelgraph):
+    """Test experiment instance with default settings"""
+    return Experiment("test_experiment_plain", modelgraph)
+
+
+@pytest.fixture
+def expt(modelgraph):
+    """Test experiment instance with modifiers and component substitutions"""
+
+    return Experiment(
+        "test_experiment",
+        modelgraph,
+        component_substitutes={"component": ["a", "b"]},
+        modifiers=[(loop_modifier, {"parameter": "d"})],
+        description="test experiment with components",
+    )
 
 
 @pytest.fixture
