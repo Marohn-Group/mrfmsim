@@ -17,6 +17,7 @@ pyyaml = "^6.0"
 mmodel = ">=0.4.0"
 click = ">=8.1.0"
 tox = { version = ">=3.25.0", optional = true }
+tox-conda = { version = ">=0.9.2", optional = true } 
 pytest = { version = ">=7.1.1", optional = true }
 pytest-cov = { version = ">=3.0.0", optional = true }
 sphinx = { version = "^4.4.0", optional = true }
@@ -32,6 +33,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.dev-dependencies]
 tox = ">=3.24.5"
+tox-conda = ">=0.9.2"
 pytest = ">=7.1.1"
 pytest-cov = ">=3.0.0"
 sphinx = "^4.4.0"
