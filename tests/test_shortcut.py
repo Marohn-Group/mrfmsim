@@ -13,10 +13,11 @@ def test_loop_shortcut(model, expt_plain):
     """
 
     loop_model = loop_shortcut(model, "d")
-    assert loop_model(a=0, b=2, d=[1, 2], f=3) == [(8, 1, 9), (0, 1, 9)]
+
+    assert loop_model(a=0, b=2, d=[1, 2], f=3) == ([8, 0], 1.0, 9)
 
     loop_expt = loop_shortcut(expt_plain, "f")
-    assert loop_expt(a=0, b=2, d=1, f=[3, 4]) == [(8, 1, 9), (16, 1, 16)]
+    assert loop_expt(a=0, b=2, d=1, f=[3, 4]) ==  ((8, 9), 1.0, (16, 16))
 
 
 def test_loop_shortcut_top_level(model, expt_plain):

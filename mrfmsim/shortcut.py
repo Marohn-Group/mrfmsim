@@ -3,7 +3,7 @@
 The shortcut should work for both Model and Experiment
 """
 
-from mmodel import loop_modifier, subgraph_by_parameters, modify_subgraph
+from mmodel import loop_modifier, subgraph_by_parameters, modify_subgraph, model_signature
 from networkx.utils import nodes_equal
 
 
@@ -32,10 +32,12 @@ def loop_shortcut(model, parameter: str):
     # this is case when the parameter is in signature but not in graph
     # this is due to signature modifier on the model level
     # therefore the whole model is looped.
-    elif parameter not in graph.nodes():
+    
+    elif parameter not in model_signature(graph).parameters:
         modifiers = modifiers + [loop_mod]
 
     else:  # the parameter is within the graph
+
         subgraph = subgraph_by_parameters(graph, [parameter])
 
         if nodes_equal(graph.nodes, subgraph.nodes):
