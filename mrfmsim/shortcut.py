@@ -3,7 +3,12 @@
 The shortcut should work for both Model and Experiment
 """
 
-from mmodel import loop_modifier, subgraph_by_parameters, modify_subgraph, model_signature
+from mmodel import (
+    loop_modifier,
+    subgraph_by_parameters,
+    modify_subgraph,
+    model_signature,
+)
 from networkx.utils import nodes_equal
 
 
@@ -32,7 +37,7 @@ def loop_shortcut(model, parameter: str):
     # this is case when the parameter is in signature but not in graph
     # this is due to signature modifier on the model level
     # therefore the whole model is looped.
-    
+
     elif parameter not in model_signature(graph).parameters:
         modifiers = modifiers + [loop_mod]
 
@@ -46,11 +51,11 @@ def loop_shortcut(model, parameter: str):
         else:
             sub_model_name = f'"{parameter}" looped sub model'
             # create the model and substitute the subgraph
-            looped_node = ModelClass(
-                sub_model_name, subgraph, handler, modifiers=[loop_mod]
-            )
+            looped_node = ModelClass("sub_model", subgraph, handler)
             # create new graph
-            graph = modify_subgraph(graph, subgraph, node_name, looped_node)
+            graph = modify_subgraph(
+                graph, subgraph, node_name, looped_node, modifiers=[loop_mod]
+            )
 
     looped_model = ModelClass(
         name, graph, handler, modifiers=modifiers, description=description
