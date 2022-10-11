@@ -24,7 +24,7 @@ def component_modifier(func, component_substitutes):
     return wrapped
 
 
-def printout_modifier(func, variables: list = [], units: dict = {}):
+def stdout_modifier(func, variables: list = [], result: bool = True, units: dict = {}):
     """Print the variables and the result to console of a specific node
 
     The modifier is helpful to output looped node input and outputs. The
@@ -48,7 +48,7 @@ def printout_modifier(func, variables: list = [], units: dict = {}):
         form = "{} {{{}}} {}".format(val, des["format"], des["unit"])
         formats[val] = form
 
-    if hasattr(func, "returns"):
+    if hasattr(func, "returns") and result:
         rt_length = len(func.returns)
         form_list = []
         for val_name in func.returns:
@@ -57,7 +57,10 @@ def printout_modifier(func, variables: list = [], units: dict = {}):
                 "{} {{{}}} {}".format(val_name, des["format"], des["unit"])
             )
         form = ", ".join(form_list)
-    else:  # if function has no returns
+    elif not result: # force no output
+        rt_length = 1
+        form = ""
+    else:  # if function has no "returns" attribute the returns are outputted together
         rt_length = 0
         form = "{}"
 

@@ -12,7 +12,7 @@ and this project adheres to
 Added
 ^^^^^
 - add Experiment class designed for MRFM experiments
-- add loop_shortcut
+- add loop_shortcut with stdout modifiers
 - add component that replaces partial parameters
 - add component and printout modifiers
 - add cli and yaml configurations
