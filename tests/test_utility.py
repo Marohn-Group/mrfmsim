@@ -12,5 +12,5 @@ def test_job_execution(model, expt_plain):
         [(loop_shortcut, {"parameter": "a"})],
     )
 
-    assert job_execution(model, job) == [(8, 1, 9), (192, 2, 81)]
-    assert job_execution(expt_plain, job) == [(8, 1, 9), (192, 2, 81)]
+    assert job_execution(model, job) == [(8, 1), (192, 2)]
+    assert job_execution(expt_plain, job) == [(8, 1), (192, 2)]

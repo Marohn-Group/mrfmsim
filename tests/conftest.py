@@ -9,9 +9,26 @@ import pytest
 import math
 from mmodel import Model, MemHandler, ModelGraph, loop_modifier
 from mrfmsim.experiment import Experiment
-from mrfmsim.modifier import component_modifier
-from networkx.utils import nodes_equal, edges_equal
-from types import SimpleNamespace
+
+
+def addition(a, b=2):
+    return a + b
+
+
+def subtraction(c, d):
+    return c - d
+
+
+def polynomial(c, f):
+    return c**f
+
+
+def multiplication(e, g):
+    return e * g
+
+
+def logarithm(c, b):
+    return math.log(c, b)
 
 
 @pytest.fixture
@@ -21,23 +38,7 @@ def modelgraph():
     The results are:
     k = (a + b - d)(a + b)^f
     m = log(a + b, b)
-    p = f^(a + b)
     """
-
-    def addition(a, b=2):
-        return a + b
-
-    def subtraction(c, d):
-        return c - d
-
-    def polynomial(c, f):
-        return c**f, f**c
-
-    def multiplication(e, g):
-        return e * g
-
-    def logarithm(c, b):
-        return math.log(c, b)
 
     grouped_edges = [
         ("add", ["subtract", "poly", "log"]),
@@ -45,11 +46,11 @@ def modelgraph():
     ]
 
     node_objects = [
-        ("add", addition, ["c"]),
-        ("subtract", subtraction, ["e"]),
-        ("poly", polynomial, ["g", "p"]),
-        ("multiply", multiplication, ["k"]),
-        ("log", logarithm, ["m"]),
+        ("add", addition, "c"),
+        ("subtract", subtraction, "e"),
+        ("poly", polynomial, "g"),
+        ("multiply", multiplication, "k"),
+        ("log", logarithm, "m"),
     ]
 
     G = ModelGraph(name="test")
@@ -115,13 +116,12 @@ def units():
 
 
 def graph_equal(G1, G2):
-    """Test if graphs have the same nodes, edges and attributes"""
+    """Test if graphs have the same nodes, edges and attributes
+    Dictionary comparison does not care about key orders
+    """
 
-    assert nodes_equal(G1._node, G2._node)
-    assert edges_equal(G1._adj, G2._adj)
-
-    assert G1._pred == G2._pred
-    assert G1._succ == G2._succ
+    assert dict(G1.nodes) == dict(G2.nodes)
+    assert dict(G1.edges) == dict(G2.edges)
 
     # test graph attributes
     assert G1.graph == G2.graph
