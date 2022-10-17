@@ -65,8 +65,9 @@ def graph_constructor(loader, node):
     for node_name, node_info in param_dict["node_objects"].items():
 
         func = node_info["func"]
+        output = node_info["output"]
         inputs = node_info.get("inputs", None)
-        graph.set_node_object(node_name, func, node_info["returns"], inputs)
+        graph.set_node_object(node_name, func, output=output, inputs=inputs)
 
     return graph
 
@@ -109,9 +110,8 @@ def experiment_constructor(loader, node):
     param_dict = loader.construct_mapping(node)
 
     expt_params = {}
-    expt_params['name'] = param_dict['name']
+    expt_params["name"] = param_dict["name"]
     expt_params["graph"] = param_dict["graph"]
-
 
     for param in ["handler", "description", "component_substitutes", "modifiers"]:
         if param in param_dict:

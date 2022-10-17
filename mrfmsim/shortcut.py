@@ -9,6 +9,7 @@ from mmodel import (
     modify_subgraph,
     modify_node,
     model_signature,
+    model_returns,
 )
 from networkx.utils import nodes_equal
 from mrfmsim.modifier import stdout_modifier
@@ -20,6 +21,7 @@ def loop_shortcut(model, parameter: str, stdout: dict = None):
     :param model: executable model
     :param str parameter: loop parameter
     :param dict stdout: stdout_modifier keyword arguments
+        values, result and unit
     :return: a new model with looped parameter
     """
     # check if the parameter is in the signature
@@ -54,13 +56,13 @@ def loop_shortcut(model, parameter: str, stdout: dict = None):
         if nodes_equal(graph.nodes, subgraph.nodes):
             modifiers = modifiers + [loop_mod]
             name = f"{name}_loop_{parameter}"
-        
+
         elif len(subgraph.nodes()) == 1:
             node = list(subgraph.nodes)[0]
             # if the looped node is only one node
             # add loop modifier to node attribute
-            node_modifiers = subgraph.nodes[node]['modifiers'] + [loop_mod]
-            graph = modify_node(graph, node, node_modifiers)
+            node_modifiers = subgraph.nodes[node]["modifiers"] + [loop_mod]
+            graph = modify_node(graph, node, modifiers=node_modifiers)
 
         else:
             submodel_description = (
@@ -75,7 +77,12 @@ def loop_shortcut(model, parameter: str, stdout: dict = None):
                 description=submodel_description,
             )
             # create new graph
-            graph = modify_subgraph(graph, subgraph, node_name, looped_node)
+            output = ", ".join(model_returns(subgraph))
+            output = f"looped_{output}"
+
+            graph = modify_subgraph(
+                graph, subgraph, node_name, looped_node, output=output
+            )
 
     looped_model = ModelClass(
         name, graph, handler, modifiers=modifiers, description=description

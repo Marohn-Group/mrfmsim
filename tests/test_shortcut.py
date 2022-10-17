@@ -14,11 +14,11 @@ def test_loop_shortcut(model, expt_plain):
 
     loop_model = loop_shortcut(model, "d")
 
-    assert loop_model(a=0, b=2, d=[1, 2], f=3) == ([8, 0], 1.0, 9)
+    assert loop_model(a=0, b=2, d=[1, 2], f=3) == ([8, 0], 1.0)
 
     loop_expt = loop_shortcut(expt_plain, "f")
-    print(loop_expt.graph.nodes["f_loop_node"]["func"](c=2, e=1, f=[3, 4]))
-    assert loop_expt(a=0, b=2, d=1, f=[3, 4]) == ((8, 9), 1.0, (16, 16))
+
+    assert loop_expt(a=0, b=2, d=1, f=[3, 4]) == ([8, 16], 1.0)
 
 
 def test_loop_shortcut_single_node(model, expt_plain):
@@ -29,15 +29,11 @@ def test_loop_shortcut_single_node(model, expt_plain):
     """
 
     loop_model = loop_shortcut(loop_shortcut(model, "d"), "d")
-    assert loop_model(a=0, b=2, d=[[1, 2], [1, 2]], f=3) == ([[8, 0], [8, 0]], 1.0, 9)
+    assert loop_model(a=0, b=2, d=[[1, 2], [1, 2]], f=3) == ([[8, 0], [8, 0]], 1.0)
 
     loop_model = loop_shortcut(loop_shortcut(model, "f"), "f")
     # the output is actually k1, p1, k2, p2
-    assert loop_model(a=0, b=2, d=1, f=[[3, 4], [3, 4]]) == (
-        [(8, 9), (16, 16)],
-        1.0,
-        [(8, 9), (16, 16)],
-    )
+    assert loop_model(a=0, b=2, d=1, f=[[1, 2], [3, 4]]) == ([[2, 4], [8, 16]], 1.0)
 
 
 def test_loop_shortcut_top_level(model, expt_plain):

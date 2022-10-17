@@ -24,7 +24,7 @@ def subtraction(c, d):
     return c - d
 
 def polynomial(c, f):
-    return c**f, f**c
+    return c**f
 
 def multiplication(e, g):
     return e * g
@@ -84,19 +84,19 @@ grouped_edges:
 node_objects:
     add:
         func: !Func user_module.addition
-        returns: [c]
+        output: c
     subtract:
         func: !Func user_module.subtraction
-        returns: [e]
+        output: e
     poly:
         func: !Func user_module.polynomial
-        returns: [g, p]
+        output: g
     multiply:
         func: !Func user_module.multiplication
-        returns: [k]
+        output: k
     log:
         func: !Func user_module.logarithm
-        returns: [m]
+        output: m
 """
 
 
@@ -104,6 +104,21 @@ def test_graph_constructor(model, user_module):
     """Test the graph constructor parse the graph correctly"""
     load_module("user_module", user_module)
     graph = yaml.load(GRAPH_YAML, MrfmsimLoader)
+
+    # check if the two graph are the same
+    # however the function are directly parse therefore 
+    # we can only check if the function names are the same
+
+    assert graph.graph == model.graph.graph 
+    assert list(graph.nodes) == list(model.graph.nodes)
+    assert graph.edges == graph.edges
+
+    for nodes, attrs in graph.nodes.items():
+        model_attrs = model.graph.nodes[nodes]
+        assert attrs.pop('base_func').__name__ == model_attrs.pop('base_func').__name__
+        assert attrs.pop('func').__name__ == model_attrs.pop('func').__name__
+        assert attrs == model_attrs
+
 
     assert graph_equal(graph, model.graph)
 
@@ -123,19 +138,19 @@ graph:
     node_objects:
         add:
             func: !Func user_module.addition
-            returns: [c]
+            output: c
         subtract:
             func: !Func user_module.subtraction
-            returns: [e]
+            output: e
         poly:
             func: !Func user_module.polynomial
-            returns: [g, p]
+            output: g
         multiply:
             func: !Func user_module.multiplication
-            returns: [k]
+            output: k
         log:
             func: !Func user_module.logarithm
-            returns: [m]
+            output: m
 component_substitutes:
     component: [a, b]
 description: test experiment with components

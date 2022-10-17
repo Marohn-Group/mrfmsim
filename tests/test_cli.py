@@ -40,19 +40,19 @@ graph:
     node_objects:
         add:
             func: !Func user_m.addition
-            returns: [c]
+            output: c
         subtract:
             func: !Func user_m.subtraction
-            returns: [e]
+            output: e
         multiply:
             func: !Func user_m.multiplication
-            returns: [g]
+            output: g
         poly:
             func: !Func user_m.polynomial
-            returns: [k]
+            output: k
         log:
             func: !Func user_m.logarithm
-            returns: [m]
+            output: m
 component_substitutes: {{}}
 description: yaml test experiment
 modifiers: []
