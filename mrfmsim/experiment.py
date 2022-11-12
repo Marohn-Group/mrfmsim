@@ -37,10 +37,6 @@ class Experiment(Model):
 
         super().__init__(name, graph, handler, modifiers, description, returns)
 
-    def draw(self, method: callable = draw_graph):
-        """Add the default drawing method to experiment"""
-        return super().draw(method)
-
 
 class Job:
     """Create Experiment execution job.
