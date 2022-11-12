@@ -6,8 +6,8 @@ from types import SimpleNamespace
 EXPT_STR = """test_experiment(component, d, f)
   returns: k, m
   handler: MemHandler, {}
-  modifiers: [loop_modifier, {'parameter': 'd'}, \
-component_modifier, {'component_substitutes': {'component': ['a', 'b']}}]
+  modifiers: [loop_modifier, {'parameter': 'd'}, component_modifier,
+{'component_substitutes': {'component': ['a', 'b']}}]
 test experiment with components"""
 
 
