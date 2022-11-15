@@ -1,9 +1,8 @@
 from mrfmsim.configuration import (
     load_module,
     load_func,
-    MrfmsimLoader,
-    MrfmsimJobLoader,
-    MrfmsimDumper,
+    MrfmSimLoader,
+    MrfmSimDumper,
 )
 import sys
 import pytest
@@ -69,7 +68,7 @@ FUNC_YAML = """
 def test_func_constructor():
     """Test function constructor correctly loads function"""
 
-    yaml_func = yaml.load(FUNC_YAML, MrfmsimLoader)
+    yaml_func = yaml.load(FUNC_YAML, MrfmSimLoader)
     assert yaml_func.__name__ == "sum"
     assert yaml_func([1, 2]) == 3
 
@@ -103,22 +102,21 @@ node_objects:
 def test_graph_constructor(model, user_module):
     """Test the graph constructor parse the graph correctly"""
     load_module("user_module", user_module)
-    graph = yaml.load(GRAPH_YAML, MrfmsimLoader)
+    graph = yaml.load(GRAPH_YAML, MrfmSimLoader)
 
     # check if the two graph are the same
-    # however the function are directly parse therefore 
+    # however the function are directly parse therefore
     # we can only check if the function names are the same
 
-    assert graph.graph == model.graph.graph 
+    assert graph.graph == model.graph.graph
     assert list(graph.nodes) == list(model.graph.nodes)
     assert graph.edges == graph.edges
 
     for nodes, attrs in graph.nodes.items():
         model_attrs = model.graph.nodes[nodes]
-        assert attrs.pop('base_func').__name__ == model_attrs.pop('base_func').__name__
-        assert attrs.pop('func').__name__ == model_attrs.pop('func').__name__
+        assert attrs.pop("base_func").__name__ == model_attrs.pop("base_func").__name__
+        assert attrs.pop("func").__name__ == model_attrs.pop("func").__name__
         assert attrs == model_attrs
-
 
     assert graph_equal(graph, model.graph)
 
@@ -163,7 +161,7 @@ def test_experiment_constructor(user_module, expt):
     """Test experimental constructor"""
     expt_yaml = EXPT_YAML.format(user_module_path=user_module)
 
-    yaml_expt = yaml.load(expt_yaml, MrfmsimLoader)
+    yaml_expt = yaml.load(expt_yaml, MrfmSimLoader)
     assert str(yaml_expt) == str(expt)
 
 
@@ -173,7 +171,7 @@ def test_func_representer():
     def func(a, b):
         return
 
-    func_yaml = yaml.dump(func, Dumper=MrfmsimDumper, sort_keys=False)
+    func_yaml = yaml.dump(func, Dumper=MrfmSimDumper, sort_keys=False)
     assert func_yaml.strip() == "!Func 'tests.test_configuration.func'"
 
 
@@ -196,7 +194,7 @@ def test_job_dumper():
 
     job = Job("test", {"a": 1, "b": 2}, [loop_shortcut])
 
-    job_yaml = yaml.dump(job, Dumper=MrfmsimDumper, sort_keys=False)
+    job_yaml = yaml.dump(job, Dumper=MrfmSimDumper, sort_keys=False)
 
     assert JOB_STR == job_yaml
 
@@ -204,7 +202,7 @@ def test_job_dumper():
 def test_job_constructor():
     """Test job constructor parsing job yaml"""
 
-    job = yaml.load(JOB_STR, Loader=MrfmsimJobLoader)
+    job = yaml.load(JOB_STR, Loader=MrfmSimLoader)
     assert job.name == "test"
     assert job.inputs == {"a": 1, "b": 2}
     assert job.shortcuts[0] == loop_shortcut
@@ -220,7 +218,7 @@ inputs: {}
 def test_job_constructor_no_shortcut():
     """Test load job object when shortcuts are not specified"""
 
-    job = yaml.load(JOB_STR_PLAIN, Loader=MrfmsimJobLoader)
+    job = yaml.load(JOB_STR_PLAIN, Loader=MrfmSimLoader)
     assert job.name == ""
     assert job.inputs == {}
     assert job.shortcuts == []

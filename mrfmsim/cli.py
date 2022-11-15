@@ -1,6 +1,6 @@
 from email.policy import default
 import click
-from mrfmsim.configuration import MrfmsimJobLoader, MrfmsimLoader, MrfmsimDumper
+from mrfmsim.configuration import MrfmSimLoader, MrfmSimDumper
 from mrfmsim.experiment import Job
 from mrfmsim.utility import job_execution
 import yaml
@@ -13,7 +13,7 @@ def cli(ctx, expt):
     """Simple program that greets NAME for a total of COUNT times."""
     ctx.ensure_object(dict)
     with open(expt, "r") as f:
-        experiment = yaml.load(f, Loader=MrfmsimLoader)
+        experiment = yaml.load(f, Loader=MrfmSimLoader)
     ctx.obj["experiment"] = experiment
 
 
@@ -32,7 +32,7 @@ def template(ctx):
     """Create a template job file based on the experiment"""
     experiment = ctx.obj["experiment"]
     job_template = [Job("", {k: "" for k in experiment.__signature__.parameters}, [])]
-    click.echo(yaml.dump(job_template, Dumper=MrfmsimDumper, sort_keys=False))
+    click.echo(yaml.dump(job_template, Dumper=MrfmSimDumper, sort_keys=False))
 
 
 @cli.command()
@@ -43,7 +43,7 @@ def execute(ctx, job):
     experiment = ctx.obj["experiment"]
 
     with open(job, "r") as f:
-        jobs = yaml.load(f, Loader=MrfmsimJobLoader)
+        jobs = yaml.load(f, Loader=MrfmSimLoader)
 
     for job in jobs:
         # return the result to console

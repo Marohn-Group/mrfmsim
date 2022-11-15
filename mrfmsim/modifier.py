@@ -7,18 +7,23 @@ from collections import defaultdict
 def component_modifier(func, component_substitutes):
     """Modify the signature with components"""
 
+    sig = inspect.signature(func)
+    params = sig.parameters
     @wraps(func)
     def wrapped(**kwargs):
 
         for component, substitutes in component_substitutes.items():
             component_obj = kwargs.pop(component)
             for attr in substitutes:
-
-                kwargs[attr] = getattr(component_obj, attr)
+                # skip the attribute if it is not needed
+                # this allows the component modifier to be recycled
+                # even if the underlying function is changed
+                if attr in params:
+                    kwargs[attr] = getattr(component_obj, attr)
 
         return func(**kwargs)
 
-    sig = inspect.signature(func)
+    
     wrapped.__signature__ = replace_signature(sig, component_substitutes)
 
     return wrapped

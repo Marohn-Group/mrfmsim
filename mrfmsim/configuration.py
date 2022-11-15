@@ -48,7 +48,7 @@ def module_constructor(loader, node):
     # under graph. The alternative is to have a multipage yaml, however,
     # the return would not be a single object
 
-    params = loader.construct_mapping(node)
+    params = loader.construct_mapping(node, deep=True)
 
     for name, path in params.items():
         load_module(name, path)
@@ -57,7 +57,7 @@ def module_constructor(loader, node):
 def graph_constructor(loader, node):
     """Parse !Graph tag into ModelGraph object"""
 
-    param_dict = loader.construct_mapping(node)
+    param_dict = loader.construct_mapping(node, deep=True)
 
     graph = ModelGraph(name=param_dict["name"])
     graph.add_grouped_edges_from(param_dict["grouped_edges"])
@@ -67,23 +67,12 @@ def graph_constructor(loader, node):
         func = node_info["func"]
         output = node_info["output"]
         inputs = node_info.get("inputs", None)
-        graph.set_node_object(node_name, func, output=output, inputs=inputs)
+        modifiers = node_info.get("modifiers", None)
+        graph.set_node_object(
+            node_name, func, output=output, inputs=inputs, modifiers=modifiers
+        )
 
     return graph
-
-
-# def graph_representer(dumper, graph: ModelGraph):
-#     """Parse ModelGraph object into yaml string"""
-
-#     graph_dict = {
-#         "name": graph.name,
-#         # "grouped_edges": graph.grouped_edges,
-#         # "node_objects": graph.node_objects,
-#         "grouped_edges": list(graph.edges()),
-#         "node_objects": list(graph.nodes()),
-#     }
-
-#     return dumper.represent_mapping("!Graph", graph_dict)
 
 
 def func_representer(dumper: yaml.Dumper, func: types.FunctionType):
@@ -107,7 +96,7 @@ def experiment_constructor(loader, node):
     The handler, description, components parameters are optional
     """
 
-    param_dict = loader.construct_mapping(node)
+    param_dict = loader.construct_mapping(node, deep=True)
 
     expt_params = {}
     expt_params["name"] = param_dict["name"]
@@ -120,21 +109,9 @@ def experiment_constructor(loader, node):
     return Experiment(**expt_params)
 
 
-# def experiment_representer(dumper, experiment: Experiment):
-#     """Parse experiment object to yaml string"""
-
-#     experiment_dict = {
-#         "graph": experiment.graph,
-#         "description": experiment.description,
-#         "modifiers": experiment.modifiers,
-#     }
-
-#     return dumper.represent_mapping("!Experiment", experiment_dict)
-
-
 def job_constructor(loader: yaml.BaseLoader, node):
     """Load job yaml string to Job object"""
-    param_dict = loader.construct_mapping(node)
+    param_dict = loader.construct_mapping(node, deep=True)
 
     return Job(**param_dict)
 
@@ -147,58 +124,20 @@ def job_representer(dumper: yaml.SafeDumper, job: Job):
     )
 
 
-MrfmsimLoader = yaml.BaseLoader
-MrfmsimLoader.add_constructor("!Module", module_constructor)
-MrfmsimLoader.add_constructor("!Func", func_constructor)
-MrfmsimLoader.add_constructor("!Graph", graph_constructor)
-MrfmsimLoader.add_constructor("!Experiment", experiment_constructor)
-
-# base loader is unable to load numbers
-MrfmsimJobLoader = yaml.SafeLoader
-MrfmsimJobLoader.add_constructor("!Func", func_constructor)
-MrfmsimJobLoader.add_constructor("!Job", job_constructor)
-
-MrfmsimDumper = yaml.Dumper
-MrfmsimDumper.add_representer(types.FunctionType, func_representer)
-MrfmsimDumper.add_representer(Job, job_representer)
+class MrfmSimLoader(yaml.SafeLoader):
+    """Yaml loader with special constructors"""
 
 
-# Selective loader and dumper
-# current favors a unified one
-
-# def mrfmsim_loader(*tags) -> yaml.SafeLoader:
-#     """Add loader based on tags specified"""
-
-#     tag_dict = {
-#         "!Module": module_constructor,
-#         "!Func": func_constructor,
-#         "!Graph": graph_constructor,
-#         "!Experiment": experiment_constructor,
-#         "!Job": job_constructor,
-#     }
-
-#     # The following line creates a new subclass
-#     # add_constructor is a classmethod which modifies
-#     # the original cls.__dict__
-#     loader = type("MrfmsimLoader", (yaml.SafeLoader,), {})
-#     for tag in tags:
-#         loader.add_constructor(tag, tag_dict[tag])
-
-#     return loader
+MrfmSimLoader.add_constructor("!Module", module_constructor)
+MrfmSimLoader.add_constructor("!Func", func_constructor)
+MrfmSimLoader.add_constructor("!Graph", graph_constructor)
+MrfmSimLoader.add_constructor("!Experiment", experiment_constructor)
+MrfmSimLoader.add_constructor("!Job", job_constructor)
 
 
-# def mrfmsim_dumper(*tags) -> yaml.SafeLoader:
-#     """Add dumper based on tags specified"""
+class MrfmSimDumper(yaml.Dumper):
+    """Yaml sumper with special constructors"""
 
-#     tag_dict = {
-#         "!Func": (types.FunctionType, func_representer),
-#         # '!Graph': graph_representer,
-#         # '!Experiment': experiment_representer,
-#         "!Job": (Job, job_representer),
-#     }
 
-#     dumper = type("MrfmsimDumper", (yaml.Dumper,), {})
-#     for tag in tags:
-#         dumper.add_representer(tag, *tag_dict[tag])
-
-#     return dumper
+MrfmSimDumper.add_representer(types.FunctionType, func_representer)
+MrfmSimDumper.add_representer(Job, job_representer)
