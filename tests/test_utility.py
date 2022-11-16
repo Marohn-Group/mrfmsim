@@ -3,7 +3,7 @@ from mrfmsim.utility import job_execution
 from mrfmsim.shortcut import loop_shortcut
 
 
-def test_job_execution(model, expt_plain):
+def test_job_execution(model, experiment):
     """Test the job execution"""
 
     job = Job(
@@ -13,4 +13,4 @@ def test_job_execution(model, expt_plain):
     )
 
     assert job_execution(model, job) == [(8, 1), (192, 2)]
-    assert job_execution(expt_plain, job) == [(8, 1), (192, 2)]
+    assert job_execution(experiment, job) == [(8, 1), (192, 2)]

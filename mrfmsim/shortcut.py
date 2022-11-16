@@ -28,10 +28,6 @@ def loop_shortcut(model, parameter: str, stdout: dict = None):
     if parameter not in model.__signature__.parameters:
         raise Exception(f"'{parameter}' is not a model parameter")
 
-    if stdout is not None:  # accept empty dictionary input
-        modifiers = modifiers + [(stdout_modifier, stdout)]
-
-    loop_mod = loop_modifier, {"parameter": parameter}
     name = model.__name__
     handler = model.handler
     graph = model.graph
@@ -41,12 +37,19 @@ def loop_shortcut(model, parameter: str, stdout: dict = None):
 
     ModelClass = type(model)  # works for both mmodel.Model and mrfmsim.Experiment
 
+    loop_mod = loop_modifier, {"parameter": parameter}
+    if stdout is not None:  # accept empty dictionary input
+        if stdout.get('parameters', None) is None:
+            stdout['parameters'] = [parameter]
+        combined_mod = [(stdout_modifier, stdout), loop_mod]
+    else:
+        combined_mod = [loop_mod]
     # this is case when the parameter is in signature but not in graph
     # this is due to signature modifier on the model level
     # therefore the whole model is looped.
 
     if parameter not in model_signature(graph).parameters:
-        modifiers = modifiers + [loop_mod]
+        modifiers = modifiers + combined_mod
         name = f"{name}_loop_{parameter}"
 
     else:  # the parameter is within the graph
@@ -54,14 +57,14 @@ def loop_shortcut(model, parameter: str, stdout: dict = None):
         subgraph = subgraph_by_parameters(graph, [parameter])
 
         if nodes_equal(graph.nodes, subgraph.nodes):
-            modifiers = modifiers + [loop_mod]
+            modifiers = modifiers + combined_mod
             name = f"{name}_loop_{parameter}"
 
         elif len(subgraph.nodes()) == 1:
             node = list(subgraph.nodes)[0]
             # if the looped node is only one node
             # add loop modifier to node attribute
-            node_modifiers = subgraph.nodes[node]["modifiers"] + [loop_mod]
+            node_modifiers = subgraph.nodes[node]["modifiers"] + combined_mod
             graph = modify_node(graph, node, modifiers=node_modifiers)
 
         else:
@@ -73,7 +76,7 @@ def loop_shortcut(model, parameter: str, stdout: dict = None):
                 f"{parameter}_looped_sub_model",
                 subgraph,
                 handler,
-                modifiers=[loop_mod],
+                modifiers=combined_mod,
                 description=submodel_description,
             )
             # create new graph

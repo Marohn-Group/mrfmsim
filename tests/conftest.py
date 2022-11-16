@@ -11,8 +11,8 @@ from mmodel import Model, MemHandler, ModelGraph, loop_modifier
 from mrfmsim.experiment import Experiment
 
 
-def addition(a, b=2):
-    return a + b
+def addition(a, factor=2):
+    return a + factor
 
 
 def subtraction(c, d):
@@ -36,8 +36,8 @@ def modelgraph():
     """Model graph for creating experiment and model
 
     The results are:
-    k = (a + b - d)(a + b)^f
-    m = log(a + b, b)
+    k = (a + 2 - d)(a + 2)^f
+    m = log(a + 2, b)
     """
 
     grouped_edges = [
@@ -75,13 +75,13 @@ def model(modelgraph):
 
 
 @pytest.fixture
-def expt_plain(modelgraph):
+def experiment(modelgraph):
     """Test experiment instance with default settings"""
     return Experiment("test_experiment_plain", modelgraph)
 
 
 @pytest.fixture
-def expt(modelgraph):
+def experiment_mod(modelgraph):
     """Test experiment instance with modifiers and component substitutions"""
 
     return Experiment(

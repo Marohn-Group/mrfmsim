@@ -5,10 +5,10 @@ from mrfmsim.shortcut import loop_shortcut
 import pytest
 
 
-def test_loop_shortcut(model, expt_plain):
+def test_loop_shortcut(model, experiment):
     """Test loop shortcut
 
-    The resulting value should create a looped model of d. For expt,
+    The resulting value should create a looped model of d. For experiment_mod,
     the d is already looped.
     """
 
@@ -16,15 +16,15 @@ def test_loop_shortcut(model, expt_plain):
 
     assert loop_model(a=0, b=2, d=[1, 2], f=3) == ([8, 0], 1.0)
 
-    loop_expt = loop_shortcut(expt_plain, "f")
+    loop_expt = loop_shortcut(experiment, "f")
 
     assert loop_expt(a=0, b=2, d=1, f=[3, 4]) == ([8, 16], 1.0)
 
 
-def test_loop_shortcut_single_node(model, expt_plain):
+def test_loop_shortcut_single_node(model, experiment):
     """Test loop shortcut when the subgraph is a single node
 
-    The resulting value should create a looped model of d. For expt,
+    The resulting value should create a looped model of d. For experiment_mod,
     the d is already looped.
     """
 
@@ -36,7 +36,7 @@ def test_loop_shortcut_single_node(model, expt_plain):
     assert loop_model(a=0, b=2, d=1, f=[[1, 2], [3, 4]]) == ([[2, 4], [8, 16]], 1.0)
 
 
-def test_loop_shortcut_top_level(model, expt_plain):
+def test_loop_shortcut_top_level(model, experiment):
     """Test loop shortcut when the parameter is used at the top level
 
     The resulting value should create a looped model of b
@@ -44,24 +44,24 @@ def test_loop_shortcut_top_level(model, expt_plain):
     """
 
     loop_model = loop_shortcut(model, "b")
-    assert loop_model(a=0, b=[2, 4], d=2, f=3) == [(0, 1), (128, 1)]
+    assert loop_model(a=0, b=[2, 4], d=2, f=3) == (0, [1, 0.5])
 
-    loop_expt = loop_shortcut(expt_plain, "b")
-    assert loop_expt(a=0, b=[2, 4], d=2, f=3) == [(0, 1), (128, 1)]
+    loop_expt = loop_shortcut(experiment, "b")
+    assert loop_expt(a=0, b=[2, 4], d=2, f=3) == (0, [1, 0.5])
 
 
-def test_loop_shortcut_component(expt):
+def test_loop_shortcut_component(experiment_mod):
     """Test loop shortcut of experiment with component
 
     The component loop occurs first then the "d" parameter loop
     that is defined with the experiment instance.
     """
 
-    loop_expt = loop_shortcut(expt, "component")
+    loop_expt = loop_shortcut(experiment_mod, "component")
 
-    comps = [SimpleNamespace(a=0, b=3), SimpleNamespace(a=2, b=2)]
-    assert loop_expt(comps, d=[1, 2, 3], f=3)[0] == [(54, 1), (27, 1), (0, 1)]
-    assert loop_expt(comps, d=[1, 2, 3], f=3)[1] == [(192, 2), (128, 2), (64, 2)]
+    comps = [SimpleNamespace(a=0, b=2), SimpleNamespace(a=2, b=16)]
+    assert loop_expt(comps, d=[1, 2, 3], f=3)[0] == [(8, 1), (0, 1), (-8, 1)]
+    assert loop_expt(comps, d=[1, 2, 3], f=3)[1] == [(192, 0.5), (128, 0.5), (64, 0.5)]
 
 
 def test_loop_shortcut_incorrect_parameter(model):
@@ -72,3 +72,26 @@ def test_loop_shortcut_incorrect_parameter(model):
 
     with pytest.raises(Exception, match="'c' is not a model parameter"):
         loop_shortcut(model, "c")
+
+
+def test_loop_shortcut_with_stdout(model, experiment, capsys):
+    """Test loop shortcut when the parameter is not in model parameter
+
+    If a wrong parameter is chosen, an exception should be raised
+    """
+
+    loop_model = loop_shortcut(model, "a", {})
+    loop_model(a=[0, 2], b=2, d=2, f=3)
+
+    captured = capsys.readouterr()
+    assert captured.out == "0 | a 0 | k 0 , m 1.0\n1 | a 2 | k 128 , m 2.0\n"
+
+    unit = {"k": {"unit": "a.u.", "format": ":.3f"}}
+    loop_model = loop_shortcut(experiment, "a", {"units": unit})
+    loop_model(a=[0, 2], b=2, d=2, f=3)
+
+    captured = capsys.readouterr()
+    assert (
+        captured.out
+        == "0 | a 0 | k 0.000 a.u., m 1.0\n1 | a 2 | k 128.000 a.u., m 2.0\n"
+    )

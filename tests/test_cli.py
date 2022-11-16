@@ -8,8 +8,8 @@ MODULE_STR = """
 
 import math
 
-def addition(a, b=2):
-    return a + b
+def addition(a, factor=2):
+    return a + factor
 
 def subtraction(c, d):
     return c - d
@@ -101,14 +101,14 @@ def job_file(tmp_path):
 
 dot_source = """digraph test {
 graph [label="\
-test_experiment(a, d, f, b=2)\
+test_experiment(a, b, d, f)\
    returns: k, m\
    handler: MemHandler, {}\
    modifiers: [] 
 yaml test experiment " 
 labeljust=l labelloc=t ordering=out splines=ortho]
 node [shape=box]
-add [label="add addition(a, b=2) return c "]
+add [label="add addition(a, factor=2) return c "]
 subtract [label="subtract subtraction(c, d) return e "]
 multiply [label="multiply multiplication(c, f) return g "]
 log [label="log logarithm(c, b) return m "]
@@ -148,9 +148,9 @@ JOB_TEMPLATE = """\
   name: ''
   inputs:
     a: ''
+    b: ''
     d: ''
     f: ''
-    b: ''
   shortcuts: []
 
 """

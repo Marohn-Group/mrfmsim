@@ -16,8 +16,8 @@ MODULE_STR = """
 
 import math
 
-def addition(a, b=2):
-    return a + b
+def addition(a, factor=2):
+    return a + factor
 
 def subtraction(c, d):
     return c - d
@@ -157,12 +157,12 @@ modifiers:
 """
 
 
-def test_experiment_constructor(user_module, expt):
+def test_experiment_constructor(user_module, experiment_mod):
     """Test experimental constructor"""
     expt_yaml = EXPT_YAML.format(user_module_path=user_module)
 
     yaml_expt = yaml.load(expt_yaml, MrfmSimLoader)
-    assert str(yaml_expt) == str(expt)
+    assert str(yaml_expt) == str(experiment_mod)
 
 
 def test_func_representer():

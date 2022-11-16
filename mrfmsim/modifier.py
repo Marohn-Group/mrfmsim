@@ -29,7 +29,7 @@ def component_modifier(func, component_substitutes):
     return wrapped
 
 
-def stdout_modifier(func, variables: list = [], result: bool = True, units: dict = {}):
+def stdout_modifier(func, parameters: list = [], result: bool = True, units: dict = {}):
     """Print the variables and the result to console of a specific node
 
     The modifier is helpful to output looped node input and outputs. The
@@ -37,7 +37,7 @@ def stdout_modifier(func, variables: list = [], result: bool = True, units: dict
     The units parameters should be attached to individual experiment.
     If the attribute is not found, then no units are printed.
 
-    :param list variables: list of variables to print out
+    :param list parameters: list of parameters to print out
         defaults to empty list. (Only result is printed)
     :param dict units: dictionary of units and display format
     """
@@ -46,7 +46,7 @@ def stdout_modifier(func, variables: list = [], result: bool = True, units: dict
     func_sig = inspect.signature(func).parameters
     # units = units or getattr(func, 'units', {})
 
-    for val in variables:
+    for val in parameters:
         if val not in func_sig:
             raise Exception(f"cannot modify {func.__name__}, {val} not in signature")
         des = units.get(val, defaultdict(str))
@@ -75,7 +75,7 @@ def stdout_modifier(func, variables: list = [], result: bool = True, units: dict
     def wrapped(**kwargs):
         """print format is 'count vars | result'"""
         print(wrapped.count, end=" | ")
-        for val in variables:
+        for val in parameters:
             print(formats[val].format(kwargs[val]).rstrip(), end=" | ")
 
         result = func(**kwargs)
