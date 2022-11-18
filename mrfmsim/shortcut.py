@@ -39,8 +39,8 @@ def loop_shortcut(model, parameter: str, stdout: dict = None):
 
     loop_mod = loop_modifier, {"parameter": parameter}
     if stdout is not None:  # accept empty dictionary input
-        if stdout.get('parameters', None) is None:
-            stdout['parameters'] = [parameter]
+        if stdout.get("parameters", None) is None:
+            stdout["parameters"] = [parameter]
         combined_mod = [(stdout_modifier, stdout), loop_mod]
     else:
         combined_mod = [loop_mod]
@@ -87,8 +87,41 @@ def loop_shortcut(model, parameter: str, stdout: dict = None):
                 graph, subgraph, node_name, looped_node, output=output
             )
 
-    looped_model = ModelClass(
-        name, graph, handler, modifiers=modifiers, description=description
+    return ModelClass(
+        name=name,
+        graph=graph,
+        handler=handler,
+        modifiers=modifiers,
+        description=description,
     )
 
-    return looped_model
+
+def remodel_shortcut(
+    model,
+    name=None,
+    graph=None,
+    handler=None,
+    modifiers=None,
+    description=None,
+    returns=None,
+):
+    """Remodel parts of the model to generate a new model"""
+
+    name = name or model.name
+    graph = graph or model.graph
+    # an empty modifiers will skip if only use or statement
+    modifiers = modifiers if not None else model.modifiers
+    handler = handler or model.handler
+    returns = returns if not None else model.returns
+    description = description or model.description
+
+    ModelCls = type(model)
+
+    return ModelCls(
+        name=name,
+        graph=graph,
+        handler=handler,
+        modifiers=modifiers,
+        description=description,
+        returns=returns,
+    )

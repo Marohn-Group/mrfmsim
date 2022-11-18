@@ -1,8 +1,9 @@
 """Test the shortcut on both Model and Experiment instances"""
 
 from types import SimpleNamespace
-from mrfmsim.shortcut import loop_shortcut
+from mrfmsim.shortcut import loop_shortcut, remodel_shortcut
 import pytest
+from inspect import signature
 
 
 def test_loop_shortcut(model, experiment):
@@ -95,3 +96,18 @@ def test_loop_shortcut_with_stdout(model, experiment, capsys):
         captured.out
         == "0 | a 0 | k 0.000 a.u., m 1.0\n1 | a 2 | k 128.000 a.u., m 2.0\n"
     )
+
+def test_remodel_shortcut(model, experiment_mod):
+    """Test remodel shortcut"""
+
+    # change the returns
+    mod_model = remodel_shortcut(model, returns=['c', 'k'])
+    # partial graph
+    assert list(signature(mod_model).parameters.keys()) == ['a', 'd', 'f']
+    assert mod_model(a=0, d=2, f=3) == (2, 0)
+
+    # get rid of modifiers
+    mod_model = remodel_shortcut(experiment_mod, modifiers=[])
+
+    assert list(signature(mod_model).parameters.keys()) == ['a', 'b', 'd', 'f']
+    assert mod_model.modifiers == []
