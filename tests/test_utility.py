@@ -4,7 +4,7 @@ from mrfmsim.shortcut import loop_shortcut
 
 
 def test_job_execution(model, experiment):
-    """Test the job execution"""
+    """Test the job execution."""
 
     job = Job(
         "test",

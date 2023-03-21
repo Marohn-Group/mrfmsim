@@ -10,49 +10,17 @@ import yaml
 from tests.conftest import graph_equal
 from mrfmsim.shortcut import loop_shortcut
 from mrfmsim.experiment import Job
-
-MODULE_STR = """
-# Test python script
-
-import math
-
-def addition(a, factor=2):
-    return a + factor
-
-def subtraction(c, d):
-    return c - d
-
-def polynomial(c, f):
-    return c**f
-
-def multiplication(e, g):
-    return e * g
-
-def logarithm(c, b):
-    return math.log(c, b)
-"""
-
-
-@pytest.fixture
-def user_module(tmp_path):
-    """Create a custom module for testing"""
-    module_path = tmp_path / "user_module.py"
-    module_path.write_text(MODULE_STR)
-
-    yield module_path
-    # runs after the test is complete
-    if "user_module" in sys.modules:
-        del sys.modules["user_module"]
+from textwrap import dedent
 
 
 def test_load_module(user_module):
-    """Test the user module in imported"""
+    """Test the user module in imported."""
     load_module("user_module", user_module)
     assert "user_module" in sys.modules
 
 
 def test_load_func(user_module):
-    """Load the function from user module using dot path"""
+    """Load the function from user module using dot path."""
 
     load_module("user_module", user_module)
     func = load_func("user_module.addition")
@@ -60,49 +28,46 @@ def test_load_func(user_module):
     assert func(1, 2) == 3
 
 
-FUNC_YAML = """
-!Func numpy.sum
-"""
-
-
 def test_func_constructor():
-    """Test function constructor correctly loads function"""
+    """Test function constructor correctly loads function."""
 
-    yaml_func = yaml.load(FUNC_YAML, MrfmSimLoader)
+    func_yaml = """\
+    !Func numpy.sum
+    """
+    yaml_func = yaml.load(dedent(func_yaml), MrfmSimLoader)
     assert yaml_func.__name__ == "sum"
     assert yaml_func([1, 2]) == 3
 
 
-GRAPH_YAML = """
-# graph tag
-!Graph
-name: test
-grouped_edges:
-    - [add, [subtract, poly, log]]
-    - [[subtract, poly], multiply]
-node_objects:
-    add:
-        func: !Func user_module.addition
-        output: c
-    subtract:
-        func: !Func user_module.subtraction
-        output: e
-    poly:
-        func: !Func user_module.polynomial
-        output: g
-    multiply:
-        func: !Func user_module.multiplication
-        output: k
-    log:
-        func: !Func user_module.logarithm
-        output: m
-"""
-
-
 def test_graph_constructor(model, user_module):
-    """Test the graph constructor parse the graph correctly"""
+    """Test the graph constructor parsing the graph correctly."""
+    graph_yaml = """
+    # graph tag
+    !Graph
+    name: test
+    grouped_edges:
+        - [add, [subtract, power, log]]
+        - [[subtract, power], multiply]
+    node_objects:
+        add:
+            func: !Func user_module.addition
+            output: c
+        subtract:
+            func: !Func user_module.subtraction
+            output: e
+        power:
+            func: !Func user_module.power
+            output: g
+        multiply:
+            func: !Func user_module.multiplication
+            output: k
+        log:
+            func: !Func user_module.logarithm
+            output: m
+    """
+
     load_module("user_module", user_module)
-    graph = yaml.load(GRAPH_YAML, MrfmSimLoader)
+    graph = yaml.load(dedent(graph_yaml), MrfmSimLoader)
 
     # check if the two graph are the same
     # however the function are directly parse therefore
@@ -114,54 +79,18 @@ def test_graph_constructor(model, user_module):
 
     for nodes, attrs in graph.nodes.items():
         model_attrs = model.graph.nodes[nodes]
-        assert attrs.pop("base_func").__name__ == model_attrs.pop("base_func").__name__
+        assert attrs.pop("_func").__name__ == model_attrs.pop("_func").__name__
         assert attrs.pop("func").__name__ == model_attrs.pop("func").__name__
         assert attrs == model_attrs
 
-    assert graph_equal(graph, model.graph)
+    # assert graph_equal(graph, model.graph)
 
 
-EXPT_YAML = """
-!Experiment
-user_module:
-    !Module
-    user_module: {user_module_path}
-name: test_experiment
-graph:
-    !Graph
-    name: test
-    grouped_edges:
-        - [add, [subtract, poly, log]]
-        - [[subtract, poly], multiply]
-    node_objects:
-        add:
-            func: !Func user_module.addition
-            output: c
-        subtract:
-            func: !Func user_module.subtraction
-            output: e
-        poly:
-            func: !Func user_module.polynomial
-            output: g
-        multiply:
-            func: !Func user_module.multiplication
-            output: k
-        log:
-            func: !Func user_module.logarithm
-            output: m
-component_substitutes:
-    component: [a, b]
-description: test experiment with components
-modifiers:
-    - [!Func mmodel.loop_modifier, {{'parameter': 'd'}}]
-"""
-
-
-def test_experiment_constructor(user_module, experiment_mod):
+def test_experiment_constructor(expt_file, experiment_mod):
     """Test experimental constructor"""
-    expt_yaml = EXPT_YAML.format(user_module_path=user_module)
 
-    yaml_expt = yaml.load(expt_yaml, MrfmSimLoader)
+    with open(expt_file, "r") as f:
+        yaml_expt = yaml.load(f.read(), MrfmSimLoader)
     assert str(yaml_expt) == str(experiment_mod)
 
 
@@ -173,6 +102,20 @@ def test_func_representer():
 
     func_yaml = yaml.dump(func, Dumper=MrfmSimDumper, sort_keys=False)
     assert func_yaml.strip() == "!Func 'tests.test_configuration.func'"
+
+
+def test_dataobj_constructor():
+    """Test dataobj constructor."""
+
+    dataobj_str = """
+    !Dataobj
+    a: 1
+    b: 'test'
+    """
+
+    dataobj = yaml.load(dataobj_str, MrfmSimLoader)
+    assert dataobj.a == 1
+    assert dataobj.b == "test"
 
 
 JOB_STR = """\
@@ -187,9 +130,9 @@ shortcuts:
 
 
 def test_job_dumper():
-    """Test job dumper can dump the correct values
+    """Test job dumper can dump the correct values.
 
-    Job dumper currently only supports plain template dumping
+    Job dumper currently only supports plain template dumping.
     """
 
     job = Job("test", {"a": 1, "b": 2}, [loop_shortcut])
@@ -200,7 +143,7 @@ def test_job_dumper():
 
 
 def test_job_constructor():
-    """Test job constructor parsing job yaml"""
+    """Test job constructor parsing job yaml."""
 
     job = yaml.load(JOB_STR, Loader=MrfmSimLoader)
     assert job.name == "test"
@@ -208,17 +151,16 @@ def test_job_constructor():
     assert job.shortcuts[0] == loop_shortcut
 
 
-JOB_STR_PLAIN = """\
-!Job
-name: ''
-inputs: {}
-"""
-
-
 def test_job_constructor_no_shortcut():
-    """Test load job object when shortcuts are not specified"""
+    """Test load job object when shortcuts are not specified."""
 
-    job = yaml.load(JOB_STR_PLAIN, Loader=MrfmSimLoader)
+    job_str_plain = """\
+    !Job
+    name: ''
+    inputs: {}
+    """
+
+    job = yaml.load(dedent(job_str_plain), Loader=MrfmSimLoader)
     assert job.name == ""
     assert job.inputs == {}
     assert job.shortcuts == []

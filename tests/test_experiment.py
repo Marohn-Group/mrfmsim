@@ -1,31 +1,35 @@
 """Test Experiment Class"""
 
 from types import SimpleNamespace
+from textwrap import dedent
 
-
-EXPT_STR = """test_experiment(component, d, f)
-  returns: k, m
-  handler: MemHandler, {}
-  modifiers: [loop_modifier, {'parameter': 'd'}, component_modifier,
-{'component_substitutes': {'component': ['a', 'b']}}]
-test experiment with components"""
-
-
-EXPT_PLAIN_STR = """test_experiment_plain(a, b, d, f)
-  returns: k, m
-  handler: MemHandler, {}
-  modifiers: []"""
 
 
 def test_experiment_str(experiment_mod, experiment):
-    """Test if the experiment have the correct output"""
+    """Test if the experiment have the correct output."""
 
-    assert str(experiment_mod) == EXPT_STR
-    assert str(experiment) == EXPT_PLAIN_STR
+    expt_str = """\
+    test_experiment(component, d, f)
+    returns: (k, m)
+    handler: MemHandler()
+    modifiers:
+      - loop_modifier('d')
+      - component_modifier({'component': ['a', 'b']})
+
+    Test experiment with components."""
+
+    ext_str_plain = """\
+    test_experiment_plain(a, b, d, f)
+    returns: (k, m)
+    handler: MemHandler()"""
+
+
+    assert str(experiment_mod) == dedent(expt_str)
+    assert str(experiment) == dedent(ext_str_plain)
 
 
 def test_experiment_execution(experiment_mod, experiment):
-    """Test the experiment execute correctly"""
+    """Test the experiment execute correctly."""
 
     assert experiment(0, 2, 1, 3) == (8, 1)
 

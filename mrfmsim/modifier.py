@@ -5,7 +5,7 @@ from collections import defaultdict
 
 
 def component_modifier(func, component_substitutes):
-    """Modify the signature with components"""
+    """Modify the signature with components."""
 
     sig = inspect.signature(func)
     params = sig.parameters
@@ -30,7 +30,7 @@ def component_modifier(func, component_substitutes):
 
 
 def stdout_modifier(func, parameters: list = [], result: bool = True, units: dict = {}):
-    """Print the variables and the result to console of a specific node
+    """Print the variables and the result to console of a specific node.
 
     The modifier is helpful to output looped node input and outputs. The
     function return are automatically printed out.

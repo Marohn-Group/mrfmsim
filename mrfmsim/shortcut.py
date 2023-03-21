@@ -1,22 +1,15 @@
 """Shortcuts
 
-The shortcut should work for both Model and Experiment
+The shortcut should work for both Model and Experiment.
 """
 
-from mmodel import (
-    loop_modifier,
-    subgraph_by_parameters,
-    modify_subgraph,
-    modify_node,
-    model_signature,
-    model_returns,
-)
+from mmodel import loop_modifier
 from networkx.utils import nodes_equal
 from mrfmsim.modifier import stdout_modifier
 
 
 def loop_shortcut(model, parameter: str, stdout: dict = None):
-    """Shortcut to add loop to a subgraph
+    """Shortcut to add loop to a subgraph.
 
     :param model: executable model
     :param str parameter: loop parameter
@@ -48,13 +41,13 @@ def loop_shortcut(model, parameter: str, stdout: dict = None):
     # this is due to signature modifier on the model level
     # therefore the whole model is looped.
 
-    if parameter not in model_signature(graph).parameters:
+    if parameter not in graph.signature.parameters:
         modifiers = modifiers + combined_mod
         name = f"{name}_loop_{parameter}"
 
     else:  # the parameter is within the graph
 
-        subgraph = subgraph_by_parameters(graph, [parameter])
+        subgraph = graph.subgraph(inputs=[parameter])
 
         if nodes_equal(graph.nodes, subgraph.nodes):
             modifiers = modifiers + combined_mod
@@ -65,7 +58,7 @@ def loop_shortcut(model, parameter: str, stdout: dict = None):
             # if the looped node is only one node
             # add loop modifier to node attribute
             node_modifiers = subgraph.nodes[node]["modifiers"] + combined_mod
-            graph = modify_node(graph, node, modifiers=node_modifiers)
+            graph = graph.modify_node(node, modifiers=node_modifiers)
 
         else:
             submodel_description = (
@@ -80,11 +73,11 @@ def loop_shortcut(model, parameter: str, stdout: dict = None):
                 description=submodel_description,
             )
             # create new graph
-            output = ", ".join(model_returns(subgraph))
+            output = ", ".join(subgraph.returns)
             output = f"looped_{output}"
 
-            graph = modify_subgraph(
-                graph, subgraph, node_name, looped_node, output=output
+            graph = graph.replace_subgraph(
+                subgraph, node_name, looped_node, output=output
             )
 
     return ModelClass(
@@ -105,7 +98,7 @@ def remodel_shortcut(
     description=None,
     returns=None,
 ):
-    """Remodel parts of the model to generate a new model"""
+    """Remodel parts of the model to generate a new model."""
 
     name = name or model.name
     graph = graph or model.graph

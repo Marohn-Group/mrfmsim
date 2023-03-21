@@ -8,11 +8,12 @@ of all component classes.
 import numpy as np
 from mrfmsim.component import ComponentBase
 import pytest
+from textwrap import dedent
 
 
 @pytest.fixture
 def component_obj(units):
-    """Create a object with different types of attributes"""
+    """Create a object with different types of attributes."""
 
     obj = ComponentBase()
     obj._units = units
@@ -30,10 +31,10 @@ def component_obj(units):
 
 
 def test_attrs_to_dict(component_obj):
-    """Test the component object create dictionary from public attributes
+    """Test the component object create dictionary from public attributes.
 
     The tests makes sure that private attributes ("_private_attr")
-    and methods ("attrs_to_dict") are not included
+    and methods ("attrs_to_dict") are not included.
     """
 
     attr_dict = component_obj.attrs_to_dict()
@@ -48,32 +49,33 @@ def test_attrs_to_dict(component_obj):
     ]
 
 
-BASE_STR = """ComponentBase(
-  b0=1.000e+02 [mT] # longitudinal magnetic field
-  b1=[1.000 2.000 3.000] [mT] # transverse magnetic field
-  b_tot=[1.0 2.0 3.0] [mT] # total magnetic field
-  list=[1 2 3]
-  str=str
-  tuple=[1 2 3]
-)"""
-
-
 def test_str(component_obj):
-    """Test representation of different types"""
-    assert str(component_obj) == BASE_STR
+    """Test representation of different types."""
 
+    base_str = """\
+    ComponentBase(
+      b0=1.000e+02 [mT] # longitudinal magnetic field
+      b1=[1.000 2.000 3.000] [mT] # transverse magnetic field
+      b_tot=[1.0 2.0 3.0] [mT] # total magnetic field
+      list=[1 2 3]
+      str=str
+      tuple=[1 2 3]
+    )"""
 
-NO_UNIT_STR = """ComponentBase(
-  b0=100.0
-  b1=[1 2 3]
-  b_tot=[1.0 2.0 3.0]
-  list=[1 2 3]
-  str=str
-  tuple=[1 2 3]
-)"""
+    assert str(component_obj) == dedent(base_str)
 
 
 def test_str_no_unit(component_obj):
-    """Test representation if units are not defined"""
+    """Test representation if units are not defined."""
+
+    str_no_unit = """\
+    ComponentBase(
+      b0=100.0
+      b1=[1 2 3]
+      b_tot=[1.0 2.0 3.0]
+      list=[1 2 3]
+      str=str
+      tuple=[1 2 3]
+    )"""
     component_obj._units = {}
-    assert str(component_obj) == NO_UNIT_STR
+    assert str(component_obj) == dedent(str_no_unit)

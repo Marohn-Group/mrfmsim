@@ -9,26 +9,70 @@ import pytest
 import math
 from mmodel import Model, MemHandler, ModelGraph, loop_modifier
 from mrfmsim.experiment import Experiment
+from textwrap import dedent
+import sys
 
 
-def addition(a, factor=2):
-    return a + factor
+def addition(a, constant=2):
+    """Add a constant to the value a."""
+    return a + constant
 
 
 def subtraction(c, d):
+    """Subtraction operation."""
     return c - d
 
 
-def polynomial(c, f):
+def power(c, f):
+    """The value of c raise to the power of f."""
     return c**f
 
 
 def multiplication(e, g):
+    """Multiply e and g."""
     return e * g
 
 
 def logarithm(c, b):
+    """Logarithm operation."""
     return math.log(c, b)
+
+
+@pytest.fixture
+def module_script():
+    """The content of a python module script."""
+
+    module_str = '''
+    # Test python script.
+
+    import math
+
+    def addition(a, constant=2):
+        """Add a constant to the value a."""
+        return a + constant
+
+
+    def subtraction(c, d):
+        """Subtraction operation."""
+        return c - d
+
+
+    def power(c, f):
+        """The value of c raise to the power of f."""
+        return c**f
+
+
+    def multiplication(e, g):
+        """Multiply e and g."""
+        return e * g
+
+
+    def logarithm(c, b):
+        """Logarithm operation."""
+        return math.log(c, b)
+
+    '''
+    return dedent(module_str)
 
 
 @pytest.fixture
@@ -41,14 +85,14 @@ def modelgraph():
     """
 
     grouped_edges = [
-        ("add", ["subtract", "poly", "log"]),
-        (["subtract", "poly"], "multiply"),
+        ("add", ["subtract", "power", "log"]),
+        (["subtract", "power"], "multiply"),
     ]
 
     node_objects = [
         ("add", addition, "c"),
         ("subtract", subtraction, "e"),
-        ("poly", polynomial, "g"),
+        ("power", power, "g"),
         ("multiply", multiplication, "k"),
         ("log", logarithm, "m"),
     ]
@@ -68,7 +112,7 @@ def model(modelgraph):
         "test_model",
         modelgraph,
         (MemHandler, {}),
-        description="test_model",
+        description="Test Model instances.",
     )
 
     return model
@@ -89,7 +133,7 @@ def experiment_mod(modelgraph):
         modelgraph,
         component_substitutes={"component": ["a", "b"]},
         modifiers=[(loop_modifier, {"parameter": "d"})],
-        description="test experiment with components",
+        description="Test experiment with components.",
     )
 
 
@@ -115,9 +159,70 @@ def units():
     }
 
 
+# External files
+
+@pytest.fixture
+def user_module(tmp_path, module_script):
+    """Create a custom module for testing"""
+    module_path = tmp_path / "user_module.py"
+    module_path.write_text(module_script)
+
+    yield module_path
+    # runs after the test is complete
+    if "user_module" in sys.modules:
+        del sys.modules["user_module"]
+
+
+@pytest.fixture
+def expt_file(user_module, tmp_path):
+    """Create a custom module for testing"""
+
+    expt_yaml = """\
+    !Experiment
+    user_module:
+        !Module
+        user_module: {user_module_path}
+    name: test_experiment
+    graph:
+        !Graph
+        name: test
+        grouped_edges:
+            - [add, [subtract, power, log]]
+            - [[subtract, power], multiply]
+        node_objects:
+            add:
+                func: !Func user_module.addition
+                output: c
+            subtract:
+                func: !Func user_module.subtraction
+                output: e
+            power:
+                func: !Func user_module.power
+                output: g
+            multiply:
+                func: !Func user_module.multiplication
+                output: k
+            log:
+                func: !Func user_module.logarithm
+                output: m
+    component_substitutes:
+        component: [a, b]
+    description: Test experiment with components.
+    modifiers:
+        - [!Func mmodel.loop_modifier, {{'parameter': 'd'}}]
+    """
+
+    expt_yaml = dedent(expt_yaml).format(user_module_path=user_module)
+
+    module_path = tmp_path / "expt.yaml"
+    module_path.write_text(expt_yaml)
+    return module_path
+
+
 def graph_equal(G1, G2):
-    """Test if graphs have the same nodes, edges and attributes
-    Dictionary comparison does not care about key orders
+    """Test if graphs have the same nodes, edges and attributes.
+
+    Dictionary comparison does not care about key orders.
     """
 
     assert dict(G1.nodes) == dict(G2.nodes)

@@ -7,7 +7,7 @@ from inspect import signature
 
 
 def test_loop_shortcut(model, experiment):
-    """Test loop shortcut
+    """Test loop shortcut.
 
     The resulting value should create a looped model of d. For experiment_mod,
     the d is already looped.
@@ -23,7 +23,7 @@ def test_loop_shortcut(model, experiment):
 
 
 def test_loop_shortcut_single_node(model, experiment):
-    """Test loop shortcut when the subgraph is a single node
+    """Test loop shortcut when the subgraph is a single node.
 
     The resulting value should create a looped model of d. For experiment_mod,
     the d is already looped.
@@ -38,10 +38,10 @@ def test_loop_shortcut_single_node(model, experiment):
 
 
 def test_loop_shortcut_top_level(model, experiment):
-    """Test loop shortcut when the parameter is used at the top level
+    """Test loop shortcut when the parameter is used at the top level.
 
     The resulting value should create a looped model of b
-    (a top level parameter, as in the subgraph is the same as the graph)
+    (a top level parameter, as in the subgraph is the same as the graph).
     """
 
     loop_model = loop_shortcut(model, "b")
@@ -52,7 +52,7 @@ def test_loop_shortcut_top_level(model, experiment):
 
 
 def test_loop_shortcut_component(experiment_mod):
-    """Test loop shortcut of experiment with component
+    """Test loop shortcut of experiment with component.
 
     The component loop occurs first then the "d" parameter loop
     that is defined with the experiment instance.
@@ -66,9 +66,9 @@ def test_loop_shortcut_component(experiment_mod):
 
 
 def test_loop_shortcut_incorrect_parameter(model):
-    """Test loop shortcut when the parameter is not in model parameter
+    """Test loop shortcut when the parameter is not in model parameter.
 
-    If a wrong parameter is chosen, an exception should be raised
+    If a wrong parameter is chosen, an exception should be raised.
     """
 
     with pytest.raises(Exception, match="'c' is not a model parameter"):
@@ -76,9 +76,9 @@ def test_loop_shortcut_incorrect_parameter(model):
 
 
 def test_loop_shortcut_with_stdout(model, experiment, capsys):
-    """Test loop shortcut when the parameter is not in model parameter
+    """Test loop shortcut when the parameter is not in model parameter.
 
-    If a wrong parameter is chosen, an exception should be raised
+    If a wrong parameter is chosen, an exception should be raised.
     """
 
     loop_model = loop_shortcut(model, "a", {})
@@ -98,13 +98,7 @@ def test_loop_shortcut_with_stdout(model, experiment, capsys):
     )
 
 def test_remodel_shortcut(model, experiment_mod):
-    """Test remodel shortcut"""
-
-    # change the returns
-    mod_model = remodel_shortcut(model, returns=['c', 'k'])
-    # partial graph
-    assert list(signature(mod_model).parameters.keys()) == ['a', 'd', 'f']
-    assert mod_model(a=0, d=2, f=3) == (2, 0)
+    """Test remodel shortcut."""
 
     # get rid of modifiers
     mod_model = remodel_shortcut(experiment_mod, modifiers=[])

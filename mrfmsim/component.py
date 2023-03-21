@@ -3,13 +3,13 @@ import numpy as np
 
 
 class ComponentBase:
-    """The base component class defines the __repr__ method"""
+    """The base component class defines the __repr__ method."""
 
     _units = {}
     # _parameters = () # list the accessible parameters
 
     def attrs_to_dict(self):
-        """Output attributes to dictionary format"""
+        """Output attributes to dictionary format."""
 
         return {
             key: value
@@ -22,12 +22,12 @@ class ComponentBase:
         # return {key: getattr(self, key) for key in self._parameters}
 
     def __str__(self):
-        """Modify the string representation of Components
-        In the format of key=value unit description.
+        """Modify the string representation of Components.
 
+        In the format of key=value unit description.
         For int and float, the format is set in the units.yaml
         For list or numpy arrays, the format is set first with
-        np.printoptions
+        np.printoptions.
         """
         name = self.__class__.__name__
         str_list = []

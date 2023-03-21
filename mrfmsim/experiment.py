@@ -2,7 +2,7 @@
 
 The class inherit from mmodel.Model class to add certain functionality and defaults
 """
-from mmodel import MemHandler, Model, draw_graph
+from mmodel import MemHandler, Model
 from mrfmsim.modifier import component_modifier
 
 

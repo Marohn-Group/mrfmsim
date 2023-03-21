@@ -90,6 +90,14 @@ def func_constructor(loader, node):
     return load_func(dotpath)
 
 
+def dataobj_constructor(loader, node):
+    """Parse !Dataobj tag into a SimpleNamespace"""
+
+    param_dict = loader.construct_mapping(node, deep=True)
+
+    return types.SimpleNamespace(**param_dict)
+
+
 def experiment_constructor(loader, node):
     """Load experiment
 
@@ -132,6 +140,7 @@ MrfmSimLoader.add_constructor("!Module", module_constructor)
 MrfmSimLoader.add_constructor("!Func", func_constructor)
 MrfmSimLoader.add_constructor("!Graph", graph_constructor)
 MrfmSimLoader.add_constructor("!Experiment", experiment_constructor)
+MrfmSimLoader.add_constructor("!Dataobj", dataobj_constructor)
 MrfmSimLoader.add_constructor("!Job", job_constructor)
 
 

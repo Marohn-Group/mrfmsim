@@ -7,7 +7,7 @@ from types import SimpleNamespace
 class TestComponentModifier:
     @pytest.fixture
     def comp_mod_func(self):
-        """Return a component modified function"""
+        """Return a component modified function."""
 
         def func(a, b, c, d, e, f):
             return a * b * c * d * e * f
@@ -21,7 +21,7 @@ class TestComponentModifier:
         assert sig_parameters == ["e", "f", "obj1", "obj2"]
 
     def test_execution(self, comp_mod_func):
-        """Test component modified function process the correct input"""
+        """Test component modified function process the correct input."""
 
         obj1 = SimpleNamespace(a=1, b=2)
         obj2 = SimpleNamespace(c=3, d=4)
@@ -38,7 +38,7 @@ class TestStdoutModifier:
         return b_tot
 
     def test_incorrect_input(self, capsys, func, units):
-        """Test printout modified function has the correct output with multiple returns"""
+        """Test printout modified function with multiple returns."""
 
         with pytest.raises(
             Exception, match="cannot modify b_tot, f_rf not in signature"
@@ -46,7 +46,7 @@ class TestStdoutModifier:
             stdout_modifier(func, ["b1", "b0", "f_rf"], units)
 
     def test_no_result(self, capsys, func, units):
-        """Test that the modifier does not output function returns if result=False"""
+        """Test that modifier function returns if result=False."""
         
 
         mod_func = stdout_modifier(func, ["b1", "b0", "bz"], result=False, units=units)
@@ -56,11 +56,11 @@ class TestStdoutModifier:
 
 
     def test_no_returns_attr(self, capsys, func, units):
-        """Test printout modified function has the correct output
+        """Test printout modified function has the correct output.
 
         Test variables that is in the units.yaml file and variable
         that is not. The function does not have a return parameter,
-        therefore the result does not have units
+        therefore the result does not have units.
         """
 
         mod_func = stdout_modifier(func, ["b1", "b0", "bz"], units=units)
@@ -75,7 +75,7 @@ class TestStdoutModifier:
         assert captured.out == "1 | b1 2.000 [mT] | b0 1.000e+00 [mT] | bz 0 | 3\n"
 
     def test_single_return(self, capsys, func, units):
-        """Test printout modified function has the correct output with one returns"""
+        """Test printout modified function has the correct output with one returns."""
 
         func.returns = ["b_tot"]
 
@@ -87,7 +87,7 @@ class TestStdoutModifier:
         assert captured.out == "0 | b_tot 6.0 [mT]\n"
 
     def test_multiple_returns(self, capsys, units):
-        """Test printout modified function has the correct output with multiple returns"""
+        """Test printout modified function with multiple returns."""
 
         def func(a, b):
             return a, b

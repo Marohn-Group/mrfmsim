@@ -21,7 +21,7 @@ def cli(ctx, expt):
 @click.pass_context
 @click.option("--view/--no-view", is_flag=True, default=True)
 def show(ctx, view):
-    """Draw experiment"""
+    """Draw experiment."""
     dot_graph = ctx.obj["experiment"].draw()
     dot_graph.render(view=view)
 
@@ -29,7 +29,7 @@ def show(ctx, view):
 @cli.command()
 @click.pass_context
 def template(ctx):
-    """Create a template job file based on the experiment"""
+    """Create a template job file based on the experiment."""
     experiment = ctx.obj["experiment"]
     job_template = [Job("", {k: "" for k in experiment.__signature__.parameters}, [])]
     click.echo(yaml.dump(job_template, Dumper=MrfmSimDumper, sort_keys=False))
@@ -39,7 +39,7 @@ def template(ctx):
 @click.pass_context
 @click.option("--job", help="job file path")
 def execute(ctx, job):
-    """Execute the job"""
+    """Execute the job."""
     experiment = ctx.obj["experiment"]
 
     with open(job, "r") as f:
