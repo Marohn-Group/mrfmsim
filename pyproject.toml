@@ -5,14 +5,13 @@ description = "Simulate magnetic resonance force microscopy experiments."
 authors = ["Peter Sun <hs859@cornell.edu>", "John Marohn <jam99@cornell.edu>"]
 maintainers = ["Peter Sun <hs859@cornell.edu>"]
 repository = "https://www.github.edu/Marohn-Group/mrfmsim"
-# adds all subpackages and the units.yaml file
+# adds all subpackages
 packages = [{ include = "mrfmsim/*.py" }, { include = "mrfmsim/**/*.py" }]
 readme = "README.rst"
 
 [tool.poetry.dependencies]
 python = ">=3.8"
 numpy = ">=1.18,<1.22" # conflict with numba 0.55.1 for 1.22 above
-numba = ">=0.56"
 pyyaml = "^6.0"
 mmodel = ">=0.5.1"
 click = ">=8.1.0"
@@ -51,9 +50,8 @@ filterwarnings = [
     # used to left align node text
     'ignore:invalid escape sequence \\l:DeprecationWarning',
     # The parallel method of numba might not be used in test
-    # ignore the warning
-    'ignore::numba.NumbaPerformanceWarning' 
 ]
+pythonpath = ["."]
 
 [tool.coverage.run]
 # pytest coverage
