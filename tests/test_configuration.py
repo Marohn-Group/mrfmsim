@@ -39,7 +39,7 @@ def test_func_constructor():
     assert yaml_func([1, 2]) == 3
 
 
-def test_graph_constructor(model, user_module):
+def test_graph_constructor(experiment, user_module):
     """Test the graph constructor parsing the graph correctly."""
     graph_yaml = """
     # graph tag
@@ -73,12 +73,12 @@ def test_graph_constructor(model, user_module):
     # however the function are directly parse therefore
     # we can only check if the function names are the same
 
-    assert graph.graph == model.graph.graph
-    assert list(graph.nodes) == list(model.graph.nodes)
+    assert graph.graph == experiment.graph.graph
+    assert list(graph.nodes) == list(experiment.graph.nodes)
     assert graph.edges == graph.edges
 
     for nodes, attrs in graph.nodes.items():
-        model_attrs = model.graph.nodes[nodes]
+        model_attrs = experiment.graph.nodes[nodes]
         assert attrs.pop("_func").__name__ == model_attrs.pop("_func").__name__
         assert attrs.pop("func").__name__ == model_attrs.pop("func").__name__
         assert attrs == model_attrs
