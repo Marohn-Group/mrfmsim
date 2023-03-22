@@ -1,4 +1,4 @@
-"""Load and dump configuration files for experiment and jobs"""
+"""Load and dump configuration files for experiment and jobs."""
 
 import importlib
 import sys
@@ -28,7 +28,7 @@ def load_module(name, path):
 def load_func(path):
     """Load functions based on the module path.
 
-    The path is split by the rightmost dot, and the
+    The path is split by the rightmost dot and the
     the module is imported.
 
     :param str path: path should be separated by a dot

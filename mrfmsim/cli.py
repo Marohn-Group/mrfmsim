@@ -46,5 +46,5 @@ def execute(ctx, job):
         jobs = yaml.load(f, Loader=MrfmSimLoader)
 
     for job in jobs:
-        # return the result to console
+        # return the result to the console
         click.echo(job_execution(experiment, job))
