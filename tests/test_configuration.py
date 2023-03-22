@@ -87,7 +87,7 @@ def test_graph_constructor(experiment, user_module):
 
 
 def test_experiment_constructor(expt_file, experiment_mod):
-    """Test experimental constructor"""
+    """Test experimental constructor."""
 
     with open(expt_file, "r") as f:
         yaml_expt = yaml.load(f.read(), MrfmSimLoader)
@@ -95,7 +95,7 @@ def test_experiment_constructor(expt_file, experiment_mod):
 
 
 def test_func_representer():
-    """Test if it identifies object and dump function into the correct tag"""
+    """Test if it identifies object and dump function into the correct tag."""
 
     def func(a, b):
         return

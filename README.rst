@@ -17,6 +17,6 @@ To run the tests locally::
 
     python -m pytest
 
-To test the coverage with report::
+To test the coverage with the report::
 
     python -m pytest --cov report

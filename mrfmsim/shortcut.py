@@ -73,8 +73,8 @@ def loop_shortcut(model, parameter: str, name=None):
     loop_mod = (loop_modifier, {"parameter": parameter})
     # all process uses list unpack to create a new list!
 
-    # this is case when the parameter is in signature but not in graph
-    # this is due to signature modifier on the model level
+    # this is the case when the parameter is in the signature but not in the graph
+    # this is due to the signature modifier on the model level
     # therefore the whole model is looped.
 
     if parameter not in G.signature.parameters:
@@ -131,7 +131,7 @@ def remodel_shortcut(
 
     name = name or model.name
     graph = graph or model.graph
-    # an empty modifiers will skip if only use or statement
+    # empty modifiers will skip if only use or statement
     modifiers = modifiers if not None else model.modifiers
     handler = handler or model.handler
     returns = returns if not None else model.returns

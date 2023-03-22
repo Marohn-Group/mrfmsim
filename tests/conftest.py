@@ -77,7 +77,7 @@ def module_script():
 
 @pytest.fixture
 def modelgraph():
-    """Model graph for creating experiment and model
+    """Model graph for creating experiment and model.
 
     The results are:
     k = (a + 2 - d)(a + 2)^f

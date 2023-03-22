@@ -10,12 +10,12 @@ import types
 
 
 def load_module(name, path):
-    """load custom module from path
+    """Load custom module from the path.
 
     Using ``import name`` to import the module.
 
     :param str name: name of the package
-        name should avoid overlap with existing python packages
+        The name should avoid overlapping with existing python packages.
     :param str path: python file path for importing
     """
 
@@ -26,12 +26,12 @@ def load_module(name, path):
 
 
 def load_func(path):
-    """load function
+    """Load functions based on the module path.
 
-    The path is split by the right most dot, and the
-    module is imported.
+    The path is split by the rightmost dot, and the
+    the module is imported.
 
-    :param str path: path should be separated by dot
+    :param str path: path should be separated by a dot
     :returns: loaded function
     """
     module, func = path.rsplit(".", maxsplit=1)
@@ -40,12 +40,12 @@ def load_func(path):
 
 
 def module_constructor(loader, node):
-    """Load user module with !Module tag"""
+    """Load user module with the "!Module" tag."""
 
-    # In yaml the tagged objects are parsed first. In order to have
+    # In yaml the tagged objects are parsed first. To have
     # the modules imported first, a compromise is to have the module
     # loading also tagged. The tag can be used under experiment or
-    # under graph. The alternative is to have a multipage yaml, however,
+    # under the graph. The alternative is to have a multi-page yaml, however,
     # the return would not be a single object
 
     params = loader.construct_mapping(node, deep=True)
@@ -55,7 +55,7 @@ def module_constructor(loader, node):
 
 
 def graph_constructor(loader, node):
-    """Parse !Graph tag into ModelGraph object"""
+    """Parse the "!Graph" tag into ModelGraph object."""
 
     param_dict = loader.construct_mapping(node, deep=True)
 
@@ -76,7 +76,7 @@ def graph_constructor(loader, node):
 
 
 def func_representer(dumper: yaml.Dumper, func: types.FunctionType):
-    """Represent function scalar"""
+    """Represent function scalar."""
     module = sys.modules[func.__module__]
     dotpath = f"{module.__name__}.{func.__name__}"
 
@@ -84,14 +84,14 @@ def func_representer(dumper: yaml.Dumper, func: types.FunctionType):
 
 
 def func_constructor(loader, node):
-    """Parse !Func tag into callable object"""
+    """Parse the "!Func" tag into a callable object."""
 
     dotpath = str(loader.construct_scalar(node))
     return load_func(dotpath)
 
 
 def dataobj_constructor(loader, node):
-    """Parse !Dataobj tag into a SimpleNamespace"""
+    """Parse the "!Dataobj" tag into a SimpleNamespace object."""
 
     param_dict = loader.construct_mapping(node, deep=True)
 
@@ -99,9 +99,9 @@ def dataobj_constructor(loader, node):
 
 
 def experiment_constructor(loader, node):
-    """Load experiment
+    """Load experiment.
 
-    The handler, description, components parameters are optional
+    The handler, description, and components parameters are optional.
     """
 
     param_dict = loader.construct_mapping(node, deep=True)
@@ -118,14 +118,14 @@ def experiment_constructor(loader, node):
 
 
 def job_constructor(loader: yaml.BaseLoader, node):
-    """Load job yaml string to Job object"""
+    """Load job yaml string to a Job object."""
     param_dict = loader.construct_mapping(node, deep=True)
 
     return Job(**param_dict)
 
 
 def job_representer(dumper: yaml.SafeDumper, job: Job):
-    """Represent an Job instance"""
+    """Represent a Job instance."""
 
     return dumper.represent_mapping(
         "!Job", {"name": job.name, "inputs": job.inputs, "shortcuts": job.shortcuts}
@@ -133,7 +133,7 @@ def job_representer(dumper: yaml.SafeDumper, job: Job):
 
 
 class MrfmSimLoader(yaml.SafeLoader):
-    """Yaml loader with special constructors"""
+    """Yaml loader with special constructors."""
 
 
 MrfmSimLoader.add_constructor("!Module", module_constructor)
@@ -145,7 +145,7 @@ MrfmSimLoader.add_constructor("!Job", job_constructor)
 
 
 class MrfmSimDumper(yaml.Dumper):
-    """Yaml sumper with special constructors"""
+    """Yaml dumper with special constructors."""
 
 
 MrfmSimDumper.add_representer(types.FunctionType, func_representer)
