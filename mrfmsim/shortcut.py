@@ -1,91 +1,120 @@
 """Shortcuts
 
-The shortcut should work for both Model and Experiment.
+The shortcut should work for both the Model and the Experiment class8.
 """
 
 from mmodel import loop_modifier
 from networkx.utils import nodes_equal
-from mrfmsim.modifier import stdout_modifier
+from mrfmsim.modifier import stdout_input_modifier, stdout_output_modifier
+import networkx as nx
 
 
-def loop_shortcut(model, parameter: str, stdout: dict = None):
-    """Shortcut to add loop to a subgraph.
+def stdout_shortcut(model, parameters, units={}, name=None):
+    """Shortcut to printout parameters.
+
+    The shortcuts determine if the parameter is an input parameter
+    or an output parameter (intermediate value). If the parameter is
+    intermediate value, the node that outputs the value adds the
+    stdout_output_modifier, otherwise the input parameter output is
+    at the level.
+    """
+    # use list comprehension instead of set to preserve order
+    name = name or model.name
+    input_params = []
+    output_params = []
+    for param in parameters:
+        if param in model.__signature__.parameters:
+            input_params.append(param)
+        else:
+            output_params.append(param)
+
+    modifiers = model.modifiers
+    G = model.graph  # produces a copy of the graph
+
+    # input parameters modifier are the model level
+    if input_params:
+        mod = (stdout_input_modifier, {"inputs": input_params, "units": units})
+        modifiers.append(mod)
+
+    if output_params:
+        # find the nodes with the output parameters
+        for node, output in nx.get_node_attributes(G, "output").items():
+            if output in output_params:
+                mod = (stdout_output_modifier, {"output": output, "units": units})
+                node_modifiers = G.nodes[node]["modifiers"]
+                node_modifiers.append(mod)
+                G.modify_node(node, modifiers=node_modifiers, inplace=True)
+
+    return type(model)(
+        name=model.name,
+        graph=G,
+        handler=model.handler,
+        modifiers=modifiers,
+        description=model.description,
+    )
+
+
+def loop_shortcut(model, parameter: str, name=None):
+    """Shortcut to add a loop to a subgraph.
 
     :param model: executable model
     :param str parameter: loop parameter
-    :param dict stdout: stdout_modifier keyword arguments
-        values, result and unit
+    :param str name: name of the new model, defaults to old model name.
     :return: a new model with looped parameter
     """
     # check if the parameter is in the signature
     if parameter not in model.__signature__.parameters:
-        raise Exception(f"'{parameter}' is not a model parameter")
+        raise Exception(f"Invalid shortcut: {repr(parameter)} is not a model input.")
 
-    name = model.__name__
-    handler = model.handler
-    graph = model.graph
+    G = model.graph
+    name = name or model.name
     modifiers = model.modifiers
-    node_name = f"{parameter}_loop_node"
-    description = model.description
 
-    ModelClass = type(model)  # works for both mmodel.Model and mrfmsim.Experiment
+    loop_mod = (loop_modifier, {"parameter": parameter})
+    # all process uses list unpack to create a new list!
 
-    loop_mod = loop_modifier, {"parameter": parameter}
-    if stdout is not None:  # accept empty dictionary input
-        if stdout.get("parameters", None) is None:
-            stdout["parameters"] = [parameter]
-        combined_mod = [(stdout_modifier, stdout), loop_mod]
-    else:
-        combined_mod = [loop_mod]
     # this is case when the parameter is in signature but not in graph
     # this is due to signature modifier on the model level
     # therefore the whole model is looped.
 
-    if parameter not in graph.signature.parameters:
-        modifiers = modifiers + combined_mod
-        name = f"{name}_loop_{parameter}"
+    if parameter not in G.signature.parameters:
+        modifiers = [*modifiers, loop_mod]
 
     else:  # the parameter is within the graph
+        H = G.subgraph(inputs=[parameter])
 
-        subgraph = graph.subgraph(inputs=[parameter])
+        if nodes_equal(G.nodes, H.nodes):
+            modifiers = [*modifiers, loop_mod]
 
-        if nodes_equal(graph.nodes, subgraph.nodes):
-            modifiers = modifiers + combined_mod
-            name = f"{name}_loop_{parameter}"
-
-        elif len(subgraph.nodes()) == 1:
-            node = list(subgraph.nodes)[0]
+        elif len(H.nodes()) == 1:
+            node = list(H.nodes)[0]
             # if the looped node is only one node
             # add loop modifier to node attribute
-            node_modifiers = subgraph.nodes[node]["modifiers"] + combined_mod
-            graph = graph.modify_node(node, modifiers=node_modifiers)
+            node_modifiers = H.nodes[node]["modifiers"]
+            node_modifiers = [*node_modifiers, loop_mod]
+            G.modify_node(node, modifiers=node_modifiers, inplace=True)
 
-        else:
-            submodel_description = (
-                f'"{parameter}" looped sub model created by mrfmsim.loop_shortcut'
+        else:  # if there is more than one node
+            sub_name = f"subnode_{parameter}"
+            sub_des = (
+                f"Submodel generated by loop_shortcut for parameter {repr(parameter)}."
             )
+            output = ", ".join(H.returns)
             # create the model and substitute the subgraph
-            looped_node = ModelClass(
-                f"{parameter}_looped_sub_model",
-                subgraph,
-                handler,
-                modifiers=combined_mod,
-                description=submodel_description,
-            )
-            # create new graph
-            output = ", ".join(subgraph.returns)
-            output = f"looped_{output}"
-
-            graph = graph.replace_subgraph(
-                subgraph, node_name, looped_node, output=output
+            looped_node = type(model)(
+                f"submodel_{parameter}", H, model.handler, description=sub_des
             )
 
-    return ModelClass(
+            G = G.replace_subgraph(
+                H, sub_name, looped_node, output=output, modifiers=[loop_mod]
+            )
+
+    return type(model)(
         name=name,
-        graph=graph,
-        handler=handler,
+        graph=G,
+        handler=model.handler,
         modifiers=modifiers,
-        description=description,
+        description=model.description,
     )
 
 

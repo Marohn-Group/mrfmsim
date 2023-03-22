@@ -1,107 +1,141 @@
 """Test the shortcut on both Model and Experiment instances"""
 
 from types import SimpleNamespace
-from mrfmsim.shortcut import loop_shortcut, remodel_shortcut
+from mrfmsim.shortcut import remodel_shortcut, stdout_shortcut, loop_shortcut
 import pytest
 from inspect import signature
 
 
-def test_loop_shortcut(model, experiment):
-    """Test loop shortcut.
+class TestStdoutShortcut:
+    """Test stdout_shortcut."""
 
-    The resulting value should create a looped model of d. For experiment_mod,
-    the d is already looped.
-    """
+    def test_stdout_input(self, experiment):
+        """Test stdout_shortcut with inputs.
 
-    loop_model = loop_shortcut(model, "d")
+        The model should have the modifier added.
+        """
 
-    assert loop_model(a=0, b=2, d=[1, 2], f=3) == ([8, 0], 1.0)
+        stdout_model = stdout_shortcut(experiment, ["a", "d"])
+        assert stdout_model.modifiers[-1][0].__name__ == "stdout_input_modifier"
+        assert stdout_model.modifiers[-1][1] == {"inputs": ["a", "d"], "units": {}}
 
-    loop_expt = loop_shortcut(experiment, "f")
+    def test_stdout_output(self, experiment):
+        """Test stdout_shortcut with inputs.
 
-    assert loop_expt(a=0, b=2, d=1, f=[3, 4]) == ([8, 16], 1.0)
+        The model should have the modifier added.
+        """
 
+        stdout_model = stdout_shortcut(experiment, ["k", "m"])
+        m_node = stdout_model.get_node("multiply")
+        assert m_node["modifiers"][-1][0].__name__ == "stdout_output_modifier"
+        assert m_node["modifiers"][-1][1] == {"output": "k", "units": {}}
 
-def test_loop_shortcut_single_node(model, experiment):
-    """Test loop shortcut when the subgraph is a single node.
+        l_node = stdout_model.get_node("log")
+        assert l_node["modifiers"][-1][0].__name__ == "stdout_output_modifier"
+        assert l_node["modifiers"][-1][1] == {"output": "m", "units": {}}
 
-    The resulting value should create a looped model of d. For experiment_mod,
-    the d is already looped.
-    """
+    def test_stdout_shortcut(self, capsys, experiment):
+        """Test stdout shortcut"""
 
-    loop_model = loop_shortcut(loop_shortcut(model, "d"), "d")
-    assert loop_model(a=0, b=2, d=[[1, 2], [1, 2]], f=3) == ([[8, 0], [8, 0]], 1.0)
-
-    loop_model = loop_shortcut(loop_shortcut(model, "f"), "f")
-    # the output is actually k1, p1, k2, p2
-    assert loop_model(a=0, b=2, d=1, f=[[1, 2], [3, 4]]) == ([[2, 4], [8, 16]], 1.0)
-
-
-def test_loop_shortcut_top_level(model, experiment):
-    """Test loop shortcut when the parameter is used at the top level.
-
-    The resulting value should create a looped model of b
-    (a top level parameter, as in the subgraph is the same as the graph).
-    """
-
-    loop_model = loop_shortcut(model, "b")
-    assert loop_model(a=0, b=[2, 4], d=2, f=3) == (0, [1, 0.5])
-
-    loop_expt = loop_shortcut(experiment, "b")
-    assert loop_expt(a=0, b=[2, 4], d=2, f=3) == (0, [1, 0.5])
+        stdout_model = stdout_shortcut(experiment, ["d", "c", "k"])
+        stdout_model(a=0, b=2, d=2, f=3)
+        captured = capsys.readouterr()
+        assert captured.out == "d 2\nc 2\nk 0\n"
 
 
-def test_loop_shortcut_component(experiment_mod):
-    """Test loop shortcut of experiment with component.
+class TestLoopShortcut:
+    """Test loop_shortcut."""
 
-    The component loop occurs first then the "d" parameter loop
-    that is defined with the experiment instance.
-    """
+    def test_loop_shortcut_raises(self, experiment):
+        """Test loop_shortcut raises an exception if parameter not in signature."""
 
-    loop_expt = loop_shortcut(experiment_mod, "component")
+        with pytest.raises(
+            Exception, match="Invalid shortcut: 'c' is not a model input."
+        ):
+            loop_shortcut(experiment, "c")
 
-    comps = [SimpleNamespace(a=0, b=2), SimpleNamespace(a=2, b=16)]
-    assert loop_expt(comps, d=[1, 2, 3], f=3)[0] == [(8, 1), (0, 1), (-8, 1)]
-    assert loop_expt(comps, d=[1, 2, 3], f=3)[1] == [(192, 0.5), (128, 0.5), (64, 0.5)]
+    def test_loop_shortcut_top(self, experiment_mod):
+        """Test loop_shortcut with signature level parameters.
+
+        In some cases, the signature is replaced. The modifier is added to the model.
+        """
+        loop_model = loop_shortcut(experiment_mod, "component")
+
+        assert loop_model.modifiers[-1][0].__name__ == "loop_modifier"
+        assert loop_model.modifiers[-1][1] == {"parameter": "component"}
+
+        comps = [SimpleNamespace(a=0, b=2), SimpleNamespace(a=2, b=16)]
+        assert loop_model(comps, d=[1, 2, 3], f=3)[0] == [(8, 1), (0, 1), (-8, 1)]
+        assert loop_model(comps, d=[1, 2, 3], f=3)[1] == [
+            (192, 0.5),
+            (128, 0.5),
+            (64, 0.5),
+        ]
+
+    def test_loop_shortcut_graph(self, experiment):
+        """Test loop_shortcut with graph level parameters.
+
+        The whole graph depends on the parameter.
+        """
+        loop_model = loop_shortcut(experiment, "a")
+
+        assert loop_model.modifiers[-1][0].__name__ == "loop_modifier"
+        assert loop_model.modifiers[-1][1] == {"parameter": "a"}
+
+        assert loop_model(a=[0, 2], b=2, d=2, f=3) == [(0, 1.0), (128, 2.0)]
+
+    def test_loop_shortcut_single(self, experiment):
+        """Test loop_shortcut on single node dependency."""
+
+        loop_model = loop_shortcut(experiment, "b")
+        # b dependency is in the node log
+        b_node_modifier = loop_model.get_node("log")["modifiers"]
+
+        assert b_node_modifier[-1][0].__name__ == "loop_modifier"
+        assert b_node_modifier[-1][1] == {"parameter": "b"}
+
+        assert loop_model(a=0, b=[2, 4], d=2, f=3) == (0, [1, 0.5])
+
+    def test_loop_shortcut_middle(self, experiment):
+        """Test loop_shortcut on subgraph."""
+
+        loop_model = loop_shortcut(experiment, "d", "loop_model")
+
+        # make sure subgraph exists
+        assert loop_model.name == "loop_model"
+        assert "subnode_d" in loop_model.graph.nodes
+        subnode = loop_model.get_node("subnode_d")
+
+        assert subnode["modifiers"][0][0].__name__ == "loop_modifier"
+        assert subnode["modifiers"][0][1] == {"parameter": "d"}
+        assert subnode["output"] == "k"
+
+    def test_loop_shortcut_middle_submodel(self, experiment):
+        """Test submodel created by loop_shortcut."""
+
+        loop_model = loop_shortcut(experiment, "d", "loop_model")
+        subnode = loop_model.get_node("subnode_d")
+        submodel = subnode["_func"]
+        # make sure the function is decorated
+        assert submodel is not subnode["func"]
+
+        assert (
+            submodel.description
+            == "Submodel generated by loop_shortcut for parameter 'd'."
+        )
+        assert sorted(list(submodel.graph.nodes)) == ["multiply", "subtract"]
+
+    def test_loop_shortcut_middle_execution(self, experiment):
+        """Test loop_shorcut submodel execution."""
+        loop_model = loop_shortcut(experiment, "d", "loop_model")
+        assert loop_model(a=0, b=2, d=[1, 2], f=3) == ([8, 0], 1.0)
 
 
-def test_loop_shortcut_incorrect_parameter(model):
-    """Test loop shortcut when the parameter is not in model parameter.
-
-    If a wrong parameter is chosen, an exception should be raised.
-    """
-
-    with pytest.raises(Exception, match="'c' is not a model parameter"):
-        loop_shortcut(model, "c")
-
-
-def test_loop_shortcut_with_stdout(model, experiment, capsys):
-    """Test loop shortcut when the parameter is not in model parameter.
-
-    If a wrong parameter is chosen, an exception should be raised.
-    """
-
-    loop_model = loop_shortcut(model, "a", {})
-    loop_model(a=[0, 2], b=2, d=2, f=3)
-
-    captured = capsys.readouterr()
-    assert captured.out == "0 | a 0 | k 0 , m 1.0\n1 | a 2 | k 128 , m 2.0\n"
-
-    unit = {"k": {"unit": "a.u.", "format": ":.3f"}}
-    loop_model = loop_shortcut(experiment, "a", {"units": unit})
-    loop_model(a=[0, 2], b=2, d=2, f=3)
-
-    captured = capsys.readouterr()
-    assert (
-        captured.out
-        == "0 | a 0 | k 0.000 a.u., m 1.0\n1 | a 2 | k 128.000 a.u., m 2.0\n"
-    )
-
-def test_remodel_shortcut(model, experiment_mod):
+def test_remodel_shortcut(experiment_mod):
     """Test remodel shortcut."""
 
     # get rid of modifiers
     mod_model = remodel_shortcut(experiment_mod, modifiers=[])
 
-    assert list(signature(mod_model).parameters.keys()) == ['a', 'b', 'd', 'f']
+    assert list(signature(mod_model).parameters.keys()) == ["a", "b", "d", "f"]
     assert mod_model.modifiers == []
