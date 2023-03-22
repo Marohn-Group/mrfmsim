@@ -1,16 +1,16 @@
 """Experiment Class
 
-The class inherit from mmodel.Model class to add certain functionality and defaults
+The class inherits from mmodel.Model class to add certain functionality and defaults.
 """
 from mmodel import MemHandler, Model
 from mrfmsim.modifier import component_modifier
 
 
 class Experiment(Model):
-    """Experiment class for mrfmsim
+    """Experiment class for mrfmsim.
 
     The class inherits from mmodel.Model with minor modifications.
-    The handler is default to MemHandler, and in plotting, the method is default
+    The handler defaults to MemHandler, and in plotting, the method defaults
     to draw_graph.
     """
 
@@ -27,7 +27,7 @@ class Experiment(Model):
 
         modifiers = modifiers or list()  # change non to list
         if component_substitutes:
-            # add component modification to modifiers
+            # add the component modification to modifiers
             component_mod = (
                 component_modifier,
                 {"component_substitutes": component_substitutes},
@@ -50,3 +50,12 @@ class Job:
         self.name = name
         self.shortcuts = shortcuts
         self.inputs = inputs
+
+
+def job_execution(experiment: Experiment, job: Job):
+    """Execute experiment based on the job."""
+
+    for shortcut, kwargs in job.shortcuts:
+        experiment = shortcut(experiment, **kwargs)
+
+    return experiment(**job.inputs)

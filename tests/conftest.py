@@ -105,28 +105,14 @@ def modelgraph():
 
 
 @pytest.fixture
-def model(modelgraph):
-    """Create model that mimic the behavior of an experiment instance"""
-
-    model = Model(
-        "test_model",
-        modelgraph,
-        (MemHandler, {}),
-        description="Test Model instances.",
-    )
-
-    return model
-
-
-@pytest.fixture
 def experiment(modelgraph):
-    """Test experiment instance with default settings"""
+    """Test experiment instance with default settings."""
     return Experiment("test_experiment_plain", modelgraph)
 
 
 @pytest.fixture
 def experiment_mod(modelgraph):
-    """Test experiment instance with modifiers and component substitutions"""
+    """Test experiment instance with modifiers and component substitutions."""
 
     return Experiment(
         "test_experiment",
@@ -161,9 +147,10 @@ def units():
 
 # External files
 
+
 @pytest.fixture
 def user_module(tmp_path, module_script):
-    """Create a custom module for testing"""
+    """Create a custom module for testing."""
     module_path = tmp_path / "user_module.py"
     module_path.write_text(module_script)
 
@@ -175,7 +162,7 @@ def user_module(tmp_path, module_script):
 
 @pytest.fixture
 def expt_file(user_module, tmp_path):
-    """Create a custom module for testing"""
+    """Create a custom module for testing."""
 
     expt_yaml = """\
     !Experiment

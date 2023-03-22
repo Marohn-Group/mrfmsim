@@ -1,10 +1,9 @@
-from mrfmsim.experiment import Experiment, Job
+from collections import defaultdict
 
 
-def job_execution(experiment: Experiment, job: Job):
-    """Execute experiment based on job."""
+def parse_format(parameter, units):
+    """Parse parameter description from units dictionary."""
 
-    for shortcut, kwargs in job.shortcuts:
-        experiment = shortcut(experiment, **kwargs)
-
-    return experiment(**job.inputs)
+    des = units.get(parameter, defaultdict(str))
+    form = "{} {{{}}} {}".format(parameter, des["format"], des["unit"])
+    return form

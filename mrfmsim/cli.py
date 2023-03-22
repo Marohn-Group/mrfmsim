@@ -1,8 +1,8 @@
 from email.policy import default
 import click
 from mrfmsim.configuration import MrfmSimLoader, MrfmSimDumper
-from mrfmsim.experiment import Job
-from mrfmsim.utility import job_execution
+from mrfmsim.experiment import Job, job_execution
+
 import yaml
 
 
