@@ -11,9 +11,9 @@ and this project adheres to
 --------------------
 Added
 ^^^^^
-- add Experiment class designed for MRFM experiments
-- add loop_shortcut with stdout modifiers
-- add remodel_shortcut to modify models
-- add the component that replaces partial parameters
-- add the component and printout modifiers
-- add cli and yaml configurations
+- Add Experiment class designed for MRFM experiments.
+- Add loop_shortcut with stdout modifiers.
+- Add remodel_shortcut to modify models.
+- Add the component that replaces partial parameters.
+- Add the component and printout modifiers.
+- Add cli and yaml configurations.
