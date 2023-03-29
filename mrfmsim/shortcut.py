@@ -116,34 +116,3 @@ def loop_shortcut(model, parameter: str, name=None):
         modifiers=modifiers,
         description=model.description,
     )
-
-
-def remodel_shortcut(
-    model,
-    name=None,
-    graph=None,
-    handler=None,
-    modifiers=None,
-    description=None,
-    returns=None,
-):
-    """Remodel parts of the model to generate a new model."""
-
-    name = name or model.name
-    graph = graph or model.graph
-    # empty modifiers will skip if only use or statement
-    modifiers = modifiers if not None else model.modifiers
-    handler = handler or model.handler
-    returns = returns if not None else model.returns
-    description = description or model.description
-
-    ModelCls = type(model)
-
-    return ModelCls(
-        name=name,
-        graph=graph,
-        handler=handler,
-        modifiers=modifiers,
-        description=description,
-        returns=returns,
-    )
