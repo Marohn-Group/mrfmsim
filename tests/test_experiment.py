@@ -12,6 +12,7 @@ def test_experiment_str(experiment_mod, experiment):
     expt_str = """\
     test_experiment(component, d, f)
     returns: (k, m)
+    graph: test_graph
     handler: MemHandler()
     modifiers:
       - loop_modifier('d')
@@ -22,6 +23,7 @@ def test_experiment_str(experiment_mod, experiment):
     ext_str_plain = """\
     test_experiment_plain(a, b, d, f)
     returns: (k, m)
+    graph: test_graph
     handler: MemHandler()"""
 
     assert str(experiment_mod) == dedent(expt_str)

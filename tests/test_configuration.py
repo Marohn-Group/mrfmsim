@@ -20,7 +20,7 @@ def test_load_module(user_module):
 
 
 def test_load_func(user_module):
-    """Load the function from user module using dot path."""
+    """Load the function from the user module using dot path."""
 
     load_module("user_module", user_module)
     func = load_func("user_module.addition")
@@ -44,7 +44,7 @@ def test_graph_constructor(experiment, user_module):
     graph_yaml = """
     # graph tag
     !Graph
-    name: test
+    name: test_graph
     grouped_edges:
         - [add, [subtract, power, log]]
         - [[subtract, power], multiply]
@@ -69,11 +69,11 @@ def test_graph_constructor(experiment, user_module):
     load_module("user_module", user_module)
     graph = yaml.load(dedent(graph_yaml), MrfmSimLoader)
 
-    # check if the two graph are the same
-    # however the function are directly parse therefore
-    # we can only check if the function names are the same
+    # Check if the two graphs are the same
+    # however the function is directly parsed. Therefore
+    # we can only check if the function names are the same.
 
-    assert graph.graph == experiment.graph.graph
+    assert graph.graph["parser"]._parser_dict == experiment.graph.graph["parser"]._parser_dict
     assert list(graph.nodes) == list(experiment.graph.nodes)
     assert graph.edges == graph.edges
 
@@ -82,8 +82,6 @@ def test_graph_constructor(experiment, user_module):
         assert attrs.pop("_func").__name__ == model_attrs.pop("_func").__name__
         assert attrs.pop("func").__name__ == model_attrs.pop("func").__name__
         assert attrs == model_attrs
-
-    # assert graph_equal(graph, model.graph)
 
 
 def test_experiment_constructor(expt_file, experiment_mod):

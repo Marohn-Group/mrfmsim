@@ -1,7 +1,7 @@
 """Test the shortcut on both Model and Experiment instances"""
 
 from types import SimpleNamespace
-from mrfmsim.shortcut import remodel_shortcut, stdout_shortcut, loop_shortcut
+from mrfmsim.shortcut import stdout_shortcut, loop_shortcut
 import pytest
 from inspect import signature
 
@@ -129,13 +129,3 @@ class TestLoopShortcut:
         """Test loop_shorcut submodel execution."""
         loop_model = loop_shortcut(experiment, "d", "loop_model")
         assert loop_model(a=0, b=2, d=[1, 2], f=3) == ([8, 0], 1.0)
-
-
-def test_remodel_shortcut(experiment_mod):
-    """Test remodel shortcut."""
-
-    # get rid of modifiers
-    mod_model = remodel_shortcut(experiment_mod, modifiers=[])
-
-    assert list(signature(mod_model).parameters.keys()) == ["a", "b", "d", "f"]
-    assert mod_model.modifiers == []

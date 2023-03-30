@@ -97,7 +97,7 @@ def modelgraph():
         ("log", logarithm, "m"),
     ]
 
-    G = ModelGraph(name="test")
+    G = ModelGraph(name="test_graph")
     G.add_grouped_edges_from(grouped_edges)
     G.set_node_objects_from(node_objects)
 
@@ -172,7 +172,7 @@ def expt_file(user_module, tmp_path):
     name: test_experiment
     graph:
         !Graph
-        name: test
+        name: test_graph
         grouped_edges:
             - [add, [subtract, power, log]]
             - [[subtract, power], multiply]
@@ -207,8 +207,7 @@ def expt_file(user_module, tmp_path):
 
 
 def graph_equal(G1, G2):
-    """Test if graphs have the same nodes, edges and attributes.
-
+    """Test if graphs have the same nodes, edges, and attributes.
     Dictionary comparison does not care about key orders.
     """
 
@@ -216,7 +215,13 @@ def graph_equal(G1, G2):
     assert dict(G1.edges) == dict(G2.edges)
 
     # test graph attributes
-    assert G1.graph == G2.graph
+    # ModelGraph adds parser attribute, here we test if the functions
+    # are the same.
+    for key in G1.graph:
+        if key == "parser":
+            assert G1.graph[key]._parser_dict == G2.graph[key]._parser_dict
+        else:
+            assert G1.graph[key] == G2.graph[key]
     assert G1.name == G2.name
 
     return True

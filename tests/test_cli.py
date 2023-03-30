@@ -30,12 +30,13 @@ def job_file(tmp_path):
 def test_cli_show(expt_file):
     """Test the show command has the correct output.
 
-    The render to browser is turned off.
+    The render to the browser is turned off.
     """
 
-    dot_source = """digraph test {
+    dot_source = """digraph test_graph {
     graph [label="test_experiment(component, d, f)
     returns: (k, m)
+    graph: test_graph
     handler: MemHandler()
     modifiers:
       - loop_modifier('d')
@@ -57,7 +58,7 @@ def test_cli_show(expt_file):
     power(c, f)
     return: g
     functype: callable
-    The value of c raise to the  power of f."]
+    The value of c raise to the power of f."]
     log [label="log
     logarithm(c, b)
     return: m
@@ -82,7 +83,8 @@ def test_cli_show(expt_file):
         assert result.exit_code == 0
         assert result.output == ""  # output to the console
 
-        with open("test.gv", "r") as f:
+        # The name of the file is the name of the graph.
+        with open("test_graph.gv", "r") as f:
             dot_graph = f.read()
             dot_graph_source = (
                 dot_graph.replace("\t", "").replace("\l", "\n").replace("\n", "")
@@ -90,7 +92,7 @@ def test_cli_show(expt_file):
         assert dot_graph_source == dedent(dot_source).replace("\n", "").replace(
             "    ", ""
         )
-        assert os.path.exists("test.gv.pdf")
+        assert os.path.exists("test_graph.gv.pdf")
 
 
 def test_cli_template(expt_file):
