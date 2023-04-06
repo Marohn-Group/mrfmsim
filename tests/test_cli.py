@@ -10,11 +10,11 @@ def job_file(tmp_path):
     """Create a job yaml file."""
 
     job_yaml = """
-    - !Job
+    - !job
       name: test
       inputs:
         component:
-          !Dataobj
+          !dataobj
           a: 0
           b: 2
         d: [2, 3]
@@ -99,7 +99,7 @@ def test_cli_template(expt_file):
     """Test the template command outputs the value correctly."""
 
     job_template = """\
-    - !Job
+    - !job
       name: ''
       inputs:
         component: ''

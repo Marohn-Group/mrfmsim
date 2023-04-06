@@ -5,6 +5,7 @@ import sys
 import yaml
 from mmodel import ModelGraph
 from mrfmsim.experiment import Experiment, Job
+from inspect import getsource
 
 import types
 
@@ -40,7 +41,7 @@ def load_func(path):
 
 
 def module_constructor(loader, node):
-    """Load user module with the "!Module" tag."""
+    """Load user module with the "!module" tag."""
 
     # In yaml the tagged objects are parsed first. To have
     # the modules imported first, a compromise is to have the module
@@ -55,7 +56,7 @@ def module_constructor(loader, node):
 
 
 def graph_constructor(loader, node):
-    """Parse the "!Graph" tag into ModelGraph object."""
+    """Parse the "!graph" tag into ModelGraph object."""
 
     param_dict = loader.construct_mapping(node, deep=True)
 
@@ -80,18 +81,18 @@ def func_representer(dumper: yaml.Dumper, func: types.FunctionType):
     module = sys.modules[func.__module__]
     dotpath = f"{module.__name__}.{func.__name__}"
 
-    return dumper.represent_scalar("!Func", dotpath)
+    return dumper.represent_scalar("!import", dotpath)
 
 
 def func_constructor(loader, node):
-    """Parse the "!Func" tag into a callable object."""
+    """Parse the "!import" tag into a callable object."""
 
     dotpath = str(loader.construct_scalar(node))
     return load_func(dotpath)
 
 
 def dataobj_constructor(loader, node):
-    """Parse the "!Dataobj" tag into a SimpleNamespace object."""
+    """Parse the "!dataobj" tag into a SimpleNamespace object."""
 
     param_dict = loader.construct_mapping(node, deep=True)
 
@@ -110,7 +111,7 @@ def experiment_constructor(loader, node):
     expt_params["name"] = param_dict["name"]
     expt_params["graph"] = param_dict["graph"]
 
-    for param in ["handler", "description", "component_substitutes", "modifiers"]:
+    for param in ["handler", "description", "replace_inputs", "modifiers"]:
         if param in param_dict:
             expt_params[param] = param_dict[param]
 
@@ -124,11 +125,17 @@ def job_constructor(loader: yaml.BaseLoader, node):
     return Job(**param_dict)
 
 
+def lambda_constructor(loader: yaml.BaseLoader, node):
+    """Load lambda function from yaml string."""
+
+    return eval(loader.construct_scalar(node))
+
+
 def job_representer(dumper: yaml.SafeDumper, job: Job):
     """Represent a Job instance."""
 
     return dumper.represent_mapping(
-        "!Job", {"name": job.name, "inputs": job.inputs, "shortcuts": job.shortcuts}
+        "!job", {"name": job.name, "inputs": job.inputs, "shortcuts": job.shortcuts}
     )
 
 
@@ -136,12 +143,13 @@ class MrfmSimLoader(yaml.SafeLoader):
     """Yaml loader with special constructors."""
 
 
-MrfmSimLoader.add_constructor("!Module", module_constructor)
-MrfmSimLoader.add_constructor("!Func", func_constructor)
-MrfmSimLoader.add_constructor("!Graph", graph_constructor)
-MrfmSimLoader.add_constructor("!Experiment", experiment_constructor)
-MrfmSimLoader.add_constructor("!Dataobj", dataobj_constructor)
-MrfmSimLoader.add_constructor("!Job", job_constructor)
+MrfmSimLoader.add_constructor("!module", module_constructor)
+MrfmSimLoader.add_constructor("!import", func_constructor)
+MrfmSimLoader.add_constructor("!lambda", lambda_constructor)
+MrfmSimLoader.add_constructor("!graph", graph_constructor)
+MrfmSimLoader.add_constructor("!experiment", experiment_constructor)
+MrfmSimLoader.add_constructor("!dataobj", dataobj_constructor)
+MrfmSimLoader.add_constructor("!job", job_constructor)
 
 
 class MrfmSimDumper(yaml.Dumper):

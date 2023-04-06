@@ -32,7 +32,7 @@ def test_func_constructor():
     """Test function constructor correctly loads function."""
 
     func_yaml = """\
-    !Func numpy.sum
+    !import numpy.sum
     """
     yaml_func = yaml.load(dedent(func_yaml), MrfmSimLoader)
     assert yaml_func.__name__ == "sum"
@@ -43,26 +43,26 @@ def test_graph_constructor(experiment, user_module):
     """Test the graph constructor parsing the graph correctly."""
     graph_yaml = """
     # graph tag
-    !Graph
+    !graph
     name: test_graph
     grouped_edges:
         - [add, [subtract, power, log]]
         - [[subtract, power], multiply]
     node_objects:
         add:
-            func: !Func user_module.addition
+            func: !import user_module.addition
             output: c
         subtract:
-            func: !Func user_module.subtraction
+            func: !import user_module.subtraction
             output: e
         power:
-            func: !Func user_module.power
+            func: !import user_module.power
             output: g
         multiply:
-            func: !Func user_module.multiplication
+            func: !import user_module.multiplication
             output: k
         log:
-            func: !Func user_module.logarithm
+            func: !import user_module.logarithm
             output: m
     """
 
@@ -99,14 +99,25 @@ def test_func_representer():
         return
 
     func_yaml = yaml.dump(func, Dumper=MrfmSimDumper, sort_keys=False)
-    assert func_yaml.strip() == "!Func 'tests.test_configuration.func'"
+    assert func_yaml.strip() == "!import 'tests.test_configuration.func'"
+
+
+def test_lambda_constructor():
+    """Test if it can load lambda function correctly."""
+
+    lambda_yaml = """
+    !lambda 'lambda a, b: a + b'
+    """
+
+    lambda_func = yaml.load(dedent(lambda_yaml), MrfmSimLoader)
+    assert lambda_func(1, 2) == 3
 
 
 def test_dataobj_constructor():
     """Test dataobj constructor."""
 
     dataobj_str = """
-    !Dataobj
+    !dataobj
     a: 1
     b: 'test'
     """
@@ -117,13 +128,13 @@ def test_dataobj_constructor():
 
 
 JOB_STR = """\
-!Job
+!job
 name: test
 inputs:
   a: 1
   b: 2
 shortcuts:
-- !Func 'mrfmsim.shortcut.loop_shortcut'
+- !import 'mrfmsim.shortcut.loop_shortcut'
 """
 
 
@@ -153,7 +164,7 @@ def test_job_constructor_no_shortcut():
     """Test load job object when shortcuts are not specified."""
 
     job_str_plain = """\
-    !Job
+    !job
     name: ''
     inputs: {}
     """
