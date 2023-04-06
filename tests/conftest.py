@@ -117,7 +117,7 @@ def experiment_mod(modelgraph):
     return Experiment(
         "test_experiment",
         modelgraph,
-        component_substitutes={"component": ["a", "b"]},
+        replace_inputs={"component": ["a", "b"]},
         modifiers=[(loop_modifier, {"parameter": "d"})],
         description="Test experiment with components.",
     )
@@ -165,38 +165,38 @@ def expt_file(user_module, tmp_path):
     """Create a custom module for testing."""
 
     expt_yaml = """\
-    !Experiment
+    !experiment
     user_module:
-        !Module
+        !module
         user_module: {user_module_path}
     name: test_experiment
     graph:
-        !Graph
+        !graph
         name: test_graph
         grouped_edges:
             - [add, [subtract, power, log]]
             - [[subtract, power], multiply]
         node_objects:
             add:
-                func: !Func user_module.addition
+                func: !import user_module.addition
                 output: c
             subtract:
-                func: !Func user_module.subtraction
+                func: !import user_module.subtraction
                 output: e
             power:
-                func: !Func user_module.power
+                func: !import user_module.power
                 output: g
             multiply:
-                func: !Func user_module.multiplication
+                func: !import user_module.multiplication
                 output: k
             log:
-                func: !Func user_module.logarithm
+                func: !import user_module.logarithm
                 output: m
-    component_substitutes:
+    replace_inputs:
         component: [a, b]
     description: Test experiment with components.
     modifiers:
-        - [!Func mmodel.loop_modifier, {{'parameter': 'd'}}]
+        - [!import mmodel.loop_modifier, {{'parameter': 'd'}}]
     """
 
     expt_yaml = dedent(expt_yaml).format(user_module_path=user_module)

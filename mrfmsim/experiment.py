@@ -22,15 +22,15 @@ class Experiment(Model):
         modifiers: list = None,
         description: str = "",
         returns: list = None,
-        component_substitutes: dict = {},
+        replace_inputs: dict = {},
     ):
 
         modifiers = modifiers or list()  # change non to list
-        if component_substitutes:
-            # add the component modification to modifiers
+        if replace_inputs:
+            # Add the component modification to modifiers.
             component_mod = (
                 component_modifier,
-                {"component_substitutes": component_substitutes},
+                {"replacement": replace_inputs},
             )
 
             modifiers = modifiers + [component_mod]
