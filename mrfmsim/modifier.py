@@ -1,11 +1,10 @@
 from mmodel.utility import replace_signature
-from mrfmsim.utility import parse_format
 from functools import wraps
 import inspect
 from collections import defaultdict
 
 
-def component_modifier(func, component_substitutes):
+def component_modifier(func, replacement: dict):
     """Modify the signature with components."""
 
     sig = inspect.signature(func)
@@ -14,7 +13,7 @@ def component_modifier(func, component_substitutes):
     @wraps(func)
     def wrapped(**kwargs):
 
-        for component, substitutes in component_substitutes.items():
+        for component, substitutes in replacement.items():
             component_obj = kwargs.pop(component)
             for attr in substitutes:
                 # skip the attribute if it is not needed
@@ -25,9 +24,20 @@ def component_modifier(func, component_substitutes):
 
         return func(**kwargs)
 
-    wrapped.__signature__ = replace_signature(sig, component_substitutes)
+    wrapped.__signature__ = replace_signature(sig, replacement)
 
     return wrapped
+
+
+def parse_format(parameter, units):
+    """Parse parameter description from units dictionary.
+
+    The function is used for stdout modifiers.
+    """
+
+    des = units.get(parameter, defaultdict(str))
+    form = "{} {{{}}} {}".format(parameter, des["format"], des["unit"])
+    return form
 
 
 def stdout_input_modifier(func, inputs: list, units: dict = {}, end: str = "\n"):
