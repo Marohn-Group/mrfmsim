@@ -82,6 +82,24 @@ def import_constructor(loader, node):
     dotpath = str(loader.construct_scalar(node))
     return load_func(dotpath)
 
+def execute_constructor(loader: yaml.BaseLoader, node):
+    """Prase the "!execute" tag into a lambda function.
+
+    The constructor is to simple function type:
+
+    def outerfunc(func, **kwargs):
+        return func(**kwargs)
+
+    The first argument is the function.
+    """
+
+    param_list = loader.construct_sequence(node)
+    print(param_list)
+
+    # dynamically create lambda function
+    inputs = ", ".join(param_list)
+    output = f"{param_list[0]}({', '.join(param_list[1:])})"
+    return eval(f"lambda {inputs}: {output}")
 
 def func_constructor(loader: yaml.BaseLoader, node):
     """Load function from yaml string."""
@@ -146,6 +164,7 @@ class MrfmSimLoader(yaml.SafeLoader):
 MrfmSimLoader.add_constructor("!module", module_constructor)
 MrfmSimLoader.add_constructor("!import", import_constructor)
 MrfmSimLoader.add_constructor("!func", func_constructor)
+MrfmSimLoader.add_constructor("!execute", execute_constructor)
 MrfmSimLoader.add_constructor("!graph", graph_constructor)
 MrfmSimLoader.add_constructor("!experiment", experiment_constructor)
 MrfmSimLoader.add_constructor("!dataobj", dataobj_constructor)

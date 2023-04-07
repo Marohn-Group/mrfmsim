@@ -102,7 +102,7 @@ def test_func_representer():
     assert func_yaml.strip() == "!import 'tests.test_configuration.func'"
 
 
-def test_lambda_constructor():
+def test_func_constructor():
     """Test if it can load lambda function correctly."""
 
     lambda_yaml = """
@@ -111,6 +111,20 @@ def test_lambda_constructor():
 
     lambda_func = yaml.load(dedent(lambda_yaml), MrfmSimLoader)
     assert lambda_func(1, 2) == 3
+
+def test_execute_constructor():
+    """Test if it can load execute object correctly."""
+
+    def add(a, b):
+        """Add two numbers."""
+        return a + b
+
+    execute_yaml = """
+    !execute [add, a, b]
+    """
+    execute_func = yaml.load(dedent(execute_yaml), MrfmSimLoader)
+
+    assert execute_func(add, 1, 2) == 3
 
 
 def test_dataobj_constructor():
