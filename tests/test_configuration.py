@@ -120,7 +120,7 @@ def test_execute_constructor():
         return a + b
 
     execute_yaml = """
-    !execute [add, a, b]
+    !execute add(a, b)
     """
     execute_func = yaml.load(dedent(execute_yaml), MrfmSimLoader)
 

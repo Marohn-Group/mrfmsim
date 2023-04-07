@@ -82,6 +82,7 @@ def import_constructor(loader, node):
     dotpath = str(loader.construct_scalar(node))
     return load_func(dotpath)
 
+
 def execute_constructor(loader: yaml.BaseLoader, node):
     """Prase the "!execute" tag into a lambda function.
 
@@ -90,16 +91,16 @@ def execute_constructor(loader: yaml.BaseLoader, node):
     def outerfunc(func, **kwargs):
         return func(**kwargs)
 
-    The first argument is the function.
+    The argument is a string that details the function and the arguments.
+    For example to use func on a and b, "!execute func(a, b)" is used.
     """
 
-    param_list = loader.construct_sequence(node)
-    print(param_list)
+    func_expression = loader.construct_scalar(node)
+    params_str = func_expression.replace("(", ",").replace(")", "")
 
     # dynamically create lambda function
-    inputs = ", ".join(param_list)
-    output = f"{param_list[0]}({', '.join(param_list[1:])})"
-    return eval(f"lambda {inputs}: {output}")
+    return eval(f"lambda {params_str}: {func_expression}")
+
 
 def func_constructor(loader: yaml.BaseLoader, node):
     """Load function from yaml string."""
