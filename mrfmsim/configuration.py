@@ -76,19 +76,25 @@ def graph_constructor(loader, node):
     return graph
 
 
+def import_constructor(loader, node):
+    """Parse the "!import" tag into a callable object."""
+
+    dotpath = str(loader.construct_scalar(node))
+    return load_func(dotpath)
+
+
+def func_constructor(loader: yaml.BaseLoader, node):
+    """Load function from yaml string."""
+
+    return eval(loader.construct_scalar(node))
+
+
 def func_representer(dumper: yaml.Dumper, func: types.FunctionType):
     """Represent function scalar."""
     module = sys.modules[func.__module__]
     dotpath = f"{module.__name__}.{func.__name__}"
 
     return dumper.represent_scalar("!import", dotpath)
-
-
-def func_constructor(loader, node):
-    """Parse the "!import" tag into a callable object."""
-
-    dotpath = str(loader.construct_scalar(node))
-    return load_func(dotpath)
 
 
 def dataobj_constructor(loader, node):
@@ -125,12 +131,6 @@ def job_constructor(loader: yaml.BaseLoader, node):
     return Job(**param_dict)
 
 
-def lambda_constructor(loader: yaml.BaseLoader, node):
-    """Load lambda function from yaml string."""
-
-    return eval(loader.construct_scalar(node))
-
-
 def job_representer(dumper: yaml.SafeDumper, job: Job):
     """Represent a Job instance."""
 
@@ -144,8 +144,8 @@ class MrfmSimLoader(yaml.SafeLoader):
 
 
 MrfmSimLoader.add_constructor("!module", module_constructor)
-MrfmSimLoader.add_constructor("!import", func_constructor)
-MrfmSimLoader.add_constructor("!lambda", lambda_constructor)
+MrfmSimLoader.add_constructor("!import", import_constructor)
+MrfmSimLoader.add_constructor("!func", func_constructor)
 MrfmSimLoader.add_constructor("!graph", graph_constructor)
 MrfmSimLoader.add_constructor("!experiment", experiment_constructor)
 MrfmSimLoader.add_constructor("!dataobj", dataobj_constructor)

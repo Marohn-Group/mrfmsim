@@ -106,7 +106,7 @@ def test_lambda_constructor():
     """Test if it can load lambda function correctly."""
 
     lambda_yaml = """
-    !lambda 'lambda a, b: a + b'
+    !func 'lambda a, b: a + b'
     """
 
     lambda_func = yaml.load(dedent(lambda_yaml), MrfmSimLoader)
