@@ -55,8 +55,8 @@ def test_str(component_obj):
     base_str = """\
     ComponentBase(
       b0=100.0 [mT] # longitudinal magnetic field
-      b1=[1 2 3] [mT] # transverse magnetic field
-      b_tot=[1. 2. 3.] [mT] # total magnetic field
+      b1=[1.000 2.000 3.000] [mT] # transverse magnetic field
+      b_tot=[1.0 2.0 3.0] [mT] # total magnetic field
       list=[1, 2, 3]
       str=str
       tuple=(1, 2, 3)
@@ -72,7 +72,7 @@ def test_str_no_unit(component_obj):
     ComponentBase(
       b0=100.0
       b1=[1 2 3]
-      b_tot=[1. 2. 3.]
+      b_tot=[1.0 2.0 3.0]
       list=[1, 2, 3]
       str=str
       tuple=(1, 2, 3)

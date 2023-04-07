@@ -40,6 +40,11 @@ class ComponentBase:
             if unit:
                 unit = f" {unit}"
 
-            str_list.append(f"\t{key}={value}{unit}{des}".expandtabs(2))
+            formatter = lambda v: "{{{}}}".format(u_dict["format"]).format(v)
+            with np.printoptions(formatter={"float": formatter, "int": formatter}):
+                s = "\t{}={}{}{}".format(key, value, unit, des)
+            
+            str_list.append(s.expandtabs(2))
+
 
         return f"{name}(\n" + "\n".join(str_list) + "\n)"
