@@ -40,10 +40,18 @@ class ComponentBase:
             if unit:
                 unit = f" {unit}"
 
-            formatter = lambda v: "{{{}}}".format(u_dict["format"]).format(v)
-            with np.printoptions(formatter={"float": formatter, "int": formatter}):
-                s = "\t{}={}{}{}".format(key, value, unit, des)
-            
+            formatter = "{{{}}}".format(u_dict["format"]).format
+            if isinstance(value, list):
+                # convert list to numpy array for representation
+                # normally carries integers, exclude the tuple cases
+                value = np.array(value)
+            if isinstance(value, np.ndarray):
+                with np.printoptions(formatter={"all": formatter}):
+                    s = "\t{}={}{}{}".format(key, value, unit, des)
+            else:
+                value_str = formatter(value)
+                s = "\t{}={}{}{}".format(key, value_str, unit, des)
+
             str_list.append(s.expandtabs(2))
 
 
