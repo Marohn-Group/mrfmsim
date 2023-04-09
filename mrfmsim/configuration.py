@@ -157,24 +157,55 @@ def job_representer(dumper: yaml.SafeDumper, job: Job):
         "!job", {"name": job.name, "inputs": job.inputs, "shortcuts": job.shortcuts}
     )
 
+def yaml_loader(constructor_dict):
+    """Create a yaml loader with special constructors.
+    
+    :param dict constructor_dict: dictionary of constructors
+    :returns: yaml loader class
+    """
 
-class MrfmSimLoader(yaml.SafeLoader):
-    """Yaml loader with special constructors."""
+    class Loader(yaml.SafeLoader):
+        """Yaml loader class."""
+
+    for key, value in constructor_dict.items():
+        Loader.add_constructor(key, value)
+    
+    return Loader
+
+default_constructors = {
+    "!module": module_constructor,
+    "!import": import_constructor,
+    "!func": func_constructor,
+    "!execute": execute_constructor,
+    "!graph": graph_constructor,
+    "!experiment": experiment_constructor,
+    "!dataobj": dataobj_constructor,
+    "!job": job_constructor,
+}
+
+MrfmSimLoader = yaml_loader(default_constructors)
 
 
-MrfmSimLoader.add_constructor("!module", module_constructor)
-MrfmSimLoader.add_constructor("!import", import_constructor)
-MrfmSimLoader.add_constructor("!func", func_constructor)
-MrfmSimLoader.add_constructor("!execute", execute_constructor)
-MrfmSimLoader.add_constructor("!graph", graph_constructor)
-MrfmSimLoader.add_constructor("!experiment", experiment_constructor)
-MrfmSimLoader.add_constructor("!dataobj", dataobj_constructor)
-MrfmSimLoader.add_constructor("!job", job_constructor)
+
+def yaml_dumper(representer_dict):
+    """Create a yaml dumper with special representer.
+
+    :param dict representer_dict: dictionary of representer
+    :returns: yaml dumper class
+    """
+
+    class Dumper(yaml.SafeDumper):
+        """Yaml dumper class."""
+
+    for key, value in representer_dict.items():
+        Dumper.add_representer(key, value)
+    
+    return Dumper 
 
 
-class MrfmSimDumper(yaml.Dumper):
-    """Yaml dumper with special constructors."""
+default_representers = {
+    types.FunctionType: func_representer,
+    Job: job_representer,
+}
 
-
-MrfmSimDumper.add_representer(types.FunctionType, func_representer)
-MrfmSimDumper.add_representer(Job, job_representer)
+MrfmSimDumper = yaml_dumper(default_representers)
