@@ -1,15 +1,15 @@
 """Shortcuts
 
-The shortcut should work for both the Model and the Experiment class8.
+The shortcut should work for both the Model and the Experiment classes.
 """
 
 from mmodel import loop_modifier
 from networkx.utils import nodes_equal
-from mrfmsim.modifier import stdout_input_modifier, stdout_output_modifier
+from mrfmsim.modifier import print_inputs, print_output
 import networkx as nx
 
 
-def stdout_shortcut(model, parameters, units={}, name=None):
+def print_shortcut(model, parameters, units={}, name=None):
     """Shortcut to printout parameters.
 
     The shortcuts determine if the parameter is an input parameter
@@ -33,14 +33,14 @@ def stdout_shortcut(model, parameters, units={}, name=None):
 
     # input parameters modifier are the model level
     if input_params:
-        mod = (stdout_input_modifier, {"inputs": input_params, "units": units})
+        mod = print_inputs(inputs=input_params, units=units)
         modifiers.append(mod)
 
     if output_params:
         # find the nodes with the output parameters
         for node, output in nx.get_node_attributes(G, "output").items():
             if output in output_params:
-                mod = (stdout_output_modifier, {"output": output, "units": units})
+                mod = print_output(output=output, units=units)
                 node_modifiers = G.nodes[node]["modifiers"]
                 node_modifiers.append(mod)
                 G.modify_node(node, modifiers=node_modifiers, inplace=True)
@@ -70,12 +70,11 @@ def loop_shortcut(model, parameter: str, name=None):
     name = name or model.name
     modifiers = model.modifiers
 
-    loop_mod = (loop_modifier, {"parameter": parameter})
-    # all process uses list unpack to create a new list!
+    loop_mod = loop_modifier(parameter)
 
-    # this is the case when the parameter is in the signature but not in the graph
-    # this is due to the signature modifier on the model level
-    # therefore the whole model is looped.
+    # If the parameter is in the signature but not in the graph.
+    # This is due to the signature modifier on the model level
+    # and the whole model is looped.
 
     if parameter not in G.signature.parameters:
         modifiers = [*modifiers, loop_mod]
@@ -115,4 +114,5 @@ def loop_shortcut(model, parameter: str, name=None):
         handler=model.handler,
         modifiers=modifiers,
         description=model.description,
+        **model.handler_args
     )

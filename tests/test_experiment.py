@@ -13,10 +13,10 @@ def test_experiment_str(experiment_mod, experiment):
     test_experiment(component, d, f)
     returns: (k, m)
     graph: test_graph
-    handler: MemHandler()
+    handler: MemHandler
     modifiers:
       - loop_modifier('d')
-      - component_modifier({'component': ['a', 'b']})
+      - replace_component({'component': ['a', 'b']})
 
     Test experiment with components."""
 
@@ -24,7 +24,7 @@ def test_experiment_str(experiment_mod, experiment):
     test_experiment_plain(a, b, d, f)
     returns: (k, m)
     graph: test_graph
-    handler: MemHandler()"""
+    handler: MemHandler"""
 
     assert str(experiment_mod) == dedent(expt_str)
     assert str(experiment) == dedent(ext_str_plain)

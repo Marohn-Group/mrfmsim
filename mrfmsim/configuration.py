@@ -188,7 +188,7 @@ MrfmSimLoader = yaml_loader(default_constructors)
 
 
 def yaml_dumper(representer_dict):
-    """Create a yaml dumper with special representer.
+    """Create a yaml dumper with custom representers.
 
     :param dict representer_dict: dictionary of representer
     :returns: yaml dumper class

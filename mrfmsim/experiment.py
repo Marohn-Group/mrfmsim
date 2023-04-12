@@ -3,7 +3,7 @@
 The class inherits from mmodel.Model class to add certain functionality and defaults.
 """
 from mmodel import MemHandler, Model
-from mrfmsim.modifier import component_modifier
+from mrfmsim.modifier import replace_component
 
 
 class Experiment(Model):
@@ -18,24 +18,23 @@ class Experiment(Model):
         self,
         name,
         graph,
-        handler=(MemHandler, {}),
+        handler=MemHandler,
         modifiers: list = None,
         description: str = "",
         returns: list = None,
         replace_inputs: dict = {},
+        **kwargs,
     ):
 
         modifiers = modifiers or list()  # change non to list
         if replace_inputs:
             # Add the component modification to modifiers.
-            component_mod = (
-                component_modifier,
-                {"replacement": replace_inputs},
-            )
-
+            component_mod = replace_component(replace_inputs)
             modifiers = modifiers + [component_mod]
 
-        super().__init__(name, graph, handler, modifiers, description, returns)
+        super().__init__(
+            name, graph, handler, modifiers, description, returns, **kwargs
+        )
 
 
 class Job:
