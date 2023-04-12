@@ -51,7 +51,7 @@ class Job:
         self.inputs = inputs
 
 
-def job_execution(experiment: Experiment, job: Job):
+def job_execution(experiment, job: Job):
     """Execute experiment based on the job."""
 
     for shortcut, kwargs in job.shortcuts:

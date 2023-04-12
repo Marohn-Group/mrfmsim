@@ -9,12 +9,12 @@ from textwrap import dedent
 def job_file(tmp_path):
     """Create a job yaml file."""
 
-    job_yaml = """
-    - !job
+    job_yaml = """\
+    - !import:mrfmsim.experiment.Job
       name: test
       inputs:
         component:
-          !dataobj
+          !import:types.SimpleNamespace
           a: 0
           b: 2
         d: [2, 3]
@@ -37,38 +37,38 @@ def test_cli_show(expt_file):
     graph [label="test_experiment(component, d, f)
     returns: (k, m)
     graph: test_graph
-    handler: MemHandler()
+    handler: MemHandler
     modifiers:
       - loop_modifier('d')
-      - component_modifier({'component': ['a', 'b']})
+      - replace_component({'component': ['a', 'b']})
     Test experiment with components." 
     labeljust=l labelloc=t ordering=out splines=ortho]
     node [shape=box]
     add [label="add
-    addition(a, constant=2)
+    add(a, constant=2)
     return: c
-    functype: callable
-    Add a constant to the value a."]
+    functype: numpy.ufunc
+    Add arguments element-wise."]
     subtract [label="subtract
-    subtraction(c, d)
+    sub(c, d)
     return: e
-    functype: callable
-    Subtraction operation."]
+    functype: builtin
+    Same as a - b."]
     power [label="power
-    power(c, f)
+    pow(c, f)
     return: g
-    functype: callable
-    The value of c raise to the power of f."]
+    functype: builtin
+    Return x**y (x to the power of y)."]
     log [label="log
-    logarithm(c, b)
+    log(c, b)
     return: m
-    functype: callable
-    Logarithm operation."]
+    functype: builtin
+    Return the logarithm of x to the given base."]
     multiply [label="multiply
-    multiplication(e, g)
+    multiply(e, g)
     return: k
-    functype: callable
-    Multiply e and g."]
+    functype: numpy.ufunc
+    Multiply arguments element-wise."]
     add -> subtract [xlabel=c]
     add -> power [xlabel=c]
     add -> log [xlabel=c]
@@ -76,9 +76,9 @@ def test_cli_show(expt_file):
     power -> multiply [xlabel=g]
     }"""
 
+ 
     runner = CliRunner()
     with runner.isolated_filesystem():
-
         result = runner.invoke(cli, ["--expt", str(expt_file), "show", "--no-view"])
         assert result.exit_code == 0
         assert result.output == ""  # output to the console
@@ -99,7 +99,7 @@ def test_cli_template(expt_file):
     """Test the template command outputs the value correctly."""
 
     job_template = """\
-    - !job
+    - !import:mrfmsim.experiment.Job
       name: ''
       inputs:
         component: ''
@@ -126,4 +126,4 @@ def test_cli_execute(expt_file, job_file):
     )
 
     assert result.exit_code == 0
-    assert result.output.strip() == "[(0, 1.0), (-2, 1.0)]"  # echo to console
+    assert result.output.strip() == "[(0.0, 1.0), (-2.0, 1.0)]"  # echo to console

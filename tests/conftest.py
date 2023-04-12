@@ -11,69 +11,8 @@ from mmodel import ModelGraph
 from mmodel.modifier import loop_modifier
 from mrfmsim.experiment import Experiment
 from textwrap import dedent
-import sys
-
-
-def addition(a, constant=2):
-    """Add a constant to the value a."""
-    return a + constant
-
-
-def subtraction(c, d):
-    """Subtraction operation."""
-    return c - d
-
-
-def power(c, f):
-    """The value of c raise to the power of f."""
-    return c**f
-
-
-def multiplication(e, g):
-    """Multiply e and g."""
-    return e * g
-
-
-def logarithm(c, b):
-    """Logarithm operation."""
-    return math.log(c, b)
-
-
-@pytest.fixture
-def module_script():
-    """The content of a python module script."""
-
-    module_str = '''
-    # Test python script.
-
-    import math
-
-    def addition(a, constant=2):
-        """Add a constant to the value a."""
-        return a + constant
-
-
-    def subtraction(c, d):
-        """Subtraction operation."""
-        return c - d
-
-
-    def power(c, f):
-        """The value of c raise to the power of f."""
-        return c**f
-
-
-    def multiplication(e, g):
-        """Multiply e and g."""
-        return e * g
-
-
-    def logarithm(c, b):
-        """Logarithm operation."""
-        return math.log(c, b)
-
-    '''
-    return dedent(module_str)
+import numpy as np
+import operator
 
 
 @pytest.fixture
@@ -91,11 +30,11 @@ def modelgraph():
     ]
 
     node_objects = [
-        ("add", addition, "c"),
-        ("subtract", subtraction, "e"),
-        ("power", power, "g"),
-        ("multiply", multiplication, "k"),
-        ("log", logarithm, "m"),
+        ("add", np.add, "c", ["a", ("constant", 2)]),
+        ("subtract", operator.sub, "e", ["c", "d"]),
+        ("power", math.pow, "g", ["c", "f"]),
+        ("multiply", np.multiply, "k", ["e", "g"]),
+        ("log", math.log, "m", ["c", "b"]),
     ]
 
     G = ModelGraph(name="test_graph")
@@ -119,7 +58,7 @@ def experiment_mod(modelgraph):
         "test_experiment",
         modelgraph,
         replace_inputs={"component": ["a", "b"]},
-        modifiers=[loop_modifier(parameter='d')],
+        modifiers=[loop_modifier(parameter="d")],
         description="Test experiment with components.",
     )
 
@@ -141,35 +80,16 @@ def units():
             "unit": "[mT]",
             "format": ":.1f",
             "description": "total magnetic field",
-        }
-        # 'bz': {'unit': '[mT]', "format": ":.3f"}, # comment the entry for testing
+        },
     }
 
 
-# External files
-
-
 @pytest.fixture
-def user_module(tmp_path, module_script):
-    """Create a custom module for testing."""
-    module_path = tmp_path / "user_module.py"
-    module_path.write_text(module_script)
-
-    yield module_path
-    # runs after the test is complete
-    if "user_module" in sys.modules:
-        del sys.modules["user_module"]
-
-
-@pytest.fixture
-def expt_file(user_module, tmp_path):
+def expt_file(tmp_path):
     """Create a custom module for testing."""
 
     expt_yaml = """\
-    !experiment
-    user_module:
-        !module
-        user_module: {user_module_path}
+    !import:mrfmsim.experiment.Experiment
     name: test_experiment
     graph:
         !graph
@@ -179,50 +99,32 @@ def expt_file(user_module, tmp_path):
             - [[subtract, power], multiply]
         node_objects:
             add:
-                func: !import user_module.addition
+                func: !import numpy.add
                 output: c
+                inputs: [a, [constant, 2]]
             subtract:
-                func: !import user_module.subtraction
+                func: !import operator.sub
                 output: e
+                inputs: [c, d]
             power:
-                func: !import user_module.power
+                func: !import math.pow
                 output: g
+                inputs: [c, f]
             multiply:
-                func: !import user_module.multiplication
+                func: !import numpy.multiply
                 output: k
+                inputs: [e, g]
             log:
-                func: !import user_module.logarithm
+                func: !import math.log
                 output: m
-    replace_inputs:
-        component: [a, b]
+                inputs: [c, b]
+    replace_inputs: {component: [a, b]}
     description: Test experiment with components.
-    modifiers:
-        - [!import mmodel.loop_modifier, {{'parameter': 'd'}}]
+    modifiers: [!import:mmodel.loop_modifier {parameter: d}]
     """
 
-    expt_yaml = dedent(expt_yaml).format(user_module_path=user_module)
+    expt_yaml = dedent(expt_yaml)
 
     module_path = tmp_path / "expt.yaml"
     module_path.write_text(expt_yaml)
     return module_path
-
-
-def graph_equal(G1, G2):
-    """Test if graphs have the same nodes, edges, and attributes.
-    Dictionary comparison does not care about key orders.
-    """
-
-    assert dict(G1.nodes) == dict(G2.nodes)
-    assert dict(G1.edges) == dict(G2.edges)
-
-    # test graph attributes
-    # ModelGraph adds parser attribute, here we test if the functions
-    # are the same.
-    for key in G1.graph:
-        if key == "parser":
-            assert G1.graph[key]._parser_dict == G2.graph[key]._parser_dict
-        else:
-            assert G1.graph[key] == G2.graph[key]
-    assert G1.name == G2.name
-
-    return True

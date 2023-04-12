@@ -59,7 +59,7 @@ class TestStdoutShortcut:
         stdout_model = print_shortcut(experiment, ["d", "c", "k"])
         stdout_model(a=0, b=2, d=2, f=3)
         captured = capsys.readouterr()
-        assert captured.out == "d 2\nc 2\nk 0\n"
+        assert captured.out == "d 2\nc 2\nk 0.0\n"
 
 
 class TestLoopShortcut:
