@@ -3,11 +3,9 @@ from mrfmsim.configuration import (
     MrfmSimLoader,
     MrfmSimDumper,
 )
-import sys
+import inspect
 import pytest
 import yaml
-
-# from tests.conftest import graph_equal
 from mrfmsim.shortcut import loop_shortcut
 from mrfmsim.experiment import Job
 from textwrap import dedent
@@ -107,6 +105,7 @@ def test_execute_constructor():
 
     execute_yaml = "!execute add(a, b)"
     execute_func = yaml.load(dedent(execute_yaml), MrfmSimLoader)
+    assert list(inspect.signature(execute_func).parameters.keys()) == ["add", "a", "b"]
 
     assert execute_func(add, 1, 2) == 3
 
@@ -122,6 +121,7 @@ def test_execute_constructor_unpack():
 
     execute_yaml = "!execute add(a, *bc)"
     execute_func = yaml.load(dedent(execute_yaml), MrfmSimLoader)
+    assert list(inspect.signature(execute_func).parameters.keys()) == ["add", "a", "bc"]
 
     assert execute_func(add, 1, [2, 3]) == 6
 
