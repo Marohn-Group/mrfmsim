@@ -97,18 +97,33 @@ def test_func_constructor():
 
 
 def test_execute_constructor():
-    """Test if it can load execute object correctly."""
+    """Test if it can load execute object correctly.
+
+    Add is an intermediate node output value."""
 
     def add(a, b):
         """Add two numbers."""
         return a + b
 
-    execute_yaml = """
-    !execute add(a, b)
-    """
+    execute_yaml = "!execute add(a, b)"
     execute_func = yaml.load(dedent(execute_yaml), MrfmSimLoader)
 
     assert execute_func(add, 1, 2) == 3
+
+
+def test_execute_constructor_unpack():
+    """Test if it can load execute object with unpacking correctly.
+
+    Add is an intermediate node output value."""
+
+    def add(a, b, c):
+        """Add three numbers."""
+        return a + b + c
+
+    execute_yaml = "!execute add(a, *bc)"
+    execute_func = yaml.load(dedent(execute_yaml), MrfmSimLoader)
+
+    assert execute_func(add, 1, [2, 3]) == 6
 
 
 def test_import_multi_obj_constructor():

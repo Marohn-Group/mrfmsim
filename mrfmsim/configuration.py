@@ -74,17 +74,25 @@ def graph_constructor(loader, node):
 def execute_constructor(loader: yaml.BaseLoader, node):
     """Prase the "!execute" tag into a lambda function.
 
-    The constructor is to simple function type:
+    The constructor is to simplify function types:
 
     def outerfunc(func, **kwargs):
         return func(**kwargs)
 
     The argument is a string that details the function and the arguments.
     For example to use func on a and b, "!execute func(a, b)" is used.
+
+    And the function type:
+
+    def outerfunc(func, argument):
+        return func(*argument)
+
+    In node execution, the function is keyword argument only. To simplify
+    the syntax, the above function is defined using "!execute func(*arguments)".
     """
 
     func_expression = loader.construct_scalar(node)
-    params_str = func_expression.replace("(", ",").replace(")", "")
+    params_str = func_expression.replace("(", ",").replace(")", "").replace("*", "")
 
     # dynamically create lambda function
     return eval(f"lambda {params_str}: {func_expression}")
