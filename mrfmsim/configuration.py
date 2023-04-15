@@ -3,7 +3,7 @@
 import importlib
 import yaml
 from mmodel import ModelGraph
-from mrfmsim.experiment import Job
+from mrfmsim.utils import Job
 
 
 def import_object(path):
@@ -154,7 +154,7 @@ def job_representer(dumper: yaml.SafeDumper, job: Job):
     """Represent a Job instance."""
 
     return dumper.represent_mapping(
-        "!import:mrfmsim.experiment.Job",
+        "!import:mrfmsim.utils.Job",
         {"name": job.name, "inputs": job.inputs, "shortcuts": job.shortcuts},
     )
 

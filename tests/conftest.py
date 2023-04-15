@@ -9,7 +9,7 @@ import pytest
 import math
 from mmodel import ModelGraph
 from mmodel.modifier import loop_modifier
-from mrfmsim.experiment import Experiment
+from mrfmsim.model import Experiment
 from textwrap import dedent
 import numpy as np
 import operator
@@ -89,7 +89,7 @@ def expt_file(tmp_path):
     """Create a custom module for testing."""
 
     expt_yaml = """\
-    !import:mrfmsim.experiment.Experiment
+    !import:mrfmsim.model.Experiment
     name: test_experiment
     graph:
         !graph

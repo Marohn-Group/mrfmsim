@@ -99,7 +99,7 @@ def load_plugin(
     :param list module_list: list of plugin module names.
         If None, all modules starting with "mrfmsim_" will be loaded.
     """
-    PLUGINS.clear() # reset the dictionary from the global variable
+    PLUGINS.clear()  # reset the dictionary from the global variable
     module_dict = create_modules(module_name, attr_list)
 
     plugin_name_list = plugin_name_list or [

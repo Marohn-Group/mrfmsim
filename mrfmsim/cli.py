@@ -1,7 +1,6 @@
 import click
 from mrfmsim.configuration import MrfmSimLoader, MrfmSimDumper
-from mrfmsim.experiment import Job, job_execution
-
+from mrfmsim.utils import Job, job_execution
 import yaml
 
 

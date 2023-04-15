@@ -7,7 +7,7 @@ import inspect
 import pytest
 import yaml
 from mrfmsim.shortcut import loop_shortcut
-from mrfmsim.experiment import Job
+from mrfmsim.utils import Job
 from textwrap import dedent
 import numpy as np
 
@@ -146,7 +146,7 @@ def test_job_dumper():
     Job dumper currently only supports plain template dumping.
     """
     job_str = """\
-    !import:mrfmsim.experiment.Job
+    !import:mrfmsim.utils.Job
     name: test
     inputs:
       a: 1
@@ -165,7 +165,7 @@ def test_job_constructor():
     """Test job constructor parsing job yaml."""
 
     job_str = """\
-    !import:mrfmsim.experiment.Job
+    !import:mrfmsim.utils.Job
     name: test
     inputs:
       a: 1
@@ -184,7 +184,7 @@ def test_job_constructor_no_shortcut():
     """Test load job object when shortcuts are not specified."""
 
     job_str_plain = """\
-    !import:mrfmsim.experiment.Job
+    !import:mrfmsim.utils.Job
     name: ''
     inputs: {}
     """

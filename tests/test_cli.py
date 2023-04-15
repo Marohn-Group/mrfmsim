@@ -10,7 +10,7 @@ def job_file(tmp_path):
     """Create a job yaml file."""
 
     job_yaml = """\
-    - !import:mrfmsim.experiment.Job
+    - !import:mrfmsim.utils.Job
       name: test
       inputs:
         component:
@@ -99,7 +99,7 @@ def test_cli_template(expt_file):
     """Test the template command outputs the value correctly."""
 
     job_template = """\
-    - !import:mrfmsim.experiment.Job
+    - !import:mrfmsim.utils.Job
       name: ''
       inputs:
         component: ''
