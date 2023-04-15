@@ -8,21 +8,6 @@ from textwrap import dedent
 import pkgutil
 
 
-def test_create_module():
-    """Test create_module.
-
-    Test the module can be created and imported and the module object attribute
-    also changes the module object in the sys.modules dictionary.
-    """
-
-    module_dict = create_modules("mock_module", ["module_name"])
-
-    module = importlib.import_module(f"mock_module.module_name")
-    module_dict["module_name"].test = True
-    assert isinstance(module, ModuleType)
-    assert module.test
-
-
 class TestImport:
     """Test plugin imports.
 
@@ -31,12 +16,17 @@ class TestImport:
     The other does not.
     """
 
-    @pytest.fixture
+    @pytest.fixture(autouse=True)
     def mock_import_module(self):
         """Mock import_module."""
 
+        main_module = ModuleType("mock_module")
+        main_module.__path__ = [""]
+        sys.modules["mock_module"] = main_module
+
         plugin = ModuleType("mock_module_plugin")
         plugin.__path__ = [""]
+        sys.modules["mock_module_plugin"] = plugin
 
         plugin_submodule1 = ModuleType("mock_module_plugin.testing")
         plugin_submodule2 = ModuleType("mock_module_plugin.utils")
@@ -47,12 +37,12 @@ class TestImport:
         plugin_submodule2.__all__ = []
         plugin_submodule2.testing_func = lambda: True
 
+        sys.modules["mock_module_plugin.testing"] = plugin_submodule1
+        sys.modules["mock_module_plugin.utils"] = plugin_submodule2
+
         main_submodule1 = ModuleType("mock_module.testing")
         main_submodule2 = ModuleType("mock_module.utils")
 
-        sys.modules["mock_module_plugin"] = plugin
-        sys.modules["mock_module_plugin.testing"] = plugin_submodule1
-        sys.modules["mock_module_plugin.utils"] = plugin_submodule2
         sys.modules["mock_module.testing"] = main_submodule1
         sys.modules["mock_module.utils"] = main_submodule2
 
@@ -78,6 +68,22 @@ class TestImport:
         monkeypatch.setattr(mrfmsim.plugin, "MODULE_NAME", "mock_module")
         monkeypatch.setattr(mrfmsim.plugin, "DEFUALT_MODULES", ())
 
+    def test_create_module(self):
+        """Test create_module.
+
+        Test the module can be created and imported and the module object attribute
+        also changes the module object in the sys.modules dictionary.
+        """
+
+        module_dict = create_modules("mock_module", ["submodule", "testing", "utils"])
+
+        # submodule does not exist in mock_module, test if it is created.
+        module = importlib.import_module(f"mock_module.submodule")
+        module.test = True
+        module_dict["submodule"].test = True
+        assert isinstance(module, ModuleType)
+        assert module.test
+
     def test_import_plugin(self, mock_import_module):
         """Test import_plugin.
 
@@ -98,7 +104,7 @@ class TestImport:
     def test_load_plugin(self, capsys):
         """Test load_plugin."""
 
-        load_plugin(attr_list=["testing", "utils"])
+        load_plugin(submodule_name_list=["testing", "utils"])
 
         test = importlib.import_module("mock_module.testing")
         utils = importlib.import_module("mock_module.utils")
@@ -113,7 +119,7 @@ class TestImport:
         """Test load_plugin manual plugin inputs."""
         load_plugin(
             plugin_name_list=["mock_module_plugin"],
-            attr_list=["testing", "utils"],
+            submodule_name_list=["testing", "utils"],
         )
 
         test = importlib.import_module("mock_module.testing")
@@ -126,7 +132,7 @@ class TestImport:
 
         load_plugin(
             plugin_name_list=["mock_module_plugin"],
-            attr_list=["testing", "utils"],
+            submodule_name_list=["testing", "utils"],
         )
 
         list_plugins("testing")
@@ -153,7 +159,7 @@ class TestImport:
         ):
             load_plugin(
                 plugin_name_list=["mock_module_plugin", "mock_module_plugin"],
-                attr_list=["testing"],
+                submodule_name_list=["testing"],
             )
             list_plugins("testing")
             captured = capsys.readouterr()

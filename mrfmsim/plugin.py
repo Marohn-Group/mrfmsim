@@ -18,6 +18,7 @@ import warnings
 
 
 PLUGINS = defaultdict(list)
+SUBMODULES = ("experiments", "shortcuts", "modifiers")
 MODULE_NAME = "mrfmsim"
 DEFUALT_MODULES = ("mmodel",)
 
@@ -36,15 +37,30 @@ def iter_namespace(ns_pkg):
     return pkgutil.iter_modules(ns_pkg.__path__, ns_pkg.__name__ + ".")
 
 
-def create_modules(module_name, attr_list):
-    """Create submodules in the main package named base_name."""
+def create_modules(module_name, submodule_name_list):
+    """Create submodules in the main package named base_name.
+
+    The function will import all submodules first to avoid circular import.
+    issue created by the plugins. If the submodule does not exist, a
+    ModuleType object is created.
+    """
+    module = importlib.import_module(module_name)
+    full_submodule_name_list = [
+        module_name.split(".", maxsplit=1)[-1]
+        for _, module_name, _ in iter_namespace(module)
+    ]
+    combined_list = set(full_submodule_name_list + submodule_name_list)
 
     main_submodule_dict = {}
-    for attr in attr_list:
-        module_name = f"{module_name}.{attr}"
-        m = ModuleType(module_name)
-        main_submodule_dict[attr] = m
-        sys.modules[module_name] = m
+    for submodule in combined_list:
+        fullname = f"{module_name}.{submodule}"
+
+        if submodule in full_submodule_name_list:
+            m = importlib.import_module(fullname)
+        else:
+            m = ModuleType(fullname)
+        main_submodule_dict[submodule] = m
+        sys.modules[fullname] = m
 
     return main_submodule_dict
 
@@ -83,6 +99,7 @@ def import_plugin(module_name, plugin: ModuleType, main_submodule_dict):
             members = getattr(plugin_submodule, "__all__", [])
 
             for member in members:
+
                 if f"{member} ({plugin.__name__})" in PLUGINS[plugin_attr_name]:
                     # remove the module name and append to beginning of the name
                     prefix = plugin.__name__.replace(f"{module_name}_", "")
@@ -91,7 +108,7 @@ def import_plugin(module_name, plugin: ModuleType, main_submodule_dict):
                         f"Duplicated plugin name: {member} in {plugin_attr_name}, "
                         f"import as {member_new}."
                     )
-                    print("happened")
+
                     PLUGINS[plugin_attr_name].append(
                         f"{member_new} ({plugin.__name__})"
                     )
@@ -106,17 +123,16 @@ def import_plugin(module_name, plugin: ModuleType, main_submodule_dict):
                 )
 
 
-def load_plugin(
-    plugin_name_list: list = None,
-    attr_list: list = ["experiment", "shortcut", "modifier", "component"],
-):
+def load_plugin(plugin_name_list: list = None, submodule_name_list: list = None):
     """Load plugins into mrfmsim main package.
 
     :param list module_list: list of plugin module names.
         If None, all modules starting with "mrfmsim_" will be loaded.
     """
     PLUGINS.clear()  # reset the dictionary from the global variable
-    module_dict = create_modules(MODULE_NAME, attr_list)
+
+    submodule_name_list = submodule_name_list or SUBMODULES
+    module_dict = create_modules(MODULE_NAME, submodule_name_list)
 
     plugin_name_list = plugin_name_list or [
         name
