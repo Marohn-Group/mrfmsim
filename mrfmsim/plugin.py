@@ -18,6 +18,8 @@ import warnings
 
 
 PLUGINS = defaultdict(list)
+MODULE_NAME = "mrfmsim"
+DEFUALT_MODULES = ("mmodel",)
 
 
 def iter_namespace(ns_pkg):
@@ -89,7 +91,7 @@ def import_plugin(module_name, plugin: ModuleType, main_submodule_dict):
                         f"Duplicated plugin name: {member} in {plugin_attr_name}, "
                         f"import as {member_new}."
                     )
-                    print('happened')
+                    print("happened")
                     PLUGINS[plugin_attr_name].append(
                         f"{member_new} ({plugin.__name__})"
                     )
@@ -105,7 +107,6 @@ def import_plugin(module_name, plugin: ModuleType, main_submodule_dict):
 
 
 def load_plugin(
-    module_name="mrfmsim",
     plugin_name_list: list = None,
     attr_list: list = ["experiment", "shortcut", "modifier", "component"],
 ):
@@ -115,17 +116,17 @@ def load_plugin(
         If None, all modules starting with "mrfmsim_" will be loaded.
     """
     PLUGINS.clear()  # reset the dictionary from the global variable
-    module_dict = create_modules(module_name, attr_list)
+    module_dict = create_modules(MODULE_NAME, attr_list)
 
     plugin_name_list = plugin_name_list or [
         name
         for _, name, ispkg in pkgutil.iter_modules()
-        if name == "mmodel" or name.startswith(f"{module_name}_") and ispkg
+        if name in DEFUALT_MODULES or name.startswith(f"{MODULE_NAME}_") and ispkg
     ]
 
     for name in plugin_name_list:
         plugin = importlib.import_module(name)
-        import_plugin(module_name, plugin, module_dict)
+        import_plugin(MODULE_NAME, plugin, module_dict)
 
     print(f"Loaded plugins from: {', '.join(plugin_name_list)}".rstrip())
 

@@ -1,4 +1,5 @@
 from mrfmsim.plugin import load_plugin, import_plugin, create_modules, list_plugins
+import mrfmsim.plugin
 import pytest
 from types import ModuleType
 import importlib
@@ -74,6 +75,8 @@ class TestImport:
                 yield (None, f"{prefix}{attr}", False)
 
         monkeypatch.setattr(pkgutil, "iter_modules", mockreturn)
+        monkeypatch.setattr(mrfmsim.plugin, "MODULE_NAME", "mock_module")
+        monkeypatch.setattr(mrfmsim.plugin, "DEFUALT_MODULES", ())
 
     def test_import_plugin(self, mock_import_module):
         """Test import_plugin.
@@ -95,7 +98,7 @@ class TestImport:
     def test_load_plugin(self, capsys):
         """Test load_plugin."""
 
-        load_plugin(module_name="mock_module", attr_list=["testing", "utils"])
+        load_plugin(attr_list=["testing", "utils"])
 
         test = importlib.import_module("mock_module.testing")
         utils = importlib.import_module("mock_module.utils")
@@ -109,7 +112,6 @@ class TestImport:
     def test_load_plugin_manual(self):
         """Test load_plugin manual plugin inputs."""
         load_plugin(
-            module_name="mock_module",
             plugin_name_list=["mock_module_plugin"],
             attr_list=["testing", "utils"],
         )
@@ -123,7 +125,6 @@ class TestImport:
         """Test list_plugin."""
 
         load_plugin(
-            module_name="mock_module",
             plugin_name_list=["mock_module_plugin"],
             attr_list=["testing", "utils"],
         )
@@ -151,7 +152,6 @@ class TestImport:
             ),
         ):
             load_plugin(
-                module_name="mock_module",
                 plugin_name_list=["mock_module_plugin", "mock_module_plugin"],
                 attr_list=["testing"],
             )
