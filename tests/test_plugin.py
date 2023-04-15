@@ -66,6 +66,8 @@ class TestImport:
         """
 
         def mockreturn(path=None, prefix=""):
+            if prefix == "mmodel":  # skip mmodel submodules for testing
+                pass
             if path is None:
                 yield (None, "mock_module_plugin", True)
             for attr in ["testing", "utils"]:
@@ -82,7 +84,7 @@ class TestImport:
 
         plugin, module_dict = mock_import_module
 
-        import_plugin(plugin, module_dict)
+        import_plugin("module_name", plugin, module_dict)
 
         test = importlib.import_module("mock_module.testing")
         assert hasattr(test, "testing_func")
@@ -90,7 +92,7 @@ class TestImport:
         utils = importlib.import_module("mock_module.utils")
         assert not hasattr(utils, "testing_func")
 
-    def test_load_plugin(self):
+    def test_load_plugin(self, capsys):
         """Test load_plugin."""
 
         load_plugin(module_name="mock_module", attr_list=["testing", "utils"])
@@ -99,6 +101,10 @@ class TestImport:
         utils = importlib.import_module("mock_module.utils")
         assert hasattr(test, "testing_func")
         assert not hasattr(utils, "testing_func")
+
+        captured = capsys.readouterr()
+        output = "Loaded plugins from: mock_module_plugin\n"
+        assert output == captured.out
 
     def test_load_plugin_manual(self):
         """Test load_plugin manual plugin inputs."""
@@ -126,10 +132,37 @@ class TestImport:
         captured = capsys.readouterr()
 
         output = dedent(
-        """\
+            """\
         List of testing loaded:
         testing_func (mock_module_plugin)
         """
         )
 
-        assert output == captured.out
+        assert output in captured.out
+
+    def test_object_collision(self, capsys):
+        """Test object name collision when loading plugins."""
+
+        with pytest.warns(
+            UserWarning,
+            match=(
+                "Duplicated plugin name: testing_func in testing"
+                ", import as plugin_testing_func."
+            ),
+        ):
+            load_plugin(
+                module_name="mock_module",
+                plugin_name_list=["mock_module_plugin", "mock_module_plugin"],
+                attr_list=["testing"],
+            )
+            list_plugins("testing")
+            captured = capsys.readouterr()
+
+            output = dedent(
+                """\
+            List of testing loaded:
+            testing_func (mock_module_plugin)
+            plugin_testing_func (mock_module_plugin)
+            """
+            )
+            assert output in captured.out

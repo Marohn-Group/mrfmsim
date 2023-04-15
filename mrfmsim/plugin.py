@@ -14,6 +14,7 @@ import pkgutil
 from types import ModuleType
 import sys
 from collections import defaultdict
+import warnings
 
 
 PLUGINS = defaultdict(list)
@@ -46,7 +47,7 @@ def create_modules(module_name, attr_list):
     return main_submodule_dict
 
 
-def import_plugin(plugin: ModuleType, main_submodule_dict):
+def import_plugin(module_name, plugin: ModuleType, main_submodule_dict):
     """Load plugins into mrfmsim main package.
 
     The function creates and loads three submodules:
@@ -80,8 +81,22 @@ def import_plugin(plugin: ModuleType, main_submodule_dict):
             members = getattr(plugin_submodule, "__all__", [])
 
             for member in members:
+                if f"{member} ({plugin.__name__})" in PLUGINS[plugin_attr_name]:
+                    # remove the module name and append to beginning of the name
+                    prefix = plugin.__name__.replace(f"{module_name}_", "")
+                    member_new = f"{prefix}_{member}"
+                    warnings.warn(
+                        f"Duplicated plugin name: {member} in {plugin_attr_name}, "
+                        f"import as {member_new}."
+                    )
+                    print('happened')
+                    PLUGINS[plugin_attr_name].append(
+                        f"{member_new} ({plugin.__name__})"
+                    )
 
-                PLUGINS[plugin_attr_name].append(f"{member} ({plugin.__name__})")
+                else:
+                    PLUGINS[plugin_attr_name].append(f"{member} ({plugin.__name__})")
+                    member_new = member
                 setattr(
                     main_submodule_dict[plugin_attr_name],
                     member,
@@ -92,7 +107,7 @@ def import_plugin(plugin: ModuleType, main_submodule_dict):
 def load_plugin(
     module_name="mrfmsim",
     plugin_name_list: list = None,
-    attr_list: list = ["experiments", "shortcuts", "modifiers"],
+    attr_list: list = ["experiment", "shortcut", "modifier", "component"],
 ):
     """Load plugins into mrfmsim main package.
 
@@ -105,12 +120,14 @@ def load_plugin(
     plugin_name_list = plugin_name_list or [
         name
         for _, name, ispkg in pkgutil.iter_modules()
-        if name.startswith(f"{module_name}_") and ispkg
+        if name == "mmodel" or name.startswith(f"{module_name}_") and ispkg
     ]
 
     for name in plugin_name_list:
         plugin = importlib.import_module(name)
-        import_plugin(plugin, module_dict)
+        import_plugin(module_name, plugin, module_dict)
+
+    print(f"Loaded plugins from: {', '.join(plugin_name_list)}".rstrip())
 
 
 def list_plugins(attr_name):
