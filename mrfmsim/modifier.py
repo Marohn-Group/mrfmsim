@@ -1,4 +1,4 @@
-from mmodel.utility import replace_signature
+from mmodel.utility import replace_signature_with_object
 from functools import wraps
 import inspect
 from collections import defaultdict
@@ -25,7 +25,7 @@ def replace_component(replacement: dict):
 
             return func(**kwargs)
 
-        wrapped.__signature__ = replace_signature(sig, replacement)
+        wrapped.__signature__ = replace_signature_with_object(sig, replacement)
         return wrapped
     
     modifier.metadata = f"replace_component({replacement})"
