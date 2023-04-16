@@ -18,7 +18,7 @@ import warnings
 
 
 PLUGINS = defaultdict(list)
-SUBMODULES = ("experiments", "shortcuts", "modifiers")
+SUBMODULES = ["experiment", "shortcut", "modifier", "component"]
 MODULE_NAME = "mrfmsim"
 DEFUALT_MODULES = ("mmodel",)
 
@@ -49,7 +49,8 @@ def create_modules(module_name, submodule_name_list):
         module_name.split(".", maxsplit=1)[-1]
         for _, module_name, _ in iter_namespace(module)
     ]
-    combined_list = set(full_submodule_name_list + submodule_name_list)
+
+    combined_list = set(full_submodule_name_list + list(submodule_name_list))
 
     main_submodule_dict = {}
     for submodule in combined_list:
@@ -59,8 +60,11 @@ def create_modules(module_name, submodule_name_list):
             m = importlib.import_module(fullname)
         else:
             m = ModuleType(fullname)
+        # do not reset sys module cache
+        # this step is necessary to allow testing run smoothly
+        if fullname not in sys.modules:
+            sys.modules[fullname] = m
         main_submodule_dict[submodule] = m
-        sys.modules[fullname] = m
 
     return main_submodule_dict
 
