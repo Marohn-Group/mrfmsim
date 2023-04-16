@@ -29,6 +29,8 @@ def cli(ctx, exp_file, plugin, attr, exp):
         click.echo(ctx.get_help())
     else:
         ctx.ensure_object(dict)
+        ctx.obj["plugin"] = plugin
+        ctx.obj["attr"] = attr
         if exp_file and exp:
             raise click.BadOptionUsage(
                 "exp-file", "Cannot use both exp-file and exp options."
@@ -84,28 +86,13 @@ def execute(ctx, job):
         click.echo(job_execution(experiment, job))
 
 
-@cli.command("list-plugins")
-@click.option("--plugin", multiple=True, default=None, help="Load a plugin.")
-@click.option("--attr", multiple=True, default=SUBMODULES, help="Load a submodule.")
-def show_plugs(plugin, attr):
+@cli.command()
+@click.pass_context
+def show_plugin(ctx):
     """List all available plugins."""
 
+    plugin = ctx.obj["plugin"]
+    attr = ctx.obj["attr"]
     load_plugin(plugin, attr)
     for att in attr:
         list_plugins(att)
-
-
-# @click.group()
-# @click.option("--plugin", help="load plugins")
-# @click.pass_context
-# def exp(ctx, exp):
-#     """Load experiment."""
-#     ctx.obj["experiment"] = importlib.import_module(f"mrfmsim.experiment.{exp}")
-
-# @click.command()
-# @click.option("--plugin", help="load plugins")
-# def plugin(plugins, attrs=["experiment", "component", "shortcut", "modifier"]):
-#     """Load plugins."""
-#     load_plugin(plugins, attrs)
-
-# cli = click.CommandCollection(sources=[exp_file, exp])

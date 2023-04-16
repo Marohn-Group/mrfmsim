@@ -45,11 +45,11 @@ def test_cli_help():
       --help           Show this message and exit.
 
     Commands:
-      draw          Draw experiment graph.
-      execute       Execute the job file, use --job for the job file path.
-      list-plugins  List all available plugins.
-      show          Show experiment metadata.
-      template      Create a template job file based on the experiment.
+      draw         Draw experiment graph.
+      execute      Execute the job file, use --job for the job file path.
+      show         Show experiment metadata.
+      show-plugin  List all available plugins.
+      template     Create a template job file based on the experiment.
     """
     runner = CliRunner()
     result = runner.invoke(cli, ["--help"])
@@ -88,20 +88,20 @@ def test_cli_no_command_error(expt_file):
     assert "No commands are given." in result.output
 
 
-def test_cli_list_plugins():
-    """Test the list-plugins command."""
+def test_cli_show_plugin():
+    """Test the show-plugin command."""
 
     runner = CliRunner()
-    result = runner.invoke(cli, ["list-plugins"], catch_exceptions=False)
+    result = runner.invoke(
+        cli, ["--attr", "modifier", "show-plugin"], catch_exceptions=False
+    )
 
     assert result.exit_code == 0
-    # make sure that attr returns a list
-    assert "List of experiment loaded:" in result.output
     assert "List of modifier loaded:" in result.output
 
 
-def test_cli_show(expt_file):
-    """Test the show command has the correct output.
+def test_cli_draw(expt_file):
+    """Test the draw command outputs the correct dot file.
 
     The render to the browser is turned off.
     """
@@ -223,6 +223,7 @@ def test_exp_option(job_file, experiment_mod):
     assert (
         result.output.split("\n")[-2] == "[(0.0, 1.0), (-2.0, 1.0)]"
     )  # echo to console
+
 
 def test_exp_show(experiment_mod):
     """Test the show command has the correct output.
