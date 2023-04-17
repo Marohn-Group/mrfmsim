@@ -81,7 +81,7 @@ class TestLoopShortcut:
         loop_model = loop_shortcut(experiment_mod, "component")
 
         loop_mod = loop_model.modifiers[-1]
-        assert loop_mod.metadata == "loop_modifier('component')"
+        assert loop_mod.metadata == "loop_input('component')"
         assert getclosurevars(loop_mod).nonlocals == {"parameter": "component"}
 
 
@@ -100,7 +100,7 @@ class TestLoopShortcut:
         """
         loop_model = loop_shortcut(experiment, "a")
         loop_mod = loop_model.modifiers[-1]
-        assert loop_mod.metadata == "loop_modifier('a')"
+        assert loop_mod.metadata == "loop_input('a')"
         assert getclosurevars(loop_mod).nonlocals == {"parameter": "a"}
         assert loop_model(a=[0, 2], b=2, d=2, f=3) == [(0, 1.0), (128, 2.0)]
 
@@ -111,7 +111,7 @@ class TestLoopShortcut:
         # b dependency is in the node log
         b_node_modifier = loop_model.get_node("log")["modifiers"][-1]
 
-        assert b_node_modifier.metadata == "loop_modifier('b')"
+        assert b_node_modifier.metadata == "loop_input('b')"
         assert getclosurevars(b_node_modifier).nonlocals == {"parameter": "b"}
 
         assert loop_model(a=0, b=[2, 4], d=2, f=3) == (0, [1, 0.5])
@@ -127,7 +127,7 @@ class TestLoopShortcut:
         subnode = loop_model.get_node("subnode_d")
 
         mod = subnode["modifiers"][-1]
-        assert mod.metadata == "loop_modifier('d')"
+        assert mod.metadata == "loop_input('d')"
         assert getclosurevars(mod).nonlocals == {"parameter": "d"}
         assert subnode["output"] == "k"
 

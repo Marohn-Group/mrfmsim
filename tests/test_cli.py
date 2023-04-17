@@ -112,7 +112,7 @@ def test_cli_draw(expt_file):
     graph: test_graph
     handler: MemHandler
     modifiers:
-      - loop_modifier('d')
+      - loop_input('d')
       - replace_component({'component': ['a', 'b']})
     Test experiment with components." 
     labeljust=l labelloc=t ordering=out splines=ortho]

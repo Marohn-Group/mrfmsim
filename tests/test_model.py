@@ -13,7 +13,7 @@ def test_experiment_str(experiment_mod, experiment):
     graph: test_graph
     handler: MemHandler
     modifiers:
-      - loop_modifier('d')
+      - loop_input('d')
       - replace_component({'component': ['a', 'b']})
 
     Test experiment with components."""

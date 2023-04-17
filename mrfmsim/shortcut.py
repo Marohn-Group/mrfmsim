@@ -3,7 +3,7 @@
 The shortcut should work for both the Model and the Experiment classes.
 """
 
-from mmodel import loop_modifier
+from mmodel import loop_input
 from networkx.utils import nodes_equal
 from mrfmsim.modifier import print_inputs, print_output
 import networkx as nx
@@ -42,16 +42,10 @@ def print_shortcut(model, parameters, units={}, name=None):
             if output in output_params:
                 mod = print_output(output=output, units=units)
                 node_modifiers = G.nodes[node]["modifiers"]
-                node_modifiers.append(mod)
+                node_modifiers = node_modifiers + [mod]
                 G.modify_node(node, modifiers=node_modifiers, inplace=True)
 
-    return type(model)(
-        name=model.name,
-        graph=G,
-        handler=model.handler,
-        modifiers=modifiers,
-        description=model.description,
-    )
+    return model.edit(name=name, graph=G, modifiers=modifiers)
 
 
 def loop_shortcut(model, parameter: str, name=None):
@@ -70,7 +64,7 @@ def loop_shortcut(model, parameter: str, name=None):
     name = name or model.name
     modifiers = model.modifiers
 
-    loop_mod = loop_modifier(parameter)
+    loop_mod = loop_input(parameter)
 
     # If the parameter is in the signature but not in the graph.
     # This is due to the signature modifier on the model level
@@ -108,11 +102,4 @@ def loop_shortcut(model, parameter: str, name=None):
                 H, sub_name, looped_node, output=output, modifiers=[loop_mod]
             )
 
-    return type(model)(
-        name=name,
-        graph=G,
-        handler=model.handler,
-        modifiers=modifiers,
-        description=model.description,
-        **model.handler_args
-    )
+    return model.edit(name=name, graph=G, modifiers=modifiers, **model.handler_args)

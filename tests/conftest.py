@@ -8,7 +8,7 @@ and test functions
 import pytest
 import math
 from mmodel import ModelGraph
-from mmodel.modifier import loop_modifier
+from mmodel.modifier import loop_input
 from mrfmsim.model import Experiment
 from textwrap import dedent
 import numpy as np
@@ -58,7 +58,7 @@ def experiment_mod(modelgraph):
         "test_experiment",
         modelgraph,
         replace_inputs={"component": ["a", "b"]},
-        modifiers=[loop_modifier(parameter="d")],
+        modifiers=[loop_input(parameter="d")],
         description="Test experiment with components.",
     )
 
@@ -120,7 +120,7 @@ def expt_file(tmp_path):
                 inputs: [c, b]
     replace_inputs: {component: [a, b]}
     description: Test experiment with components.
-    modifiers: [!import:mmodel.loop_modifier {parameter: d}]
+    modifiers: [!import:mmodel.loop_input {parameter: d}]
     """
 
     expt_yaml = dedent(expt_yaml)
