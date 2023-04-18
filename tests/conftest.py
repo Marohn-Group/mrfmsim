@@ -120,7 +120,7 @@ def expt_file(tmp_path):
                 inputs: [c, b]
     replace_inputs: {component: [a, b]}
     description: Test experiment with components.
-    modifiers: [!import:mmodel.loop_input {parameter: d}]
+    modifiers: [!import:mmodel.modifier.loop_input {parameter: d}]
     """
 
     expt_yaml = dedent(expt_yaml)

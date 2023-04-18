@@ -3,7 +3,7 @@
 The shortcut should work for both the Model and the Experiment classes.
 """
 
-from mmodel import loop_input
+from mmodel.modifier import loop_input
 from networkx.utils import nodes_equal
 from mrfmsim.modifier import print_inputs, print_output
 import networkx as nx

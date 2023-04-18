@@ -159,7 +159,7 @@ def test_cli_draw(expt_file):
         with open("test_graph.gv", "r") as f:
             dot_graph = f.read()
             dot_graph_source = (
-                dot_graph.replace("\t", "").replace("\l", "\n").replace("\n", "")
+                dot_graph.replace("\t", "").replace(r"\l", "\n").replace("\n", "")
             )
         assert dot_graph_source == dedent(dot_source).replace("\n", "").replace(
             "    ", ""
