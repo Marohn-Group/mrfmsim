@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "MrfmSim"
-version = "0.0.1"
+version = "0.1.0"
 description = "Simulate magnetic resonance force microscopy experiments."
 authors = ["Peter Sun <hs859@cornell.edu>", "John Marohn <jam99@cornell.edu>"]
 maintainers = ["Peter Sun <hs859@cornell.edu>"]
