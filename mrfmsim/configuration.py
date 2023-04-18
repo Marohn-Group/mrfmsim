@@ -72,23 +72,27 @@ def graph_constructor(loader, node):
 
 
 def execute_constructor(loader: yaml.BaseLoader, node):
-    """Prase the "!execute" tag into a lambda function.
+    """Parse the "!execute" tag into a lambda function.
 
     The constructor is to simplify function types:
 
-    def outerfunc(func, **kwargs):
-        return func(**kwargs)
+    .. code:: python
+
+        def outerfunc(func, **kwargs):
+            return func(**kwargs)
 
     The argument is a string that details the function and the arguments.
     For example to use func on a and b, "!execute func(a, b)" is used.
 
     And the function type:
 
-    def outerfunc(func, argument):
-        return func(*argument)
+    .. code:: python
+
+        def outerfunc(func, arguments):
+            return func(*arguments)
 
     In node execution, the function is keyword argument only. To simplify
-    the syntax, the above function is defined using "!execute func(*arguments)".
+    the syntax, the above function is defined using ``!execute func(*arguments)``.
     """
 
     func_expression = loader.construct_scalar(node)
@@ -112,7 +116,7 @@ def yaml_loader(constructor):
     """
 
     class Loader(yaml.SafeLoader):
-        """Yaml loader class."""
+        pass
 
     for key, value in constructor["constructor"].items():
         Loader.add_constructor(key, value)
@@ -142,7 +146,7 @@ def yaml_dumper(representer_dict):
     """
 
     class Dumper(yaml.SafeDumper):
-        """Yaml dumper class."""
+        pass 
 
     for key, value in representer_dict.items():
         Dumper.add_representer(key, value)
