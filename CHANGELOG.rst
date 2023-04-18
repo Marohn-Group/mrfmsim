@@ -7,13 +7,18 @@ The format is based on
 and this project adheres to
 `Semantic Versioning <https://semver.org/spec/v2.0.0.html>`_
 
-[unreleased]
+[0.1.0] - 2020-04-17
 --------------------
+
+The initial release of the mrfmsim framework.
+
 Added
 ^^^^^
-- Add Experiment class designed for MRFM experiments.
-- Add loop_shortcut with stdout modifiers.
-- Add remodel_shortcut to modify models.
-- Add the component that replaces partial parameters.
-- Add the component and printout modifiers.
-- Add cli and yaml configurations.
+- Add the ``Experiment`` class designed for MRFM experiments.
+- Add the ``Job`` class designed for MRFM execution jobs.
+- Add the ``ComponentBase`` class for experiment components.
+- Add ``loop_shortcut`` and ``print_shortcut`` shortcuts.
+- Add ``replace_component``, ``print_inputs`` and ``print_outputs`` modifiers.
+- Add command line interface.
+- Add configuration module to parse experiment and job yaml files. 
+- Add a plugin system that combines methods from different packages.
