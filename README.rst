@@ -59,7 +59,7 @@ To test in different environments::
     tox
 
 
-.. |GitHub version| image:: https://badge.fury.io/gh/peterhs73%2Fmrfmsim.svg
+.. |GitHub version| image:: https://badge.fury.io/gh/Marohn-Group%2Fmrfmsim.svg
    :target: https://github.com/Marohn-Group/mrfmsim
 
 .. .. |PyPI version shields.io| image:: https://img.shields.io/pypi/v/mrfmsim.svg
