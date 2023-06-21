@@ -60,12 +60,12 @@ def graph_constructor(loader, node):
 
     for node_name, node_info in param_dict["node_objects"].items():
 
-        func = node_info["func"]
-        output = node_info["output"]
-        inputs = node_info.get("inputs", None)
-        modifiers = node_info.get("modifiers", None)
+        func = node_info.pop("func")
+        output = node_info.pop("output")
+        inputs = node_info.pop("inputs", None)
+        modifiers = node_info.pop("modifiers", None)
         graph.set_node_object(
-            node_name, func, output=output, inputs=inputs, modifiers=modifiers
+            node_name, func, output=output, inputs=inputs, modifiers=modifiers, **node_info
         )
 
     return graph
