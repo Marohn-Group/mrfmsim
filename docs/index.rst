@@ -18,19 +18,31 @@ Indices and tables
    :titlesonly:
    :hidden:
 
+   overview
    changelog
-
 
 .. toctree::
    :maxdepth: 2
    :titlesonly:
-   :caption: Reference
+   :caption: User Guide
    :hidden:
 
+   ref_cli
    ref_model
-   ref_component
    ref_modifier
    ref_shortcut
-   ref_cli
-   ref_configuration
-   ref_plugin
+
+.. toctree::
+   :maxdepth: 2
+   :titlesonly:
+   :caption: API Documentation
+   :hidden:
+
+   api_plugin
+   api_component
+   api_units
+   api_configuration
+
+
+   
+

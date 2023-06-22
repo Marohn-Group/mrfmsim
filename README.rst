@@ -3,24 +3,22 @@ MrfmSim
 
 |GitHub version| |Unit tests|
 
-MrfmSim is a Python package for simulating magnetic resonance force microscopy
+MrfmSim is a Python package for simulating magnetic resonance force microscopy (MRFM)
 experiments. The package is based on the
 `mmodel <https://github.com/Marohn-Group/mmodel>`_
 framework, with added command line interface and yaml experiment scripting
-capabilities. 
-
-The package also employs a plugin system. By calling ``load_plugin()``
-function, the user can load a plugin that adds additional functionality.
-It can also automatically load plugin packages with the prefix "mrfmsim_".
-
+capabilities. The package also employs a plugin system, all sub-packages can
+be directly loaded into the ``mrfmsim`` to provide a uniform user experience.
 
 Quickstart
 ----------
 
+See documentation for detailed API documentation.
+
 Load plugin
 ^^^^^^^^^^^^
 
-To load plugin run:
+To automatically load plugins run:
 
 .. code:: python
 
@@ -29,15 +27,39 @@ To load plugin run:
 
 The default plugin option attempts to load all plugins with the prefix "mrfmsim_".
 The default submodules are "experiment", "modifier", "shortcut", and "component".
+Users can also specify plugins and submodule attributes to load.
+
+Configuration file
+^^^^^^^^^^^^^^^^^^
+
+To aid the portability of the experiment models, the experiment can be defined in
+a YAML file, with the nodes, edges, graph and model settings. For simple jobs, a
+job configuration file can be defined as well.
 
 Command line interface
 ^^^^^^^^^^^^^^^^^^^^^^
 
 Run at the terminal::
 
-    mrfmsim
+    mrfmsim --help
 
 to see the command line interface help.
+
+For show or draw experiments of existing experiments::
+
+    mrfmsim --exp exp_to_show show
+    mrfmsim --exp exp_to_draw draw
+
+Use ``--expt`` for YAML experiment files. 
+
+To execute a job::
+
+    mrfmsim --job job_to_run execute
+
+Experiments
+^^^^^^^^^^^
+
+See the ``mrfmsim-marohn`` for experiment examples.
 
 Installation
 ^^^^^^^^^^^^^
