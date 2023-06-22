@@ -16,7 +16,8 @@ Added
 
 Fixed
 ^^^^^
-- Fix an issue where the ``print_shortcut`` changes the original modifier list.
+
+- Change the ``print_shortcut`` algorithm to modify nodes instead of the model.
 
 [0.1.0] - 2020-04-17
 --------------------

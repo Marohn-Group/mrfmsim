@@ -17,14 +17,24 @@ class TestStdoutShortcut:
 
         stdout_model = print_shortcut(experiment, ["a", "d"])
 
-        mod = stdout_model.modifiers[-1]
-        assert getclosurevars(mod).nonlocals == {
-            "inputs": ["a", "d"],
+        mod_a = stdout_model.get_node("add")["modifiers"][-1]
+        mod_d = stdout_model.get_node("subtract")["modifiers"][-1]
+
+        # mod = stdout_model.modifiers[-1]
+        assert getclosurevars(mod_a).nonlocals == {
+            "inputs": ["a"],
             "units": {},
-            "end": "\n",
+            "end": " | ",
         }
 
-        assert mod.metadata == "print_inputs(['a', 'd'])"
+        assert mod_a.metadata == "print_inputs(['a'])"
+        assert getclosurevars(mod_d).nonlocals == {
+            "inputs": ["d"],
+            "units": {},
+            "end": " | ",
+        }
+
+        assert mod_d.metadata == "print_inputs(['d'])"
 
     def test_stdout_output(self, experiment):
         """Test stdout_shortcut with inputs.
@@ -34,6 +44,7 @@ class TestStdoutShortcut:
 
         stdout_model = print_shortcut(experiment, ["k", "m"])
         m_node = stdout_model.get_node("multiply")
+        print(m_node["modifiers"])
 
         m_node_mod = m_node["modifiers"][-1]
         assert m_node_mod.metadata == "print_output('k')"
@@ -59,7 +70,7 @@ class TestStdoutShortcut:
         stdout_model = print_shortcut(experiment, ["d", "c", "k"])
         stdout_model(a=0, b=2, d=2, f=3)
         captured = capsys.readouterr()
-        assert captured.out == "d 2\nc 2\nk 0.0\n"
+        assert captured.out == "c 2 | d 2 | k 0.0\n"
 
 
 class TestLoopShortcut:
@@ -83,7 +94,6 @@ class TestLoopShortcut:
         loop_mod = loop_model.modifiers[-1]
         assert loop_mod.metadata == "loop_input('component')"
         assert getclosurevars(loop_mod).nonlocals == {"parameter": "component"}
-
 
         comps = [SimpleNamespace(a=0, b=2), SimpleNamespace(a=2, b=16)]
         assert loop_model(comps, d=[1, 2, 3], f=3)[0] == [(8, 1), (0, 1), (-8, 1)]

@@ -27,7 +27,7 @@ def replace_component(replacement: dict):
 
         wrapped.__signature__ = replace_signature_with_object(sig, replacement)
         return wrapped
-    
+
     modifier.metadata = f"replace_component({replacement})"
     return modifier
 
@@ -71,6 +71,7 @@ def print_inputs(inputs: list, units: dict = {}, end: str = "\n"):
             return func(**kwargs)
 
         return wrapped
+
     # skip the long unit dictionary printout
     stdout_input_modifier.metadata = f"print_inputs({repr(inputs)})"
     return stdout_input_modifier
@@ -85,8 +86,8 @@ def print_output(output: str, units: dict = {}, end: str = "\n"):
     :param list parameter: parameter name
     :param dict units: a dictionary of units and display format
     """
-    def stdout_output_modifier(func):
 
+    def stdout_output_modifier(func):
 
         form = parse_format(output, units)
 
@@ -99,5 +100,6 @@ def print_output(output: str, units: dict = {}, end: str = "\n"):
             return result
 
         return wrapped
+
     stdout_output_modifier.metadata = f"print_output({repr(output)})"
     return stdout_output_modifier

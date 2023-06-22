@@ -12,40 +12,47 @@ import networkx as nx
 def print_shortcut(model, parameters, units={}, name=None):
     """Shortcut to printout parameters.
 
-    The shortcuts determine if the parameter is an input parameter
-    or an output parameter (intermediate value). If the parameter is
-    intermediate value, the node that outputs the value adds the
-    stdout_output_modifier, otherwise the input parameter output is
-    at the level.
+    If the parameter is a graph output value, we trace the output
+    back to the last node (the last node in the topological sort
+    of the subgraph). If the parameter is an input (or intermediate)
+    input, we track the input to the first node (the first node in
+    the topological sort). In the case that the input parameter
+    shows up in two nodes, only one will be modified based on the
+    topological sort.
+
+    Sometimes multiple parameters are in one node, the algorithm
+    will create multiple modifiers. The behavior is by design to
+    simplify the algorithm.
+
+    The printout of the input ends with ' | ' and the output ends
+    with '\n'. The behavior is considered because normally user
+    wants to print out outputs. The shortcut will not have line
+    breaks if only input parameters are included.
+
+    ..TODO::
+        Consider user customized format for the input and output.
     """
     # use list comprehension instead of set to preserve order
     name = name or model.name
-    input_params = []
-    output_params = []
-    for param in parameters:
-        if param in model.__signature__.parameters:
-            input_params.append(param)
-        else:
-            output_params.append(param)
-
-    modifiers = model.modifiers.copy() # a copy of the list 
     G = model.graph  # produces a copy of the graph
 
-    # input parameters modifier are the model level
-    if input_params:
-        mod = print_inputs(inputs=input_params, units=units)
-        modifiers.append(mod)
+    for param in parameters:
 
-    if output_params:
-        # find the nodes with the output parameters
-        for node, output in nx.get_node_attributes(G, "output").items():
-            if output in output_params:
-                mod = print_output(output=output, units=units)
-                node_modifiers = G.nodes[node]["modifiers"]
-                node_modifiers = node_modifiers + [mod]
-                G.modify_node(node, modifiers=node_modifiers, inplace=True)
+        if param in G.returns:
+            subgraph = G.subgraph(outputs=[param])
+            node = list(nx.topological_sort(subgraph))[-1]
+            mod = print_output(output=param, units=units, end="\n")
+            node_modifiers = G.nodes[node]["modifiers"] + [mod]
+            G.modify_node(node, modifiers=node_modifiers, inplace=True)
 
-    return model.edit(name=name, graph=G, modifiers=modifiers)
+        else:
+            subgraph = G.subgraph(inputs=[param])
+            node = next(nx.topological_sort(subgraph))
+            mod = print_inputs(inputs=[param], units=units, end=" | ")
+            node_modifiers = G.nodes[node]["modifiers"] + [mod]
+            G.modify_node(node, modifiers=node_modifiers, inplace=True)
+
+    return model.edit(name=name, graph=G)
 
 
 def loop_shortcut(model, parameter: str, name=None):
