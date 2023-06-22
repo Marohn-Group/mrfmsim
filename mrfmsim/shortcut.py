@@ -28,7 +28,7 @@ def print_shortcut(model, parameters, units={}, name=None):
         else:
             output_params.append(param)
 
-    modifiers = model.modifiers
+    modifiers = model.modifiers.copy() # a copy of the list 
     G = model.graph  # produces a copy of the graph
 
     # input parameters modifier are the model level

@@ -14,6 +14,10 @@ Added
 ^^^^^
 - Allow experiment configuration file to add additional node keyword arguments.
 
+Fixed
+^^^^^
+- Fix an issue where the ``print_shortcut`` changes the original modifier list.
+
 [0.1.0] - 2020-04-17
 --------------------
 
