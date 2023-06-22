@@ -1,14 +1,3 @@
-"""The scripts handler loading plugin information into mrfmsim main package.
-
-
-Mrfmsim plugin modules should have the starting string 'mrfmsim_'.
-The architecture is only a pesudo plugin because the subsequent packages
-depends on the main mrfmsim package. Therefore the plugin cannot be loaded
-during mrfmsim import. The load_plugin function needs to be called.
-
-"""
-
-
 import importlib
 import pkgutil
 from types import ModuleType
@@ -31,7 +20,7 @@ def iter_namespace(ns_pkg):
     import_module to work without having to do additional modifications to
     the name.
 
-    The function is based on Python packaging user guide:
+    The function is based on the Python packaging user guide:
     https://packaging.python.org/en/latest/guides/creating-and-discovering-plugins/
     """
     return pkgutil.iter_modules(ns_pkg.__path__, ns_pkg.__name__ + ".")
@@ -61,7 +50,7 @@ def create_modules(module_name, submodule_name_list):
         else:
             m = ModuleType(fullname)
         # do not reset sys module cache
-        # this step is necessary to allow testing run smoothly
+        # this step is necessary to allow testing to run smoothly
         if fullname not in sys.modules:
             sys.modules[fullname] = m
         main_submodule_dict[submodule] = m

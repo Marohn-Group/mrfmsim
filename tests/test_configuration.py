@@ -127,7 +127,7 @@ def test_execute_constructor_unpack():
 
 
 def test_import_multi_obj_constructor():
-    """Test import_multi_constructor that returns an SimpleNamespace instance."""
+    """Test import_multi_constructor that returns a SimpleNamespace instance."""
 
     dataobj_str = """
     !import:types.SimpleNamespace

@@ -43,7 +43,7 @@ class ComponentBase:
             formatter = "{{{}}}".format(u_dict["format"]).format
             if isinstance(value, list):
                 # convert list to numpy array for representation
-                # normally carries integers, exclude the tuple cases
+                # normally carries integers, excluding the tuple cases
                 value = np.array(value)
             if isinstance(value, np.ndarray):
                 with np.printoptions(formatter={"all": formatter}):
