@@ -10,7 +10,7 @@ import networkx as nx
 
 
 def print_shortcut(model, parameters, units={}, name=None):
-    """Shortcut to printout parameters.
+    r"""Shortcut to printout parameters.
 
     If the parameter is a graph output value, we trace the output
     back to the last node (the last node in the topological sort
@@ -29,7 +29,8 @@ def print_shortcut(model, parameters, units={}, name=None):
     wants to print out outputs. The shortcut will not have line
     breaks if only input parameters are included.
 
-    ..TODO::
+    TODO
+
         Consider user customized format for the input and output.
     """
     # use list comprehension instead of set to preserve order
