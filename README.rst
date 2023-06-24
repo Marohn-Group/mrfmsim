@@ -5,7 +5,7 @@ MrfmSim
 
 MrfmSim is a Python package for simulating magnetic resonance force microscopy (MRFM)
 experiments. The package is based on the
-`mmodel <https://github.com/Marohn-Group/mmodel>`_
+`mmodel <https://marohn-group.github.io/mmodel-docs/>`_
 framework, with added command line interface and yaml experiment scripting
 capabilities. The package also employs a plugin system, all sub-packages can
 be directly loaded into the ``mrfmsim`` to provide a uniform user experience.
@@ -28,6 +28,9 @@ To automatically load plugins run:
 The default plugin option attempts to load all plugins with the prefix "mrfmsim_".
 The default submodules are "experiment", "modifier", "shortcut", and "component".
 Users can also specify plugins and submodule attributes to load.
+
+See plugin example
+`MrfmSim-Marohn <https://github.com/Marohn-Group/mrfmsim-marohn-docs>`__.
 
 Configuration file
 ^^^^^^^^^^^^^^^^^^

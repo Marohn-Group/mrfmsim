@@ -18,7 +18,8 @@ the "graph", "model", "modifier", and "shortcut" functionalities,
 see `mmodel documentation <https://github.com/Marohn-Group/mmodel-docs>`__. 
 
 Here we use a Cornell-style CERMIT-ESR experiment as an example
-(see ``mrfmsim_marohn`` for the explanation of the experiment). The
+(see `MrfmSim-Marohn documentation <https://github.com/Marohn-Group/mrfmsim-marohn-docs>`__ 
+for the explanation of the experiment). The
 notebook with all the codes of this page is available at
 :download:`mrfmsim_overview </_downloads/mrfmsim_overview.ipynb>`.
 
