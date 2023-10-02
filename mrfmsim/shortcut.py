@@ -31,7 +31,7 @@ def print_shortcut(model, parameters, units={}, name=None):
 
     TODO
 
-        Consider user customized format for the input and output.
+        Consider a user-customized format for the input and output.
     """
     # use list comprehension instead of set to preserve order
     name = name or model.name
@@ -81,7 +81,7 @@ def loop_shortcut(model, parameter: str, name=None):
     if parameter not in G.signature.parameters:
         modifiers = [*modifiers, loop_mod]
 
-    else:  # the parameter is within the graph
+    else:  # if the parameter is within the graph
         H = G.subgraph(inputs=[parameter])
 
         if nodes_equal(G.nodes, H.nodes):
@@ -110,4 +110,6 @@ def loop_shortcut(model, parameter: str, name=None):
                 H, sub_name, looped_node, output=output, modifiers=[loop_mod]
             )
 
-    return model.edit(name=name, graph=G, modifiers=modifiers, **model.handler_args)
+    return model.edit(
+        name=name, graph=G, modifiers=modifiers, returns=None, **model.handler_args
+    )
