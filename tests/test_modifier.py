@@ -2,6 +2,7 @@ from mrfmsim.modifier import (
     replace_component,
     print_inputs,
     print_output,
+    numba_jit
 )
 import inspect
 import pytest
@@ -87,3 +88,14 @@ class TestPrintoutModifier:
             print_output("b_tot", units=units, end="---").metadata
             == "print_output('b_tot')"
         )
+
+def test_numba_jit():
+    """Test the numba_jit decorator modifier."""
+
+    mod = numba_jit(nopython=True, parallel=True)
+
+    def func(x):
+        return x
+
+    assert mod.metadata == "numba_jit(nopython=True, parallel=True)"
+    assert mod(func)(1) == 1

@@ -15,6 +15,16 @@ Fixed
 ^^^^^
 - Fixed the issue that ``loop_shortcut`` failed to update the model "returns".
 
+Added
+^^^^^
+
+- Added grid, magnet, sample, and cantilever component objects.
+
+Removed
+^^^^^^^
+
+- Removed the ``cli`` module to ``mrfmsim-cli`` plugin for separate development.
+
 
 [0.1.1] - 2023-06-23
 --------------------

@@ -2,6 +2,7 @@ from mmodel.utility import replace_signature_with_object
 from functools import wraps
 import inspect
 from collections import defaultdict
+import numba as nb
 
 
 def replace_component(replacement: dict):
@@ -13,11 +14,10 @@ def replace_component(replacement: dict):
 
         @wraps(func)
         def wrapped(**kwargs):
-
             for component, substitutes in replacement.items():
                 component_obj = kwargs.pop(component)
                 for attr in substitutes:
-                    # skip the attribute if it is not needed
+                    # skip the attribute if it is not needed 
                     # this allows the component modifier to be recycled
                     # even if the underlying function is changed
                     if attr in params:
@@ -88,7 +88,6 @@ def print_output(output: str, units: dict = {}, end: str = "\n"):
     """
 
     def stdout_output_modifier(func):
-
         form = parse_format(output, units)
 
         @wraps(func)
@@ -103,3 +102,20 @@ def print_output(output: str, units: dict = {}, end: str = "\n"):
 
     stdout_output_modifier.metadata = f"print_output({repr(output)})"
     return stdout_output_modifier
+
+
+def numba_jit(**kwargs):
+    """Numba jit modifier with keyword arguments.
+
+    Add metadata to numba.jit. The numba decorator outputs
+    all the parameters make it hard to read.
+    Use the decorator the same way as numba.jit().
+    """
+
+    def decorator(func):
+        func = nb.jit(**kwargs)(func)
+        return func
+
+    meta = ", ".join(f"{k}={v}" for k, v in kwargs.items())
+    decorator.metadata = f"numba_jit({meta})"
+    return decorator
