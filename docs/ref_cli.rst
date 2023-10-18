@@ -42,9 +42,9 @@ The available commands are:
 - ``show``: show the experiment model metadata.
 - ``template``: create a template job file based on the experiment.
 
-:mod:`cli` module
-----------------------
+.. :mod:`cli` module
+.. ----------------------
 
-.. automodule:: mrfmsim.cli
-    :members:
-    :show-inheritance:
+.. .. automodule:: mrfmsim.cli
+..     :members:
+..     :show-inheritance:

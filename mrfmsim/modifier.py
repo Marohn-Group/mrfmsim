@@ -3,6 +3,7 @@ from functools import wraps
 import inspect
 from collections import defaultdict
 import numba as nb
+from mmodel.modifier import *  # add all mmodel modifier to mrfmsim
 
 
 def replace_component(replacement: dict):

@@ -33,6 +33,16 @@ Indices and tables
    ref_shortcut
 
 .. toctree::
+   :maxdepth: 1
+   :caption: Experimental Setup
+
+   component/sample.rst
+   component/grid.rst
+   component/magnet.rst
+   component/cantilever.rst
+
+
+.. toctree::
    :maxdepth: 2
    :titlesonly:
    :caption: API Documentation

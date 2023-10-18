@@ -8,8 +8,13 @@ and this project adheres to
 `Semantic Versioning <https://semver.org/spec/v2.0.0.html>`_
 
 
-[Unreleased] - 2023-10-02
+[Unreleased]
 -------------------------
+
+Changed
+^^^^^^^
+- Reworked the plugin system using package entry points. Automatically load
+  plugins at import time.
 
 Fixed
 ^^^^^
@@ -17,14 +22,11 @@ Fixed
 
 Added
 ^^^^^
-
 - Added grid, magnet, sample, and cantilever component objects.
 
 Removed
 ^^^^^^^
-
 - Removed the ``cli`` module to ``mrfmsim-cli`` plugin for separate development.
-
 
 [0.1.1] - 2023-06-23
 --------------------
@@ -35,7 +37,6 @@ Added
 
 Fixed
 ^^^^^
-
 - Change the ``print_shortcut`` algorithm to modify nodes instead of the model.
 
 [0.1.0] - 2020-04-17

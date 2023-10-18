@@ -4,6 +4,7 @@ The shortcut should work for both the Model and the Experiment classes.
 """
 
 from mmodel.modifier import loop_input
+from mmodel.shortcut import *  # add all mmodel shortcut to mrfmsim
 from networkx.utils import nodes_equal
 from mrfmsim.modifier import print_inputs, print_output
 import networkx as nx
@@ -21,7 +22,7 @@ def print_shortcut(model, parameters, units={}, name=None):
     topological sort.
 
     Sometimes multiple parameters are in one node, the algorithm
-    will create multiple modifiers. The behavior is by design to
+    will create multiple modifiers. The behavior is designed to
     simplify the algorithm.
 
     The printout of the input ends with ' | ' and the output ends
