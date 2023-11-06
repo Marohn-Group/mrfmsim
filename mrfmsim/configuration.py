@@ -2,8 +2,7 @@
 
 import importlib
 import yaml
-from mmodel import ModelGraph
-from mrfmsim.utils import Job
+from mrfmsim import Graph, Node, Experiment
 
 
 def import_object(path):
@@ -51,61 +50,46 @@ def import_constructor(loader, node):
 
 
 def graph_constructor(loader, node):
-    """Parse the "!graph" tag into ModelGraph object."""
+    """Parse the "!Graph" tag into Graph object.
+
+    The node are listed as a dictionary of node name and node object.
+    The design is for a clearer view of nodes. To change this
+    behavior, change the graph_constructor.
+    """
 
     param_dict = loader.construct_mapping(node, deep=True)
 
-    graph = ModelGraph(name=param_dict["name"])
+    graph = Graph(name=param_dict["name"])
     graph.add_grouped_edges_from(param_dict["grouped_edges"])
 
     for node_name, node_info in param_dict["node_objects"].items():
-
-        func = node_info.pop("func")
-        output = node_info.pop("output")
-        inputs = node_info.pop("inputs", None)
-        modifiers = node_info.pop("modifiers", None)
-        graph.set_node_object(
-            node_name, func, output=output, inputs=inputs, modifiers=modifiers, **node_info
-        )
+        graph.set_node_object(Node(node_name, **node_info))
 
     return graph
 
 
-def execute_constructor(loader: yaml.BaseLoader, node):
-    """Parse the "!execute" tag into a lambda function.
+def experiment_constructor(loader, node):
+    """Parse the "!Experiment" tag into Experiment object."""
 
-    The constructor is to simplify function types:
+    param_dict = loader.construct_mapping(node, deep=True)
 
-    .. code:: python
+    return Experiment(**param_dict)
 
-        def outerfunc(func, **kwargs):
-            return func(**kwargs)
 
-    The argument is a string that details the function and the arguments.
-    For example to use func on a and b, "!execute func(a, b)" is used.
+def func_multi_constructor(loader: yaml.BaseLoader, tag_suffix, node):
+    """Load the "!func:" tag from yaml string.
 
-    And the function type:
-
-    .. code:: python
-
-        def outerfunc(func, arguments):
-            return func(*arguments)
-
-    In node execution, the function is keyword argument only. To simplify
-    the syntax, the above function is defined using ``!execute func(*arguments)``.
+    The constructor parses !func:function "lambda a, b: a + b".
+    In the example, the name of the function is set to "function",
+    the function is the lambda expression. The doc is None, set
+    doc at the node level.
     """
+    node = loader.construct_scalar(node)
 
-    func_expression = loader.construct_scalar(node)
-    params_str = func_expression.replace("(", ",").replace(")", "").replace("*", "")
+    func = eval(node)
+    func.__name__ = tag_suffix
 
-    # dynamically create lambda function
-    return eval(f"lambda {params_str}: {func_expression}")
-
-
-def func_constructor(loader: yaml.BaseLoader, node):
-    """Load function from yaml string."""
-
-    return eval(loader.construct_scalar(node))
+    return func
 
 
 def yaml_loader(constructor):
@@ -128,43 +112,13 @@ def yaml_loader(constructor):
 default_constructors = {
     "constructor": {
         "!import": import_constructor,
-        "!func": func_constructor,
-        "!execute": execute_constructor,
-        "!graph": graph_constructor,
+        "!Graph": graph_constructor,
+        "!Experiment": experiment_constructor,
     },
-    "multi_constructor": {"!import:": import_multi_constructor},
+    "multi_constructor": {
+        "!import:": import_multi_constructor,
+        "!func:": func_multi_constructor,
+    },
 }
 
 MrfmSimLoader = yaml_loader(default_constructors)
-
-
-def yaml_dumper(representer_dict):
-    """Create a yaml dumper with custom representers.
-
-    :param dict representer_dict: dictionary of representer
-    :returns: yaml dumper class
-    """
-
-    class Dumper(yaml.SafeDumper):
-        pass 
-
-    for key, value in representer_dict.items():
-        Dumper.add_representer(key, value)
-
-    return Dumper
-
-
-def job_representer(dumper: yaml.SafeDumper, job: Job):
-    """Represent a Job instance."""
-
-    return dumper.represent_mapping(
-        "!import:mrfmsim.utils.Job",
-        {"name": job.name, "inputs": job.inputs, "shortcuts": job.shortcuts},
-    )
-
-
-default_representers = {
-    Job: job_representer,
-}
-
-MrfmSimDumper = yaml_dumper(default_representers)

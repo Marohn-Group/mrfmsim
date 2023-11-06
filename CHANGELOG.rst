@@ -13,20 +13,25 @@ and this project adheres to
 
 Changed
 ^^^^^^^
-- Reworked the plugin system using package entry points. Automatically load
+- Change python requirement to 3.10.
+- Change the plugin system using package entry points. Automatically load
   plugins at import time.
+- Change the print related modifier and shortcuts.
+- Change yaml tags for easier function definition.
 
 Fixed
 ^^^^^
-- Fixed the issue that ``loop_shortcut`` failed to update the model "returns".
+- Fixe the issue that ``loop_shortcut`` failed to update the model "returns".
 
 Added
 ^^^^^
-- Added grid, magnet, sample, and cantilever component objects.
+- Add grid, magnet, sample, and cantilever component objects.
+- Add symbolic unit system to nodes and models.
+- Add custom node, model string representation.
 
 Removed
 ^^^^^^^
-- Removed the ``cli`` module to ``mrfmsim-cli`` plugin for separate development.
+- Remove the ``cli`` module to ``mrfmsim-cli`` plugin for separate development.
 
 [0.1.1] - 2023-06-23
 --------------------

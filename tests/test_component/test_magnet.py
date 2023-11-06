@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""Test magnet module in mrfmsim_marohn.component.
+"""Test magnet module in mrfmsim.component.
 
 SphereMagnet
 ------------
@@ -26,14 +26,16 @@ import numpy as np
 from mrfmsim.component import SphereMagnet, RectangularMagnet
 from textwrap import dedent
 
+
 class MagnetTester:
     """Base class for testing magnet classes."""
+
     magnet_str = ""
 
-    # def test_str(self, magnet):
-    #     """Test magnet str."""
+    def test_str(self, magnet):
+        """Test magnet str."""
 
-    #     assert str(magnet) == dedent(self.magnet_str)
+        assert str(magnet) == dedent(self.magnet_str)
 
     def check_bz(self, magnet, x, y, z, theory):
         """Test Bz calculation against the theory."""
@@ -69,16 +71,14 @@ class TestSphereMagnet(MagnetTester):
     """Test SphereManget class."""
 
     magnet_str = """\
-    SphereMagnet(
-      magnet_origin=[0.0 0.0 0.0] [nm] # magnet origin
-      magnet_radius=50.0 [nm] # magnet radius
-      mu0_Ms=1800.0 [mT] # tip magnetization, oriented along z
-    )"""
+    SphereMagnet(radius=50.0 nm
+    \torigin=[0.0, 0.0, 0.0] nm
+    \tmu0_Ms=1800.000 mT)"""
 
     @pytest.fixture
     def magnet(self):
         """Instantiate a SphereManget instance."""
-        return SphereMagnet(radius=50.0, mu0_Ms=1800.0, origin=[0.0, 0.0, 0.0])
+        return SphereMagnet(radius=50.0, origin=[0.0, 0.0, 0.0], mu0_Ms=1800.0)
 
     @pytest.mark.parametrize(
         "x, y, z, theory",
@@ -126,18 +126,18 @@ class TestRectangularMagnet(MagnetTester):
     """Tests RectangularMagnet."""
 
     magnet_str = """\
-    RectangularMagnet(
-      magnet_length=[40.0 60.0 100.0] [nm] # magnet length in x, y, z direction
-      magnet_origin=[0.0 0.0 0.0] [nm] # magnet origin
-      mu0_Ms=1800.0 [mT] # tip magnetization, oriented along z
-    )"""
+    RectangularMagnet(length=[40.0, 60.0, 100.0] nm
+    \torigin=[0.0, 0.0, 0.0] nm
+    \tmu0_Ms=1800.000 mT)"""
 
     @pytest.fixture
     def magnet(self):
         """Instantiate a RectangularManget instance."""
 
         return RectangularMagnet(
-            length=[40.0, 60.0, 100.0], mu0_Ms=1800.0, origin=[0.0, 0.0, 0.0]
+            length=[40.0, 60.0, 100.0],
+            origin=[0.0, 0.0, 0.0],
+            mu0_Ms=1800.0,
         )
 
     @pytest.mark.parametrize("x, y, z", [(np.arange(50, 100, 5), 100, 100)])
@@ -149,7 +149,9 @@ class TestRectangularMagnet(MagnetTester):
         Bzxx - even function in the x direction
         """
 
-        assert np.allclose(magnet.Bz_method(x, y, z), magnet.Bz_method(-x, y, z), rtol=1e-10)
+        assert np.allclose(
+            magnet.Bz_method(x, y, z), magnet.Bz_method(-x, y, z), rtol=1e-10
+        )
         assert np.allclose(
             magnet.Bzx_method(x, y, z), -magnet.Bzx_method(-x, y, z), rtol=1e-10
         )

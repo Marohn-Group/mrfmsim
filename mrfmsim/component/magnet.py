@@ -1,47 +1,48 @@
 import numpy as np
 import numba as nb
+from dataclasses import dataclass, field
+from mrfmsim.component import ComponentBase
 
 
-class SphereMagnet:
-    """Spherical magnet object with its Bz, Bzx, Bzxx calculations."""
+@dataclass
+class SphereMagnet(ComponentBase):
+    """Spherical magnet object with its Bz, Bzx, Bzxx calculations.
 
-    def __init__(self, radius, mu0_Ms, origin):
-        """Construct a magnet instance.
+    :param float radius: sphere magnet radius [nm]
+    :param list origin: the position of the magnet origin (x, y, z)
+    :param float mu0_Ms: saturation magnetization [mT]
+    """
 
-        :param float radius: sphere magnet radius [nm]
-        :param float mu0_Ms: magnet magnetization [mT],
-            assumed oriented along z.
-        :param list origin: the position of the magnet origin (x, y, z)
-        """
-        self.magnet_origin = np.array(origin)
-        self.mu0_Ms = mu0_Ms
-        self.magnet_radius = radius
+    radius: float = field(metadata={"unit": "nm", "format": ".1f"})
+    origin: list[float] = field(metadata={"unit": "nm"})
+    mu0_Ms: float = field(metadata={"unit": "mT"})
 
     def Bz_method(self, x, y, z):
         r"""Calculate magnetic field :math:`B_z` [mT].
+
         :param float x: x coordinate of sample grid [nm]
         :param float y: y coordinate of sample grid [nm]
         :param float z: z coordinate of sample grid [nm]
+
         The magnetic field is calculated as
-    
+
         .. math::
             B_z = \dfrac{\mu_0 M_s}{3}
             \left( 3 \dfrac{Z^2}{R^5} - \dfrac{1}{R^3} \right)
             R = \sqrt{X^2+Y^2+Z^2}
-    
-        Here :math:`(x,y,z)` is the location at which we want to know the
-        field;
+
+        Here :math:`(x,y,z)` is the location at which we want to know the field;
         :math:`(x_0, y_0, z_0)` is the location of the center of the magnet;
-        :math:`r` is the radius of the magnet; :math:`X = (x-x_0)/r`,
+        :math:`r` is the radius of the magnet; :math:`X = (x-x_0)/r`;
         :math:`Y = (y-y_0)/r`, and :math:`Z = (z-z_0)/r` are normalized
         distances to the center of the magnet;
         :math:`\mu_0 M_s` is the magnetic sphere's saturation
         magnetization in mT.
         """
 
-        dx = (x - self.magnet_origin[0]) / self.magnet_radius
-        dy = (y - self.magnet_origin[1]) / self.magnet_radius
-        dz = (z - self.magnet_origin[2]) / self.magnet_radius
+        dx = (x - self.origin[0]) / self.radius
+        dy = (y - self.origin[1]) / self.radius
+        dz = (z - self.origin[2]) / self.radius
 
         pre_term = self.mu0_Ms / 3.0
 
@@ -77,13 +78,13 @@ class SphereMagnet:
         With :math:`X`, :math:`Y`, :math:`Z`, :math:`R`, :math:`r`, and
         :math:`\mu_0 M_s` defined in Bz(x, y, z), the magnetic field
         gradient is calculated as
-    
+
         .. math::
             B_{zx} = \dfrac{\partial B_z}{\partial z}
             = \dfrac{\mu_0 M_s}{r} X \:
             \left( \dfrac{1}{R^5} - 5 \dfrac{Z^2}{R^7} \right)
             R = \sqrt{X^2+Y^2+Z^2}
-    
+
         :param float x: x coordinate of sample grid [nm]
         :param float y: y coordinate of sample grid [nm]
         :param float z: z coordinate of sample grid [nm]
@@ -91,10 +92,10 @@ class SphereMagnet:
         :rtype: np.array
         """
 
-        dx = (x - self.magnet_origin[0]) / self.magnet_radius
-        dy = (y - self.magnet_origin[1]) / self.magnet_radius
-        dz = (z - self.magnet_origin[2]) / self.magnet_radius
-        pre_term = self.mu0_Ms / self.magnet_radius
+        dx = (x - self.origin[0]) / self.radius
+        dy = (y - self.origin[1]) / self.radius
+        dz = (z - self.origin[2]) / self.radius
+        pre_term = self.mu0_Ms / self.radius
 
         return pre_term * self._bzx(dx, dy, dz)
 
@@ -106,7 +107,7 @@ class SphereMagnet:
     )
     def _bzx(dx, dy, dz):
         """Internal calculation for bzx, optimized with numba.
-    
+
         :param dx: normalized distances to the center of the magnet in x
         :param dy: normalized distances to the center of the magnet in y
         :param dz: normalized distances to the center of the magnet in z
@@ -128,7 +129,7 @@ class SphereMagnet:
         With :math:`X`, :math:`Y`, :math:`Z`, :math:`R`, :math:`r`, and
         :math:`\mu_0 M_s` defined as above, the magnetic field
         second derivative is calculated as
-    
+
         .. math::
             B_{zxx} = \dfrac{\partial B_z}{\partial z}
             = \dfrac{\mu_0 M_s}{r^2} \:
@@ -143,10 +144,10 @@ class SphereMagnet:
         :rtype: np.array
         """
 
-        dx = (x - self.magnet_origin[0]) / self.magnet_radius
-        dy = (y - self.magnet_origin[1]) / self.magnet_radius
-        dz = (z - self.magnet_origin[2]) / self.magnet_radius
-        pre_term = self.mu0_Ms / (self.magnet_radius**2)
+        dx = (x - self.origin[0]) / self.radius
+        dy = (y - self.origin[1]) / self.radius
+        dz = (z - self.origin[2]) / self.radius
+        pre_term = self.mu0_Ms / (self.radius**2)
 
         return pre_term * self._bzxx(dx, dy, dz)
 
@@ -175,27 +176,27 @@ class SphereMagnet:
         )
 
 
-class RectangularMagnet:
-    """Rectangular magnet object with the bz, bzx, bzxx calculations."""
+@dataclass
+class RectangularMagnet(ComponentBase):
+    """Rectangular magnet object with the bz, bzx, bzxx calculations.
 
-    def __init__(self, length, mu0_Ms, origin):
-        """Initiate a rectangular magnet object
-        :param list length: length of rectangular magnet in (x, y, z) direction [nm]
-        :param float mu0_Ms: the rectangle's magnetization [mT],
-            assumed to be oriented along ``z``
-        :param list origin: the position of the magnet origin (x, y, z)
-        :ivar np.array _range:
-            [-xrange, +xrange, -yrange, +yrange, -zrange, zrange]
-            range in the x, y and z direction after the center point to the origin.
-        """
-        self.magnet_origin = np.array(origin)
-        self.mu0_Ms = mu0_Ms
+    :param list length: length of rectangular magnet in (x, y, z) direction [nm]
+    :param list origin: the position of the magnet origin (x, y, z)
+    :param float mu0_Ms: saturation magnetization [mT]
+    :ivar np.array _range:
+        [-xrange, +xrange, -yrange, +yrange, -zrange, zrange]
+        range in the x, y and z direction after the center point to the origin.
+    """
 
-        self.magnet_length = np.array(length, dtype=np.float64)
+    length: list[float] = field(metadata={"unit": "nm"})
+    origin: list[float] = field(metadata={"unit": "nm"})
+    mu0_Ms: float = field(metadata={"unit": "mT"})
+
+    def __post_init__(self):
         self._range = np.column_stack(
             (
-                -self.magnet_length / 2 + self.magnet_origin,
-                self.magnet_length / 2 + self.magnet_origin,
+                -np.array(self.length) / 2 + self.origin,
+                np.array(self.length) / 2 + self.origin,
             )
         ).ravel()
         self._pre_term = self.mu0_Ms / (4 * np.pi)
@@ -422,7 +423,7 @@ class RectangularMagnet:
     )
     def _bzxx(dx1, dx2, dy1, dy2, dz1, dz2):
         """The summation term for the second derivative of magnetic field.
-    
+
         Optimized by numba. See bzxx method for the explanation.
         :param float dx1, dx2: distance between grid and the one end of magnet
                         in x direction [nm]

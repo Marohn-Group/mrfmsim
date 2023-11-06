@@ -6,42 +6,46 @@
 import numpy as np
 import pytest
 from mrfmsim.component import Grid
-
-# GRID_REPR = """Grid(
-#   grid_length=[12.1 2.0 9.9] [nm] # actual grid length in x, y, z direction
-#   grid_origin=[1.0 1.0 1.0] [nm] # grid origin
-#   grid_range=[11.0 1.6 8.8] [nm] # distance between two edge points in each direction
-#   grid_shape=[11 5 9] # grid points in x, y, z direction
-#   grid_step=[1.1 0.4 1.1] [nm] # grid step size in x, y, z direction
-#   grid_voxel=0.484 [nm^3] # grid voxel volume
-# )"""
+from textwrap import dedent
 
 
 class TestGrid:
     @pytest.fixture
     def grid(self):
         """Standard grid."""
-        return Grid(shape=[11, 5, 9], step=[1.10, 0.40, 1.10], origin=[1.0, 1.0, 1.0])
+        return Grid(
+            shape=(11, 5, 9),
+            step=[1.10, 0.40, 1.10],
+            origin=[1.0, 1.0, 1.0],
+        )
 
-    # def test_str(self, grid):
-    #     """Test grid str."""
+    def test_str(self, grid):
+        """Test grid str."""
 
-    #     assert str(grid) == GRID_REPR
+        grid_str = """\
+        Grid(shape=(11, 5, 9)
+        \tstep=[1.1, 0.4, 1.1] nm
+        \torigin=[1.0, 1.0, 1.0] nm
+        \tvoxel=0.484 nm^3
+        \trange=[11.   1.6  8.8] nm
+        \tlength=[12.1  2.   9.9] nm)"""
+
+        assert str(grid) == dedent(grid_str)
 
     def test_grid_voxel(self, grid):
         """Test attribute grid voxel."""
 
-        assert grid.grid_voxel == 1.1 * 0.40 * 1.1
+        assert grid.voxel == 1.1 * 0.40 * 1.1
 
     def test_grid_range(self, grid):
         """Test grid range."""
 
-        assert np.array_equal(grid.grid_range, np.array([11.0, 1.6, 8.8]))
+        assert np.array_equal(grid.range, np.array([11.0, 1.6, 8.8]))
 
     def test_grid_length(self, grid):
         """Test grid length."""
 
-        assert np.allclose(grid.grid_length, np.array([12.1, 2.0, 9.9]), rtol=1e-15)
+        assert np.allclose(grid.length, np.array([12.1, 2.0, 9.9]), rtol=1e-15)
 
     def test_grid_array(self, grid):
         """Test grid values.

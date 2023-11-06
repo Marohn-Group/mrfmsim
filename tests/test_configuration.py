@@ -1,15 +1,11 @@
-from mrfmsim.configuration import (
-    import_object,
-    MrfmSimLoader,
-    MrfmSimDumper,
-)
+from mrfmsim.configuration import import_object, MrfmSimLoader
 import inspect
 import pytest
 import yaml
-from mrfmsim.shortcut import loop_shortcut
-from mrfmsim.utils import Job
 from textwrap import dedent
 import numpy as np
+from types import SimpleNamespace as SNs
+import math
 
 
 def test_import_object():
@@ -35,7 +31,7 @@ def test_graph_constructor(experiment):
     """Test the graph constructor parsing the graph correctly."""
     graph_yaml = """
     # graph tag
-    !graph
+    !Graph
     name: test_graph
     grouped_edges:
         - [add, [subtract, power, log]]
@@ -44,7 +40,7 @@ def test_graph_constructor(experiment):
         add:
             func: !import numpy.add
             output: c
-            inputs: [a, [constant, 2]]
+            inputs: [a, h]
         subtract:
             func: !import operator.sub
             output: e
@@ -57,6 +53,7 @@ def test_graph_constructor(experiment):
             func: !import numpy.multiply
             output: k
             inputs: [e, g]
+            output_unit: m^2
         log:
             func: !import math.log
             output: m
@@ -69,61 +66,38 @@ def test_graph_constructor(experiment):
     # however the function is directly parsed. Therefore
     # we can only check if the function names are the same.
 
-    assert (
-        graph.graph["parser"]._parser_dict
-        == experiment.graph.graph["parser"]._parser_dict
-    )
     assert list(graph.nodes) == list(experiment.graph.nodes)
     assert graph.edges == graph.edges
 
+    node_obj_config = graph.nodes["add"]
+
     for nodes, attrs in graph.nodes.items():
         model_attrs = experiment.graph.nodes[nodes]
-        assert attrs.pop("_func").__name__ == model_attrs.pop("_func").__name__
-        assert attrs.pop("func").__name__ == model_attrs.pop("func").__name__
-        assert attrs == model_attrs
+
+        config_dict = attrs["node_obj"].__dict__
+        graph_dict = experiment.graph.nodes[nodes]["node_obj"].__dict__
+
+        assert (
+            config_dict.pop("_base_func").__dict__
+            == graph_dict.pop("_base_func").__dict__
+        )
+        assert (
+            config_dict.pop("node_func").__dict__
+            == graph_dict.pop("node_func").__dict__
+        )
+        assert config_dict == graph_dict
 
 
 def test_func_constructor():
     """Test if it can load lambda function correctly."""
 
-    lambda_yaml = """
-    !func 'lambda a, b: a + b'
+    lambda_yaml = """\
+    !func:test "lambda a, b: a + b"
     """
 
     lambda_func = yaml.load(dedent(lambda_yaml), MrfmSimLoader)
     assert lambda_func(1, 2) == 3
-
-
-def test_execute_constructor():
-    """Test if it can load execute object correctly.
-
-    Add is an intermediate node output value."""
-
-    def add(a, b):
-        """Add two numbers."""
-        return a + b
-
-    execute_yaml = "!execute add(a, b)"
-    execute_func = yaml.load(dedent(execute_yaml), MrfmSimLoader)
-    assert list(inspect.signature(execute_func).parameters.keys()) == ["add", "a", "b"]
-
-    assert execute_func(add, 1, 2) == 3
-
-
-def test_execute_constructor_unpack():
-    """Test if it can load execute object with unpacking correctly.
-
-    Add is an intermediate node output value."""
-
-    def add(a, b, c):
-        """Add three numbers."""
-        return a + b + c
-
-    execute_yaml = "!execute add(a, *bc)"
-    execute_func = yaml.load(dedent(execute_yaml), MrfmSimLoader)
-    assert list(inspect.signature(execute_func).parameters.keys()) == ["add", "a", "bc"]
-
-    assert execute_func(add, 1, [2, 3]) == 6
+    assert lambda_func.__name__ == "test"
 
 
 def test_import_multi_obj_constructor():
@@ -140,56 +114,70 @@ def test_import_multi_obj_constructor():
     assert dataobj.b == "test"
 
 
-def test_job_dumper():
-    """Test job dumper can dump the correct values.
+@pytest.fixture
+def expt_file(tmp_path):
+    """Create a custom module for testing."""
 
-    Job dumper currently only supports plain template dumping.
-    """
-    job_str = """\
-    !import:mrfmsim.utils.Job
-    name: test
-    inputs:
-      a: 1
-      b: 2
-    shortcuts: []
-    """
-
-    job = Job("test", {"a": 1, "b": 2})
-
-    job_yaml = yaml.dump(job, Dumper=MrfmSimDumper, sort_keys=False)
-
-    assert dedent(job_str) == job_yaml
-
-
-def test_job_constructor():
-    """Test job constructor parsing job yaml."""
-
-    job_str = """\
-    !import:mrfmsim.utils.Job
-    name: test
-    inputs:
-      a: 1
-      b: 2
-    shortcuts:
-        - !import mrfmsim.shortcut.loop_shortcut
-    """
-
-    job = yaml.load(job_str, Loader=MrfmSimLoader)
-    assert job.name == "test"
-    assert job.inputs == {"a": 1, "b": 2}
-    assert job.shortcuts[0] == loop_shortcut
-
-
-def test_job_constructor_no_shortcut():
-    """Test load job object when shortcuts are not specified."""
-
-    job_str_plain = """\
-    !import:mrfmsim.utils.Job
-    name: ''
-    inputs: {}
+    expt_yaml = """\
+    !Experiment
+    name: test_experiment
+    graph:
+        !Graph
+        name: test_graph
+        grouped_edges:
+            - [add, [subtract, power, log]]
+            - [[subtract, power], multiply]
+        node_objects:
+            add:
+                func: !func:add "lambda a, h: a + h"
+                doc: Add a and h.
+                inputs: [a, h]
+                output: c
+            subtract:
+                func: !import operator.sub
+                output: e
+                inputs: [c, d]
+            power:
+                func: !import math.pow
+                output: g
+                inputs: [c, f]
+            multiply:
+                func: !import numpy.multiply
+                output: k
+                inputs: [e, g]
+                output_unit: m^2
+            log:
+                func: !import math.log
+                output: m
+                inputs: [c, b]
+    components: {comp: [[a, a1], [b, b1]]}
+    doc: Test experiment with components.
+    modifiers: [!import:mmodel.modifier.loop_input {parameter: d}]
+    defaults:
+        h: 2
     """
 
-    job = yaml.load(dedent(job_str_plain), Loader=MrfmSimLoader)
-    assert job.name == ""
-    assert job.inputs == {}
-    assert job.shortcuts == []
+    expt_yaml = dedent(expt_yaml)
+
+    module_path = tmp_path / "expt.yaml"
+    module_path.write_text(expt_yaml)
+    return module_path
+
+
+def test_parse_yaml_file(expt_file):
+    """Test if the yaml file is parsed correctly."""
+
+    with open(expt_file) as f:
+        expt = yaml.load(f, MrfmSimLoader)
+
+    assert expt.name == "test_experiment"
+    assert expt.doc == "Test experiment with components."
+    assert expt.graph.name == "test_graph"
+    assert expt(comp=SNs(a1=1, b1=2), d_loop=[1, 2], f=2) == [
+        (18, math.log(3, 2)),
+        (9, math.log(3, 2)),
+    ]
+    assert expt(comp=SNs(a1=1, b1=2), d_loop=[1, 2], f=2, h=3) == [(48, 2), (32, 2)]
+    assert expt.defaults == {"h": 2}  # check default is an int
+    assert expt.get_node_obj("add").doc == "Add a and h."
+    assert expt.get_node_obj("add").__name__ == "add"

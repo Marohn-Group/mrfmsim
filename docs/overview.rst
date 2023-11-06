@@ -66,7 +66,7 @@ To printout the metadata of the model::
         modifiers:
           - replace_component({'magnet': ['Bz_method', 'Bzxx_method'], 'sample': ['J',
           'Gamma', 'spin_density', 'temperature', 'dB_sat', 'dB_hom'], 'grid':
-          ['grid_array', 'grid_shape', 'grid_step', 'grid_voxel', 'extend_grid_method'],
+          ['grid_array', 'shape', 'step', 'voxel', 'extend_grid_method'],
           'cantilever': ['dk_to_df_ac_cermit']})
 
         Simulates a Cornell-style frequency shift magnetic resonance force microscope

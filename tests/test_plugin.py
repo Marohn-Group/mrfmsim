@@ -122,7 +122,7 @@ class TestImport:
 
         # register to finder
         finder = self.register_entry_point("test", "host_plugin")
-        
+
         with pytest.warns(
             UserWarning,
             match=(
@@ -151,7 +151,6 @@ class TestImport:
 
         # remove the finder
         sys.meta_path.remove(finder)
-
 
     def test_plugin_not_registered(self, mock_module):
         """Test plugin is not registered."""

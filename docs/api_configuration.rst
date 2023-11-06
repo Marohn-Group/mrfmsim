@@ -6,7 +6,9 @@ To facilitate collaboration and better visual representation,
 experiments. 
 
 Here we create 
-For example, a simple model and graph can be defined::
+For example, a simple model and graph can be defined:
+
+.. code-block:: yaml
 
     # example.yaml
     !import:mrfmsim.model.Experiment
@@ -92,7 +94,7 @@ are available in ``mrfmsim``:
         a: 1
         b: 2
 
-- create a ``mmodel.ModelGraph`` instance
+- create a ``mmodel.Graph`` instance
 
     .. code-block:: yaml
 

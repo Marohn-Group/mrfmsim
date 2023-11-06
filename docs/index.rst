@@ -27,8 +27,7 @@ Indices and tables
    :caption: User Guide
    :hidden:
 
-   ref_cli
-   ref_model
+   ref_experiment
    ref_modifier
    ref_shortcut
 

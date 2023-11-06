@@ -1,3 +1,4 @@
+from .base import ComponentBase
 from .magnet import SphereMagnet, RectangularMagnet
 from .cantilever import Cantilever
 from .grid import Grid

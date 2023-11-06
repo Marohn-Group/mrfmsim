@@ -6,71 +6,37 @@ import pytest
 from inspect import getclosurevars
 
 
-class TestStdoutShortcut:
-    """Test stdout_shortcut."""
+class TestModelPrintShortcut:
+    """Test the print_shortcut."""
 
-    def test_stdout_input(self, experiment):
-        """Test stdout_shortcut with inputs.
+    def test_print_input(self, capsys, experiment):
+        """Test print_shortcut to print input values."""
 
-        The model should have the modifier added.
-        """
+        print_model = print_shortcut(experiment, ["a", "d"], "a={a:.2f}, d={d:.3f}")
 
-        stdout_model = print_shortcut(experiment, ["a", "d"])
-
-        mod_a = stdout_model.get_node("add")["modifiers"][-1]
-        mod_d = stdout_model.get_node("subtract")["modifiers"][-1]
-
-        # mod = stdout_model.modifiers[-1]
-        assert getclosurevars(mod_a).nonlocals == {
-            "inputs": ["a"],
-            "units": {},
-            "end": " | ",
-        }
-
-        assert mod_a.metadata == "print_inputs(['a'])"
-        assert getclosurevars(mod_d).nonlocals == {
-            "inputs": ["d"],
-            "units": {},
-            "end": " | ",
-        }
-
-        assert mod_d.metadata == "print_inputs(['d'])"
-
-    def test_stdout_output(self, experiment):
-        """Test stdout_shortcut with inputs.
-
-        The model should have the modifier added.
-        """
-
-        stdout_model = print_shortcut(experiment, ["k", "m"])
-        m_node = stdout_model.get_node("multiply")
-        print(m_node["modifiers"])
-
-        m_node_mod = m_node["modifiers"][-1]
-        assert m_node_mod.metadata == "print_output('k')"
-        assert getclosurevars(m_node_mod).nonlocals == {
-            "output": "k",
-            "units": {},
-            "end": "\n",
-        }
-
-        l_node = stdout_model.get_node("log")
-        l_node_mod = l_node["modifiers"][-1]
-
-        assert l_node_mod.metadata == "print_output('m')"
-        assert getclosurevars(l_node_mod).nonlocals == {
-            "output": "m",
-            "units": {},
-            "end": "\n",
-        }
-
-    def test_stdout_shortcut(self, capsys, experiment):
-        """Test stdout shortcut."""
-
-        stdout_model = print_shortcut(experiment, ["d", "c", "k"])
-        stdout_model(a=0, b=2, d=2, f=3)
+        print_model(a=0, b=2, d=2, f=3)
         captured = capsys.readouterr()
-        assert captured.out == "c 2 | d 2 | k 0.0\n"
+        assert captured.out == "a=0.00, d=2.000\n"
+
+    def test_print_output(self, capsys, experiment):
+        """Test print_shortcut to print output values."""
+
+        print_model = print_shortcut(experiment, ["m", "k"], "m={m:.2f}, k={k:.3f}")
+
+        print_model(a=0, b=2, d=2, f=3)
+        captured = capsys.readouterr()
+        assert captured.out == "m=1.00, k=0.000\n"
+
+    def test_print_mixed(self, capsys, experiment):
+        """Test print_shortcut to print input and output values in mixed order."""
+
+        print_model = print_shortcut(
+            experiment, ["a", "d", "m", "k"], "m={m:.2f}, a={a}, k={k:.3f}, d={d:.3f}"
+        )
+
+        print_model(a=0, b=2, d=1, f=3)
+        captured = capsys.readouterr()
+        assert captured.out == "m=1.00, a=0, k=8.000, d=1.000\n"
 
 
 class TestLoopShortcut:
@@ -84,24 +50,12 @@ class TestLoopShortcut:
         ):
             loop_shortcut(experiment, "c")
 
-    def test_loop_shortcut_top(self, experiment_mod):
-        """Test loop_shortcut with signature level parameters.
-
-        In some cases, the signature is replaced. The modifier is added to the model.
-        """
-        loop_model = loop_shortcut(experiment_mod, "component")
-
-        loop_mod = loop_model.modifiers[-1]
-        assert loop_mod.metadata == "loop_input('component')"
-        assert getclosurevars(loop_mod).nonlocals == {"parameter": "component"}
-
-        comps = [SimpleNamespace(a=0, b=2), SimpleNamespace(a=2, b=16)]
-        assert loop_model(comps, d=[1, 2, 3], f=3)[0] == [(8, 1), (0, 1), (-8, 1)]
-        assert loop_model(comps, d=[1, 2, 3], f=3)[1] == [
-            (192, 0.5),
-            (128, 0.5),
-            (64, 0.5),
-        ]
+    def test_loop_shortcut_signature_exception(self, experiment_mod):
+        """Test loop_shortcut with signature level parameters raises exception."""
+        with pytest.raises(
+            Exception, match="'component' is not included in the graph."
+        ):
+            loop_model = loop_shortcut(experiment_mod, "component")
 
     def test_loop_shortcut_graph(self, experiment):
         """Test loop_shortcut with graph level parameters.
@@ -112,19 +66,19 @@ class TestLoopShortcut:
         loop_mod = loop_model.modifiers[-1]
         assert loop_mod.metadata == "loop_input('a')"
         assert getclosurevars(loop_mod).nonlocals == {"parameter": "a"}
-        assert loop_model(a=[0, 2], b=2, d=2, f=3) == [(0, 1.0), (128, 2.0)]
+        assert loop_model(a_loop=[0, 2], b=2, d=2, f=3, h=2) == [(0, 1.0), (128, 2.0)]
 
     def test_loop_shortcut_single(self, experiment):
         """Test loop_shortcut on single node dependency."""
 
         loop_model = loop_shortcut(experiment, "b")
         # b dependency is in the node log
-        b_node_modifier = loop_model.get_node("log")["modifiers"][-1]
+        b_node_modifier = loop_model.get_node_obj("log").modifiers[-1]
 
         assert b_node_modifier.metadata == "loop_input('b')"
         assert getclosurevars(b_node_modifier).nonlocals == {"parameter": "b"}
 
-        assert loop_model(a=0, b=[2, 4], d=2, f=3) == (0, [1, 0.5])
+        assert loop_model(a=0, b_loop=[2, 4], d=2, f=3, h=2) == (0, [1, 0.5])
 
     def test_loop_shortcut_middle(self, experiment):
         """Test loop_shortcut on subgraph."""
@@ -134,29 +88,25 @@ class TestLoopShortcut:
         # make sure subgraph exists
         assert loop_model.name == "loop_model"
         assert "subnode_d" in loop_model.graph.nodes
-        subnode = loop_model.get_node("subnode_d")
+        subnode = loop_model.get_node_obj("subnode_d")
 
-        mod = subnode["modifiers"][-1]
+        mod = subnode.modifiers[-1]
         assert mod.metadata == "loop_input('d')"
         assert getclosurevars(mod).nonlocals == {"parameter": "d"}
-        assert subnode["output"] == "k"
+        assert subnode.output == "k"
 
     def test_loop_shortcut_middle_submodel(self, experiment):
         """Test submodel created by loop_shortcut."""
 
         loop_model = loop_shortcut(experiment, "d", "loop_model")
-        subnode = loop_model.get_node("subnode_d")
-        submodel = subnode["_func"]
-        # make sure the function is decorated
-        assert submodel is not subnode["func"]
+        subnode = loop_model.get_node_obj("subnode_d")
 
-        assert (
-            submodel.description
-            == "Submodel generated by loop_shortcut for parameter 'd'."
-        )
-        assert sorted(list(submodel.graph.nodes)) == ["multiply", "subtract"]
+        assert subnode.node_func is not subnode.func
+
+        assert subnode.doc == "Submodel generated by loop_shortcut for parameter 'd'."
+        assert sorted(list(subnode.func.graph.nodes)) == ["multiply", "subtract"]
 
     def test_loop_shortcut_middle_execution(self, experiment):
         """Test loop_shorcut submodel execution."""
         loop_model = loop_shortcut(experiment, "d", "loop_model")
-        assert loop_model(a=0, b=2, d=[1, 2], f=3) == ([8, 0], 1.0)
+        assert loop_model(a=0, b=2, d_loop=[1, 2], f=3, h=2) == ([8, 0], 1.0)
