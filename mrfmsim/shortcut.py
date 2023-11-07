@@ -78,7 +78,7 @@ def loop_shortcut(model, parameter: str, name=None):
         node = list(H.nodes)[0]
         # if the looped node is only one node
         # add loop modifier to node attribute
-        node_modifiers = H.nodes[node]["node_obj"].modifiers
+        node_modifiers = H.nodes[node]["node_object"].modifiers
         node_modifiers = [*node_modifiers, loop_mod]
         G = G.edit_node(node, modifiers=node_modifiers)
 
