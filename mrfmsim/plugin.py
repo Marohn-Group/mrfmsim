@@ -13,8 +13,8 @@ def load_plugins(host_module, entry_point_group):
     The plugin is loaded at startup. The loading is done by
     searching for the entry point of installed packages. The name of
     the entry point is the attribute in mrfmsim to access the plugin.
-    If the a plugin is already loaded, the plugin will be renamed
-    by the name of the plugin and the module name.
+    If the plugin with the same name is already loaded, the plugin will
+    be renamed by the name of the plugin and the module name.
 
     ..Note::
         Currently, there is no option to block certain plugins.
@@ -43,7 +43,6 @@ def load_plugins(host_module, entry_point_group):
             setattr(host_module, submodule_name, submodule)
 
         for ep_dict in module:
-
             for plugin in ep_dict["plugins"]:
                 plugin_object = getattr(ep_dict["module"], plugin)
                 plugin_name = plugin
@@ -58,6 +57,6 @@ def load_plugins(host_module, entry_point_group):
                         f"import as {plugin_name}."
                     )
                 # register the object
-                setattr(submodule, plugin_name, plugin_object)   
+                setattr(submodule, plugin_name, plugin_object)
 
     return plugin_dict
