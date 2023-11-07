@@ -84,8 +84,6 @@ class ExperimentCollection:
         for experiment, instruction in instructions.items():
             self[experiment] = instruction
 
-
-
     def __getitem__(self, experiment):
         """Return the experiment with the given key."""
 
@@ -95,7 +93,7 @@ class ExperimentCollection:
 
     def __setitem__(self, experiment, instruction):
         """Set the experiment with the given key.
-        
+
         The collection name is copied to the experiment.
         """
 
@@ -116,8 +114,8 @@ class ExperimentCollection:
                 raise KeyError(f"node {repr(node)} not found")
             node_obj_list.append(self._nodes[node])
         G.set_node_objects_from(node_obj_list)
-    
-        collection = {'collection': self.name}
+
+        collection = {"collection": self.name}
         kwargs = {**collection, **self._settings, **instruction_copy}
 
         expt_obj = Experiment(name=experiment, graph=G, **kwargs)
@@ -169,9 +167,7 @@ class ExperimentCollection:
         A new collection is created with nodes and experiment_instructions copied.
         """
 
-        con_dict = construction_dict(
-            self, ["node_objects", "instructions", "settings"]
-        )
+        con_dict = construction_dict(self, ["node_objects", "instructions", "settings"])
         con_dict.update(kwargs)
         return self.__class__(**con_dict)
 

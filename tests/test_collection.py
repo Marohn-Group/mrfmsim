@@ -66,6 +66,7 @@ def test_instruction(node_objects, grouped_edges):
     assert collection["test"].collection == "test_collection_object"
     print(collection["test"])
 
+
 def test_instruction_duplicate(node_objects, grouped_edges):
     """Test the instruction property of the collection."""
 
@@ -90,7 +91,7 @@ def test_experiment_settings(node_objects, grouped_edges):
         "Test collection description.",
         node_objects,
         {"test": instruction},
-        {'doc': "Test experiment doc."},
+        {"doc": "Test experiment doc."},
     )
 
     assert collection["test"].doc == "Test experiment doc."
@@ -105,7 +106,7 @@ def test_experiment_settings_overwritten(node_objects, grouped_edges):
         "Test collection description.",
         node_objects,
         {"test": instruction},
-        {'doc': "Test experiment doc."},
+        {"doc": "Test experiment doc."},
     )
 
     assert collection["test"].doc == "Test individual settings."
@@ -139,9 +140,10 @@ def test_collection_str_representation(node_objects, grouped_edges):
     collection = ExperimentCollection("test_collection", "", node_objects)
     assert str(collection) == dedent(collection_str)
 
+
 def test_experiment_str_representation(node_objects, grouped_edges):
     """Test the str representation of the experiment.
-    
+
     Test the collection information is added to experiment object.
     """
 
@@ -206,7 +208,7 @@ def test_edit(node_objects, grouped_edges):
         description="Test collection description.",
         node_objects=node_objects,
         instructions={"test": instruction},
-        settings={'doc': "Test experiment doc."},
+        settings={"doc": "Test experiment doc."},
     )
 
     new_collection = collection.edit(settings={"doc": "New collection doc."})

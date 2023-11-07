@@ -80,4 +80,3 @@ class Experiment(Model):
 
     def __str__(self):
         return exptformatter(self)
-
