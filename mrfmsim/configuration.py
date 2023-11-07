@@ -2,7 +2,7 @@
 
 import importlib
 import yaml
-from mrfmsim import Graph, Node, Experiment
+from mrfmsim import Graph, Node, Experiment, ExperimentCollection
 
 
 def import_object(path):
@@ -76,6 +76,18 @@ def experiment_constructor(loader, node):
     return Experiment(**param_dict)
 
 
+def collection_constructor(loader, node):
+    """Parse the "!Collection" tag into ExperimentCollection object."""
+
+    param_dict = loader.construct_mapping(node, deep=True)
+
+    node_objects = []
+    for node_name, node_info in param_dict.pop("node_objects").items():
+        node_objects.append(Node(node_name, **node_info))
+
+    return ExperimentCollection(node_objects=node_objects, **param_dict)
+
+
 def func_multi_constructor(loader: yaml.BaseLoader, tag_suffix, node):
     """Load the "!func:" tag from yaml string.
 
@@ -114,6 +126,7 @@ default_constructors = {
         "!import": import_constructor,
         "!Graph": graph_constructor,
         "!Experiment": experiment_constructor,
+        "!Collection": collection_constructor,
     },
     "multi_constructor": {
         "!import:": import_multi_constructor,

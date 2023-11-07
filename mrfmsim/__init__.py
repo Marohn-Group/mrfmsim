@@ -1,6 +1,7 @@
 from mrfmsim.plugin import load_plugins
-from mrfmsim.experiment import Experiment
+from mrfmsim.model import Experiment
 from mrfmsim.node import Node
+from mrfmsim.collection import ExperimentCollection
 from mmodel import Graph
 import sys
 

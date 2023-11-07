@@ -2,7 +2,7 @@
 
 The class inherits from mmodel.Model class to add certain functionality and defaults.
 """
-from mmodel import MemHandler, Model
+from mmodel import MemHandler, Model, Graph
 from mrfmsim.modifier import replace_component
 import networkx as nx
 from mmodel.metadata import MetaDataFormatter, modelformatter, format_dictargs
@@ -14,6 +14,7 @@ _meta_order = [
     "self",
     "returns",
     "return_units",
+    "collection",
     "graph",
     "handler",
     "handler_kwargs",
@@ -79,3 +80,4 @@ class Experiment(Model):
 
     def __str__(self):
         return exptformatter(self)
+

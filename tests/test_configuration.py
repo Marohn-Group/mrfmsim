@@ -74,8 +74,8 @@ def test_graph_constructor(experiment):
     for nodes, attrs in graph.nodes.items():
         model_attrs = experiment.graph.nodes[nodes]
 
-        config_dict = attrs["node_obj"].__dict__
-        graph_dict = experiment.graph.nodes[nodes]["node_obj"].__dict__
+        config_dict = attrs["node_object"].__dict__
+        graph_dict = experiment.graph.nodes[nodes]["node_object"].__dict__
 
         assert (
             config_dict.pop("_base_func").__dict__
@@ -181,3 +181,68 @@ def test_parse_yaml_file(expt_file):
     assert expt.defaults == {"h": 2}  # check default is an int
     assert expt.get_node_obj("add").doc == "Add a and h."
     assert expt.get_node_obj("add").__name__ == "add"
+
+
+def test_collection_constructor():
+    yaml_str = """\
+    !Collection
+    name: test_collection
+    description: Test collection object.
+    node_objects:
+        add:
+            func: !func:add "lambda a, h: a + h"
+            doc: Add a and h.
+            inputs: [a, h]
+            output: c
+        subtract:
+            func: !import operator.sub
+            output: e
+            inputs: [c, d]
+        power:
+            func: !import math.pow
+            output: g
+            inputs: [c, f]
+        multiply:
+            func: !import numpy.multiply
+            output: k
+            inputs: [e, g]
+            output_unit: m^2
+        log:
+            func: !import math.log
+            output: m
+            inputs: [c, b]
+    instructions:
+        test1:
+            grouped_edges:
+                - [add, [subtract, power, log]]
+                - [[subtract, power], multiply]
+            returns: [k]
+        test2:
+            grouped_edges:
+                - [add, [subtract, power, log]]
+            doc: Shortened graph.
+            returns: [c, m]
+    settings:
+        components: {comp: [[a, a1], [b, b1]]}
+        doc: Global docstring.
+        defaults:
+            h: 2
+    """
+
+    collection = yaml.load(dedent(yaml_str), MrfmSimLoader)
+
+    assert collection.name == "test_collection"
+    assert collection.description == "Test collection object."
+    assert list(collection.nodes.keys()) == [
+        "add",
+        "subtract",
+        "power",
+        "multiply",
+        "log",
+    ]
+
+    assert collection["test1"].doc == "Global docstring."
+    assert collection["test1"](comp=SNs(a1=1, b1=2), d=1, f=2) == 18
+
+    assert collection["test2"].doc == "Shortened graph."
+    assert collection["test2"](comp=SNs(a1=1, b1=2), d=1, f=2) == (3, math.log(3, 2))
