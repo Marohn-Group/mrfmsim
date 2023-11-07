@@ -16,18 +16,19 @@ Changed
 - Change python requirement to 3.10.
 - Change the plugin system using package entry points. Automatically load
   plugins at import time.
-- Change the print related modifier and shortcuts.
+- Change the print-related modifier and shortcuts.
 - Change yaml tags for easier function definition.
 
 Fixed
 ^^^^^
-- Fixe the issue that ``loop_shortcut`` failed to update the model "returns".
+- Fix the issue that ``loop_shortcut`` failed to update the model "returns".
 
 Added
 ^^^^^
 - Add grid, magnet, sample, and cantilever component objects.
 - Add symbolic unit system to nodes and models.
 - Add custom node, model string representation.
+- Add the collection class for creating a group of experiments.
 
 Removed
 ^^^^^^^

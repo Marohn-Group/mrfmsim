@@ -79,14 +79,30 @@ class TestGrid:
             Grid.grid_extents(length, origin), [[2, 4], [2, 6], [2, 8]]
         )
 
-    def test_extend_grid_method(self, grid):
-        """Test extend grid method."""
+    def test_extend_grid_by_pts(self, grid):
+        """Test test_extend_xgrid_by_pts."""
 
         grid_x = np.array(
             [-5.6, -4.5, -3.4, -2.3, -1.2, -0.1, 1.0, 2.1, 3.2, 4.3, 5.4, 6.5, 7.6]
         )
 
-        ext_grid_array = grid.extend_grid_method(1)
+        ext_grid_array = grid.extend_grid_by_points([1, 0, 0])
+        assert len(ext_grid_array) == 3
+        assert np.allclose(
+            ext_grid_array[0], grid_x.reshape(13, 1, 1), rtol=1e-15, atol=1e-15
+        )
+        assert np.array_equal(ext_grid_array[1], grid.grid_array[1])
+        assert np.array_equal(ext_grid_array[2], grid.grid_array[2])
+
+    def test_extend_grid_by_length(self, grid):
+        """Test extend_xgrid_by_length.
+        """
+
+        grid_x = np.array(
+            [-5.6, -4.5, -3.4, -2.3, -1.2, -0.1, 1.0, 2.1, 3.2, 4.3, 5.4, 6.5, 7.6]
+        )
+
+        ext_grid_array = grid.extend_grid_by_length([1.2, 0, 0])
         assert len(ext_grid_array) == 3
         assert np.allclose(
             ext_grid_array[0], grid_x.reshape(13, 1, 1), rtol=1e-15, atol=1e-15

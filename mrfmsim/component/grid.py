@@ -4,6 +4,7 @@
 import numpy as np
 from mrfmsim.component import ComponentBase
 from dataclasses import dataclass, field
+import math
 
 
 @dataclass
@@ -66,20 +67,15 @@ class Grid(ComponentBase):
             extents[2][0] : extents[2][1] : self.shape[2] * 1j,
         ]
 
-    def extend_grid_method(self, ext_pts):
-        """Extend the grid by the number of points in the x, y, z direction (one side).
+    def extend_grid_by_points(self, ext_pts):
+        """Extend the grid by the number of points in the x direction.
 
-        :param int ext_pts: points to extend along x direction
-            (cantilever motion direction).
+        :param int ext_pts: points (one side) to extend along x direction
+            (cantilever motion direction). The points should be a list of
+            three dimensions.
         """
 
-        ext_shape = np.array(
-            [
-                self.shape[0] + np.array(ext_pts) * 2,
-                self.shape[1],
-                self.shape[2],
-            ]
-        )
+        ext_shape = self.shape + np.array(ext_pts) * 2
         ext_range = (ext_shape - [1, 1, 1]) * self.step
         extents = self.grid_extents(ext_range, self.origin)
 
@@ -88,3 +84,17 @@ class Grid(ComponentBase):
             extents[1][0] : extents[1][1] : ext_shape[1] * 1j,
             extents[2][0] : extents[2][1] : ext_shape[2] * 1j,
         ]
+
+    def extend_grid_by_length(self, ext_length):
+        """Extend the grid by the number of points in the x direction.
+
+        This is used to extend the grid by the cantilever motion.
+        The length needs to be more than the step size to count.
+
+        :param int ext_pts: distance (one side) to extend along x direction
+            (cantilever motion direction). The length should be a list of
+            three dimensions.
+        """
+
+        pts = np.floor(np.array(ext_length) / self.step).astype(int)
+        return self.extend_grid_by_points(pts)
