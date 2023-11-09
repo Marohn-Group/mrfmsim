@@ -7,21 +7,26 @@ from mmodel.modifier import loop_input
 from mmodel.utility import modelgraph_signature, modelgraph_returns
 from mrfmsim import Node
 from networkx.utils import nodes_equal
-from mrfmsim.modifier import print_inputs, print_output, print_parameters
+from mrfmsim.modifier import print_parameters
 import networkx as nx
 
 
 def print_shortcut(model, parameters, stdout_format):
     """Shortcut to printout parameters.
 
-    The shortcut facilitates creation of model level modifier.
-    Since modifier cannot access the node information, shortcut
+    The shortcut facilitates the creation of model model-level modifier.
+    Since the modifier cannot access the node information, the shortcut
     is a good way to modify the modifiers.
 
-    The printout shortcut determines if the parameters is
-    a input or output at the model level and output based on
+    The printout shortcut determines if the parameters are
+    an input or output at the model level and output based on
     the format. Intermediate values are not accessible, change the
-    returns of the model or add print_output modifier to the node.
+    returns of the model or add "print_output" modifier to the node.
+
+    The shortcut needs to be applied after the loop modifiers, and
+    it cannot output individual looped values. Instead, use node
+    modifiers to add the print input and output modifiers to nodes. Or
+    add this shortcut to the loop node.
     """
 
     G = model.graph
