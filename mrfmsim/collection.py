@@ -115,10 +115,9 @@ class ExperimentCollection:
             node_obj_list.append(self._nodes[node])
         G.set_node_objects_from(node_obj_list)
 
-        collection = {"collection": self.name}
-        kwargs = {**collection, **self._settings, **instruction_copy}
-
-        expt_obj = Experiment(name=experiment, graph=G, **kwargs)
+        info = {"collection": self.name, "name": experiment}
+        kwargs = {**info, **self._settings, **instruction_copy}
+        expt_obj = Experiment(graph=G, **kwargs)
         self._instructions[experiment] = instruction
         self._experiments[experiment] = expt_obj
 
