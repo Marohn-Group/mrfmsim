@@ -158,6 +158,7 @@ cython_debug/
 # other
 test.ipynb
 .DS_store
+.DS_Store
 
 # dot grah
 *.gv
