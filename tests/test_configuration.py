@@ -179,8 +179,8 @@ def test_parse_yaml_file(expt_file):
     ]
     assert expt(comp=SNs(a1=1, b1=2), d_loop=[1, 2], f=2, h=3) == [(48, 2), (32, 2)]
     assert expt.defaults == {"h": 2}  # check default is an int
-    assert expt.get_node_obj("add").doc == "Add a and h."
-    assert expt.get_node_obj("add").__name__ == "add"
+    assert expt.get_node_object("add").doc == "Add a and h."
+    assert expt.get_node_object("add").__name__ == "add"
 
 
 def test_collection_constructor():

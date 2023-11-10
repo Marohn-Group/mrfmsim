@@ -74,7 +74,7 @@ class Experiment(Model):
         self.return_units = {}
         for node, output in nx.get_node_attributes(self.graph, "output").items():
             if output in self.returns:
-                unit = getattr(self.get_node_obj(node), "output_unit", None)
+                unit = getattr(self.get_node_object(node), "output_unit", None)
                 if unit:
                     self.return_units[output] = unit
 

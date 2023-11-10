@@ -22,6 +22,6 @@ see the `mmodel documentation <https://marohn-group.github.io/mmodel-docs/>`__.
 :mod:`model` module
 ----------------------
 
-.. automodule:: mrfmsim.experiment.Experiment
+.. automodule:: mrfmsim.model.Experiment
     :members:
     :show-inheritance:

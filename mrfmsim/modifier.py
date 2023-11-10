@@ -23,7 +23,11 @@ def replace_component(replacement: dict):
         @wraps(func)
         def wrapped(**kwargs):
             for comp, rep_list in replacement.items():
-                comp_obj = kwargs.pop(comp)
+                # if comp itself is an argument in the signature
+                if comp in params:
+                    comp_obj = kwargs[comp]
+                else:
+                    comp_obj = kwargs.pop(comp)
 
                 for element in rep_list:
                     # allows simplified replacement
@@ -100,7 +104,7 @@ def print_output(output: str, stdout_format: str, end: str = "\n"):
 
     :param list parameter: parameter name
     :param str stdout_format: format string for input and output
-        The format should be keyword only. The behavior is for keep the
+        The format should be keyword only. The behavior is for keeping the
         consistency with other print modifiers.
     :param str end: end of printout
     """

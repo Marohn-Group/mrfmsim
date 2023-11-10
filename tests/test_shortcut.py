@@ -73,7 +73,7 @@ class TestLoopShortcut:
 
         loop_model = loop_shortcut(experiment, "b")
         # b dependency is in the node log
-        b_node_modifier = loop_model.get_node_obj("log").modifiers[-1]
+        b_node_modifier = loop_model.get_node_object("log").modifiers[-1]
 
         assert b_node_modifier.metadata == "loop_input('b')"
         assert getclosurevars(b_node_modifier).nonlocals == {"parameter": "b"}
@@ -88,7 +88,7 @@ class TestLoopShortcut:
         # make sure subgraph exists
         assert loop_model.name == "loop_model"
         assert "subnode_d" in loop_model.graph.nodes
-        subnode = loop_model.get_node_obj("subnode_d")
+        subnode = loop_model.get_node_object("subnode_d")
 
         mod = subnode.modifiers[-1]
         assert mod.metadata == "loop_input('d')"
@@ -99,7 +99,7 @@ class TestLoopShortcut:
         """Test submodel created by loop_shortcut."""
 
         loop_model = loop_shortcut(experiment, "d", "loop_model")
-        subnode = loop_model.get_node_obj("subnode_d")
+        subnode = loop_model.get_node_object("subnode_d")
 
         assert subnode.node_func is not subnode.func
 

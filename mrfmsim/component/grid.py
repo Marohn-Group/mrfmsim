@@ -42,6 +42,7 @@ class Grid(ComponentBase):
         self.voxel = np.array(self.step).prod()
         self.range = (np.array(self.shape) - [1, 1, 1]) * self.step
         self.length = np.array(self.shape) * np.array(self.step)
+        self.extents = self.grid_extents(self.range, self.origin)
 
     @staticmethod
     def grid_extents(length, origin):
@@ -59,12 +60,12 @@ class Grid(ComponentBase):
         The benefit of the property is that it generates the grid array at run time.
         """
 
-        extents = self.grid_extents(self.range, self.origin)
+        # extents = self.grid_extents(self.range, self.origin)
 
         return np.ogrid[
-            extents[0][0] : extents[0][1] : self.shape[0] * 1j,
-            extents[1][0] : extents[1][1] : self.shape[1] * 1j,
-            extents[2][0] : extents[2][1] : self.shape[2] * 1j,
+            self.extents[0][0] : self.extents[0][1] : self.shape[0] * 1j,
+            self.extents[1][0] : self.extents[1][1] : self.shape[1] * 1j,
+            self.extents[2][0] : self.extents[2][1] : self.shape[2] * 1j,
         ]
 
     def extend_grid_by_points(self, ext_pts):

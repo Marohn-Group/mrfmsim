@@ -14,7 +14,7 @@ def test_node_str(experiment):
 
     Multiply arguments element-wise."""
 
-    assert str(experiment.get_node_obj("multiply")) == dedent(node_str)
+    assert str(experiment.get_node_object("multiply")) == dedent(node_str)
 
 
 def test_node_str_unitless(experiment):
@@ -29,4 +29,4 @@ def test_node_str_unitless(experiment):
 
     Same as a - b."""
 
-    assert str(experiment.get_node_obj("subtract")) == dedent(node_str)
+    assert str(experiment.get_node_object("subtract")) == dedent(node_str)
