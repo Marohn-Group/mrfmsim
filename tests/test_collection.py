@@ -117,8 +117,8 @@ def test_collection_str_representation(node_objects, grouped_edges):
 
     collection_str = """\
     test_collection_object
-    nodes: ['add', 'subtract', 'power', 'multiply', 'log']
     experiments: ['test']
+    nodes: ['add', 'subtract', 'power', 'multiply', 'log']
 
     Test collection description."""
 
@@ -134,8 +134,8 @@ def test_collection_str_representation(node_objects, grouped_edges):
 
     collection_str = """\
     test_collection
-    nodes: ['add', 'subtract', 'power', 'multiply', 'log']
-    experiments: None"""
+    experiments: None
+    nodes: ['add', 'subtract', 'power', 'multiply', 'log']"""
 
     collection = ExperimentCollection("test_collection", "", node_objects)
     assert str(collection) == dedent(collection_str)

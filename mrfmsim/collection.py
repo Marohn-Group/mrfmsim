@@ -26,13 +26,13 @@ _format_dict = modelformatter.format_dict.copy()
 _format_dict.update(
     {
         "name": format_value,
-        "nodes": format_dictkeys,
         "experiments": format_dictkeys,
+        "nodes": format_dictkeys,
         "settings": format_dictargs,
         "description": format_value,
     }
 )
-_meta_order = ["name", "nodes", "experiments", "settings", "_", "description"]
+_meta_order = ["name", "experiments", "nodes", "settings", "_", "description"]
 collectionformatter = MetaDataFormatter(
     _format_dict,
     _meta_order,
@@ -78,7 +78,7 @@ class ExperimentCollection:
         self._settings = settings or {}
 
         # create the experiments
-        # the _instructions dict is updated during setting experiments
+        # the _instructions dictionary is updated during setting experiments
         instructions = instructions or {}
         self._instructions = {}
         for experiment, instruction in instructions.items():
