@@ -16,8 +16,9 @@ Changed
 - Change python requirement to 3.10.
 - Change the plugin system using package entry points. Automatically load
   plugins at import time.
-- Change the print-related modifier and shortcuts.
 - Change yaml tags for easier function definition.
+- Change the ``print_shortcut`` behavior to add modifiers to individual
+  nodes.
 
 Fixed
 ^^^^^
@@ -26,13 +27,15 @@ Fixed
 Added
 ^^^^^
 - Add grid, magnet, sample, and cantilever component objects.
-- Add symbolic unit system to nodes and models.
-- Add custom node, model string representation.
+- Add custom node and model string representation.
 - Add the collection class for creating a group of experiments.
 
 Removed
 ^^^^^^^
-- Remove the ``cli`` module to ``mrfmsim-cli`` plugin for separate development.
+- Remove the ``cli`` module to ``mrfmsim-cli`` plugin for separate     
+  development.
+- Remove the unit system to ``mrfmsim-units`` plugin for separate 
+  development.
 
 [0.1.1] - 2023-06-23
 --------------------
