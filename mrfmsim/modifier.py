@@ -5,6 +5,7 @@ import numba as nb
 from mmodel.modifier import loop_input, zip_loop_inputs, profile_time
 from inspect import Parameter, signature, Signature
 from pprint import pformat
+from string import Formatter
 
 
 def replace_component(replacement: dict):
@@ -65,99 +66,91 @@ def replace_component(replacement: dict):
     return modifier
 
 
-def print_inputs(inputs: list, stdout_format: str, end: str = "\n"):
-    """Print the node input to the console.
+def parse_fields(format_str):
+    """Parse the field from the format string.
 
-    If the parameter is the result of the node, set the result parameter
-    to True. Change the end string may allow printout to stay in one line.
+    :param str format_str: format string
+    :return: list of fields
 
-    :param list parameter: parameter name
-    :param str stdout_format: format string for input and output
-        The format should be keyword only.
-    :param str end: end of printout
+    The function parses out the field names in the format string.
+    Some field names have slicers or attribute access, such as
+    B0.value, B0[0], B0[0:2]. The function only returns B0 for all
+    these fields. Since there can be duplicated fields after the
+    name split, the function returns unique elements.
     """
 
-    def stdout_input_modifier(func):
+    # this is a internal function for Formatter
+    # consider rewrite with custom function to prevent breaking
+    # the function ignores slicing and attribute access
+    # B0.value -> B0, B0[0] -> B0
+    from _string import formatter_field_name_split
+
+    fields = [
+        formatter_field_name_split(field)[0]
+        for _, field, _, _ in Formatter().parse(format_str)
+        if field
+    ]
+    return list(set(fields))  # return unique elements
+
+
+def print_inputs(stdout_format: str, **pargs):
+    """Print the node input to the console.
+
+    :param str stdout_format: format string for input and output
+        The format should be keyword only.
+    :param pargs: keyword arguments for print function
+
+    The names of the parameters are parsed from the format string.
+    """
+
+    def stdout_inputs_modifier(func):
         sig = signature(func)
+        inputs = parse_fields(stdout_format)
 
         @wraps(func)
         def wrapped(*args, **kwargs):
             """Print input parameter."""
             arguments = sig.bind(*args, **kwargs).arguments
             input_dict = {k: arguments[k] for k in inputs}
-            print(stdout_format.format(**input_dict), end=end)
+            print(stdout_format.format(**input_dict), **pargs)
             return func(**arguments)
 
         return wrapped
 
-    stdout_input_modifier.metadata = (
-        f"print_inputs({repr(inputs)}, {repr(stdout_format)}, {repr(end)})"
-    )
-    return stdout_input_modifier
+    params = [repr(stdout_format)] + [f"{k}={repr(v)}" for k, v in pargs.items()]
+    stdout_inputs_modifier.metadata = f"print_inputs({', '.join(params)})"
+    return stdout_inputs_modifier
 
 
-def print_output(output: str, stdout_format: str, end: str = "\n"):
+def print_output(stdout_format: str, **pargs):
     """Print the node output to the console.
 
-    If the parameter is the result of the node, set the result parameter
-    to True.
-
-    :param list parameter: parameter name
     :param str stdout_format: format string for input and output
         The format should be keyword only. The behavior is for keeping the
         consistency with other print modifiers.
     :param str end: end of printout
+
+    The names of the parameters are parsed from the format string. The
+    use of the stdout_format is different from the input method, as
+    the modifiers do not know the return name of the node. Only one
+    output field is allowed and the field name is used as the return name.
     """
 
     def stdout_output_modifier(func):
+        output = parse_fields(stdout_format)[0]
+
         @wraps(func)
         def wrapped(*args, **kwargs):
             """Print output parameter."""
 
             result = func(*args, **kwargs)
-            print(stdout_format.format(**{output: result}), end=end)
+            print(stdout_format.format(**{output: result}), **pargs)
             return result
 
         return wrapped
 
-    stdout_output_modifier.metadata = (
-        f"print_output({repr(output)}, {repr(stdout_format)}, {repr(end)})"
-    )
-    return stdout_output_modifier
-
-
-def print_parameters(inputs, output_dict, stdout_format):
-    """Modifier for printout input and output.
-
-    The modifier is a module level modifier, but it can be
-    used at the node level. Note the modifier cannot output
-    intermediate values in the model. Either use print_output
-    add_modifier at node level, or change the model returns.
-
-    :param list inputs: list of input parameters
-    :param dict output_dict: (output, index) for returns
-    :param str format: format string for input and output
-        The format should be keyword only.
-    """
-
-    def stdout_output_modifier(func):
-        @wraps(func)
-        def wrapped(*args, **kwargs):
-            """Print output parameter."""
-            result = func(*args, **kwargs)
-
-            arguments = signature(func).bind(*args, **kwargs).arguments
-            input_dict = {k: arguments[k] for k in inputs}
-            output_values = {k: result[v] for k, v in output_dict.items()}
-            print(stdout_format.format(**input_dict, **output_values))
-            return result
-
-        return wrapped
-
-    param_list = list(inputs) + list(output_dict.keys())
-    stdout_output_modifier.metadata = (
-        f"print_parameters: {repr(param_list)}, {repr(stdout_format)}"
-    )
+    params = [repr(stdout_format)] + [f"{k}={repr(v)}" for k, v in pargs.items()]
+    stdout_output_modifier.metadata = f"print_output({', '.join(params)})"
     return stdout_output_modifier
 
 

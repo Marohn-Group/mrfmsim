@@ -3,7 +3,7 @@ from mrfmsim.modifier import (
     print_inputs,
     print_output,
     numba_jit,
-    print_parameters,
+    parse_fields,
 )
 import inspect
 import pytest
@@ -57,52 +57,52 @@ class TestPrintModifiers:
 
         return b_tot
 
+    def test_parse_field(self):
+        """Test the parse_field function."""
+
+        assert sorted(parse_fields("b1 {b1:.3f} [mT] b0 {b0:.3e} [mT]")) == ["b0", "b1"]
+
+    def test_parse_field_with_attributes_or_slicers(self):
+        """Test the parse_field that can parse field with attributes or slicers."""
+
+        assert sorted(parse_fields("{b0[0]} [mT] b0 {b0[1]:.3e} [mT] {b1.value}")) == [
+            "b0",
+            "b1",
+        ]
+
+    def test_parse_field(self):
+        """Test the parse_field function."""
+
+        assert sorted(
+            parse_fields("b1 {b1:.3f} [mT] b0 {b0:.3e} [mT] bz {bz} [mT]")
+        ) == [
+            "b0",
+            "b1",
+            "bz",
+        ]
+
     def test_print_inputs(self, capsys, func):
         """Test the print_inputs."""
 
-        mod_func = print_inputs(
-            ["b1", "b0", "bz"], "b1 {b1:.3f} [mT] b0 {b0:.3e} [mT] bz {bz}", end="--"
-        )(func)
+        mod = print_inputs("b1 {b1:.3f} [mT] b0 {b0:.3e} [mT] bz {bz}", end="--")
+        mod_func = mod(func)
         mod_func(b1=1, b0=2, bz=3)
         captured = capsys.readouterr()
         assert captured.out == "b1 1.000 [mT] b0 2.000e+00 [mT] bz 3--"
+        assert (
+            mod.metadata
+            == "print_inputs('b1 {b1:.3f} [mT] b0 {b0:.3e} [mT] bz {bz}', end='--')"
+        )
 
     def test_print_output_modifier(self, capsys, func):
         """Test the stdout_output_modifier."""
 
-        mod_func = print_output("b_tot", "b_tot {b_tot:.1f} [mT]")(func)
+        mod = print_output("b_tot {b_tot:.1f} [mT]")
+        mod_func = mod(func)
         mod_func(b1=1, b0=2, bz=3)
         captured = capsys.readouterr()
         assert captured.out == "b_tot 6.0 [mT]\n"
-
-    def test_print_parameters(self, capsys):
-        """Test the print_parameters."""
-
-        mod_func = print_parameters(["a"], {"b": 1}, "a={a:.1f} b={b}")(
-            lambda a: (a**2, a * 2)
-        )
-        mod_func(a=1)
-        captured = capsys.readouterr()
-        assert captured.out == "a=1.0 b=2\n"
-
-    def test_metadata(self):
-        """Test printout modified function has the correct metadata."""
-        assert (
-            print_inputs(
-                ["b1", "b0", "bz"], "b1 {b1:.3f} [mT] b0 {b0:.3e} [mT] bz {bz}", "--"
-            ).metadata
-            == "print_inputs(['b1', 'b0', 'bz'], 'b1 {b1:.3f}"
-            " [mT] b0 {b0:.3e} [mT] bz {bz}', '--')"
-        )
-        assert (
-            print_output("b_tot", "{b_tot:.1f} [mT]").metadata
-            == "print_output('b_tot', '{b_tot:.1f} [mT]', '\\n')"
-        )
-
-        assert (
-            print_parameters(["a"], {"b": 1}, "a={a} b={b}").metadata
-            == "print_parameters: ['a', 'b'], 'a={a} b={b}'"
-        )
+        assert mod.metadata == "print_output('b_tot {b_tot:.1f} [mT]')"
 
 
 def test_numba_jit():
