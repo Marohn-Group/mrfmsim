@@ -1,8 +1,6 @@
 from mmodel.utility import param_sorter
 from functools import wraps
-from collections import defaultdict
 import numba as nb
-from mmodel.modifier import loop_input, zip_loop_inputs, profile_time
 from inspect import Parameter, signature, Signature
 from pprint import pformat
 from string import Formatter
