@@ -3,44 +3,49 @@ MrfmSim
 
 |GitHub version| |Unit tests| |DOI|
 
-MrfmSim is a Python package for simulating magnetic resonance force microscopy (MRFM)
+MrfmSim is a Python framework for simulating magnetic resonance force microscopy (MRFM)
 experiments. The package is based on the
-`mmodel <https://marohn-group.github.io/mmodel-docs/>`_
-framework, with added command line interface and yaml experiment scripting
-capabilities. The package also employs a plugin system, all sub-packages can
-be directly loaded into the ``mrfmsim`` to provide a uniform user experience.
+`mmodel <https://marohn-group.github.io/mmodel-docs/>`_ framework, which provides
+modular modeling capabilities for the experiments. The framework offers additional
+functionalities for interacting and modifying the experiment models, for example,
+scripting using YAML files, creating optimized loops, printing out intermediate
+results, and grouping experiments using experiment collections. The package also
+provides various features through the plugin system, including a command line interface,
+unit system, and three-dimensional plotting capabilities. The detailed API and the
+available plugins are `documented <https://marohn-group.github.io/mrfmsim-docs/>`__.
 
 Quickstart
 ----------
 
-See documentation for detailed API documentation.
+Selected features
+^^^^^^^^^^^^^^^^^
 
-Load plugin
-^^^^^^^^^^^^
+Load plugins
+****************
 
-To automatically load plugins run:
-
-.. code:: python
-
-    import mrfmsim
-    mrfmsim.load_plugin()
-
-The default plugin option attempts to load all plugins with the prefix "mrfmsim_".
-The default submodules are "experiment", "modifier", "shortcut", and "component".
-Users can also specify plugins and submodule attributes to load.
-
-See plugin example
-`MrfmSim-Marohn <https://github.com/Marohn-Group/mrfmsim-marohn-docs>`__.
+The ``mrfmsim`` package searches for all packages with the prefix "mrfmsim\_" and
+loads them as plugins.
 
 Configuration file
-^^^^^^^^^^^^^^^^^^
+********************
 
 To aid the portability of the experiment models, the experiment can be defined in
-a YAML file, with the nodes, edges, graph and model settings. For simple jobs, a
-job configuration file can be defined as well.
+a YAML file, with the nodes, edges, graph and model settings. To execute the model
+directly in the terminal, job configuration can be used to define the job.
+
+Experiments and Collections
+********************************
+
+The `mrfmsim-marohn
+<https://marohn-group.github.io/mrfmsim-marohn-docs/>`__ plugin is
+required to access the Marohn group experiments. The plugin contains
+individual experiments and experiment collections.
 
 Command line interface
-^^^^^^^^^^^^^^^^^^^^^^
+************************
+
+The command line interface is provided by the `mrfmsim-cli
+<https://github.com/Marohn-Group/mrfmsim-cli>`__ plugin.
 
 Run at the terminal::
 
@@ -48,21 +53,13 @@ Run at the terminal::
 
 to see the command line interface help.
 
-For show or draw experiments of existing experiments::
+To show the experiment metadata::
 
-    mrfmsim --exp exp_to_show show
-    mrfmsim --exp exp_to_draw draw
+    mrfmsim --exp name_of_exp metadata
 
-Use ``--expt`` for YAML experiment files. 
+To draw the experiment graph::
 
-To execute a job::
-
-    mrfmsim --job job_to_run execute
-
-Experiments
-^^^^^^^^^^^
-
-See the ``mrfmsim-marohn`` for experiment examples.
+    mrfmsim --exp name_of_exp visualize
 
 Installation
 ^^^^^^^^^^^^^
