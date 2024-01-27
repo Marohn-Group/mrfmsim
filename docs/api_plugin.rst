@@ -33,9 +33,9 @@ To specify the plugin directory and submodule attribute::
 Create Plugin Package
 ----------------------
 
-To create a plugin package, the package name must start with ``mrfmsim_``. The submodule names should use the same convention "experiment", "modifier", "shortcut", and "component".
+The package name must start with ``mrfmsim_``to create a plugin package. The submodule names should use the same convention "experiment", "modifier", "shortcut", and "component".
 
-The way ``mrfmsim`` load the variables (functions, classes, etc) is by tracking the ``__all__`` attribute of each submodule. The ``__all__`` attribute is a list of strings that are commonly used to define what symbols in a module will be exported when ``from <module> import *`` is used on the module.
+The way ``mrfmsim`` loads the variables (functions, classes, etc) is by tracking the ``__all__`` attribute of each submodule. The ``__all__`` attribute is a list of strings that are commonly used to define what symbols in a module will be exported when ``from <module> import *`` is used on the module.
 
 :mod:`plugin` module
 ----------------------

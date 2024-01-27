@@ -35,7 +35,9 @@ available at
 The *mrfmsim-marohn* package is required for the following examples.
 
 
-We define the necessary inputs for the experiment::
+We define the necessary inputs for the experiment:
+
+.. code:: python
 
     from mrfmsim.component import SphereMagnet, Grid, Sample, Cantilever
 
@@ -73,11 +75,12 @@ can be accessed using the experiment name as the key.
     therefore the experiments are accessed through the 
     ``mrfmsim.experiment`` module.
 
-To access a standalone experiment model::
+To access a standalone experiment model:
+
+.. code:: python
 
     >>> from mrfmsim.experiment import IBMCyclic
     >>> print(IBMCyclic)
-
     IBMCyclic(B0, df_fm, f_rf, grid, h, magnet, sample)
     returns: (dF2_spin, dF_spin)
     graph: ibm_cyclic_graph
@@ -90,7 +93,9 @@ To access a standalone experiment model::
     Simulate an IBM-style cyclic-inversion magnetic resonance force microscope
     experiment.
 
-To access an experiment model from a collection::
+To access an experiment model from a collection:
+
+.. code:: python
 
     # print collection summary
     # print(CermitESRCollection)
@@ -99,8 +104,10 @@ To access an experiment model from a collection::
 
     CermitESR = CermitESRCollection['CermitESR']
 
-To printout the metadata of the model::
+To printout the metadata of the model:
     
+.. code:: python
+
     >>> print(CermitESR)
 
     CermitESR(B0, B1, cantilever, f_rf, grid, h, magnet, mw_x_0p, sample)
@@ -116,7 +123,9 @@ To printout the metadata of the model::
 
         CERMIT ESR experiment for a large tip.
 
-To draw the graph of the model::
+To draw the graph of the model:
+
+.. code:: python
 
     >>> CermitESR.visualize()
 
@@ -133,7 +142,7 @@ to existing models directly. The result is a must faster development
 cycle for experiment simulation.
 
 
-modify nodes - runtime profiling
+Modify nodes - runtime profiling
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 We can easily profile the performance of the target nodes by
@@ -143,7 +152,9 @@ model.
 
 Using the "CermitESR" experiment model we can
 inspect the run time of "minimum absolute x offset" and
-"relative polarization change" performance::
+"relative polarization change" performance:
+
+.. code:: python
 
     >>> from mrfmsim.modifier import profile_time
     >>> mods = CermitESR.get_node_object("rel_dpol").modifiers
@@ -152,7 +163,7 @@ inspect the run time of "minimum absolute x offset" and
 
     rel_dpol_sat_steadystate - 10 loops, best of 1: 30.27 ms per loop
 
-modify returns - output intermediate values
+Modify returns - output intermediate values
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To output intermediate values, we can directly change the returns.
@@ -168,7 +179,7 @@ of "df_spin"::
 The returned values are in the same order as the returns list.
 
 
-modify model - optimal looping
+Modify model - optimal looping
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 For a complex model, we want to optimize the parameter loop so that
@@ -192,7 +203,9 @@ The looping can be added at the node level using modifiers or
 adjusted at the model level using shortcuts.
 
 To loop the "f_rf" parameter (use the cermitesr_stdout model
-to print out the intermediate values)::
+to print out the intermediate values):
+
+.. code:: python
 
     >>> from mrfmsim.shortcut import loop_shortcut
     >>> CermitESR_frf_loop = loop_shortcut(CermitESR, "f_rf", name="CermitESR_frfLoop")
@@ -215,7 +228,9 @@ To loop the "B0" parameter on top of "f_rf"::
     :align: center
 
 |br|
-The model can be executed by supplying lists for "B0" and "f_rf"::
+The model can be executed by supplying lists for "B0" and "f_rf":
+
+.. code:: python
 
     >>> import numpy as np
     >>> B0_list = np.arange(500, 900, 200)  # external field [mT]
@@ -243,7 +258,9 @@ For the 2 by 2 loop, the output is::
     [[func(B0[0], f_rf[0]), func(B0[0], f_rf[1])],
      [func(B0[1], f_rf[0]), func(B0[1], f_rf[1])]]
 
-This is equivalent to the result from the following loops::
+This is equivalent to the result from the following loops:
+
+.. code:: python
 
     for B0 in B0_list:
         ...
@@ -258,20 +275,22 @@ This is equivalent to the result from the following loops::
     to decide which parameter to loop first. Since all nodes that are
     dependent on "f_rf" also depend on "B_0", we loop "f_rf" first. 
 
-modify nodes - print out node input and output values
+Modify nodes - print out node input and output values
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Sometimes we only want to inspect the intermediate value instead of adding
+Sometimes, we only want to inspect the intermediate value instead of adding
 them to returns. To achieve this, we can add print-related modifiers
 ``modifier.print_inputs`` and ``modifier.print_ouput`` to individual nodes.
-To simplify the process, the shortcut ``shortcut.print_shortcut`` can be
-used to automatically apply print statements to the nodes. The print format
+To simplify the process, the shortcut ``shortcut.print_shortcut`` can automatically
+apply print statements to the nodes. The print format
 uses the keyword python format string. Additional keyword arguments for the print
-function such as ``end``, ``flush``, and ``file`` can be
+function, such as ``end``, ``flush``, and ``file`` can be
 added directly to the shortcut function. 
 
 Here we show how to output the input "B0", "f_rf" and "df_spin" during
-the execution::
+the execution:
+
+.. code:: python
 
     >>> from mrfmsim.shortcut import print_shortcut
     >>> print_model = print_shortcut(

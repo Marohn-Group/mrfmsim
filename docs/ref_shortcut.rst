@@ -1,7 +1,7 @@
 Shortcut
 ======================
 
-The shortcuts are used to directly modify the Experiment/Model. The 
+The shortcuts are used to modify the Experiment/Model directly. The 
 *mrfmsim* package adds additional shortcuts:
 
 - ``print_shortcut``: automatically apply ``print_inputs`` and 
@@ -15,15 +15,15 @@ The shortcuts are used to directly modify the Experiment/Model. The
 Print Shortcut
 ----------------
 
-The goal of the print shortcut is to print out intermediate values during
+The print shortcut aims to print out intermediate values during
 node execution to check the execution process. The shortcut is helpful for
 slow algorithms and looped models. We also do not want the algorithm to
-create unnecessary subgraphs. Therefore the final design of the shortcut
+create unnecessary subgraphs. Therefore, the final design of the shortcut
 applies modifiers to individual nodes instead of the entire model. The
 design is flexible and works if the underlying graph structure is changed.
-To maintain flexibility, the user decides the string format and the
-output style. For output style that is unachievable by the shortcut, the
-users are encouraged to directly add modifiers to the nodes.
+The user decides the string format and output style to maintain flexibility.
+For the shortcut's unachievable output style, the
+users are encouraged to add modifiers to the nodes directly.
 
 For example a graph of :math:`G=\{V=\{A, B, C\}, E=\{(A, B), (B, C)\}\}`::
 
@@ -57,7 +57,7 @@ The shortcut works by applying a ``print_inputs`` modifier and
 node B.
 
 The shortcuts can modify the print keyword arguments. For example, the
-default ``end`` parameter for the print function is "\n". To change the
+print function's default ``end`` parameter is "\n". To change the
 ``end`` parameter to "" | ", the user can do::
 
     M = print_shortcut(M, ['a={a:.2f}', 'c={c:.2f}', 'e={e:.2f}'], end=' | ')
@@ -82,7 +82,7 @@ with a linebreak at the end.
 The decision to have a uniform print parameter argument is to simplify the
 user interface and the underlying algorithm. The shortcut is used to apply
 the print-related shortcuts quickly. Users are encouraged to create 
-additional nodes for monitoring execution process, which can benefit from 
+additional nodes for monitoring the execution process, which can benefit from 
 the ``print_shortcut`` as well.
 
 Loop Shortcut
@@ -103,7 +103,7 @@ For example, a graph of :math:`G=\{V=\{A, B, C\}, E=\{(A, B), (B, C)\}\}`::
     B(c, d)
     C(e, f)
 
-The optimal way to loop c and e, is to define the loop of parameter e in 
+The optimal way to loop c and e is to define the loop of parameter e in 
 node C first and then define the loop of parameter c in node B second. If 
 the order given is reversed, both parameters c and e are looped at node B 
 level. The reason for the behavior is that when loop c is created, the 

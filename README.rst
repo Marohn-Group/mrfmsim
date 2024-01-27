@@ -29,9 +29,8 @@ loads them as plugins.
 Configuration file
 ********************
 
-To aid the portability of the experiment models, the experiment can be defined in
-a YAML file, with the nodes, edges, graph and model settings. To execute the model
-directly in the terminal, job configuration can be used to define the job.
+We increase the experiment model's portability by defining experiments in YAML functionalities with the nodes, edges, graph, and model settings. To execute the model
+directly in the terminal, use job configuration to define the job.
 
 Experiments and Collections
 ********************************

@@ -14,5 +14,3 @@ parameter name, and the value as a dictionary with the following
 - ``description``: a description of the unit, e.g. ``magnet radius``.
 - ``format``: format of the value when displayed, e.g. ".1f".
 
-To simply the definition process, a YAML units file can be used, see the
-``units.yaml`` file used in ``mrfmsim-marohn`` for an example.
