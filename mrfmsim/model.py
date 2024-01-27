@@ -1,6 +1,6 @@
 """Experiment Class
 
-The class inherits from mmodel.Model class to add certain functionality and defaults.
+The class inherits from ``mmodel.Model`` class to add certain functionality and defaults.
 """
 from mmodel import MemHandler, Model, Graph
 from mrfmsim.modifier import replace_component
@@ -52,6 +52,7 @@ class Experiment(Model):
         components: dict = {},
         **kwargs,
     ):
+
         super().__init__(
             name,
             graph,
@@ -61,7 +62,7 @@ class Experiment(Model):
             returns,
             defaults,
             doc,
-            components=components,  # add as keyword argument for model class
+            components=components,  # add as keyword argument for the Model class
             **kwargs,
         )
 

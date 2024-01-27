@@ -96,7 +96,7 @@ def print_inputs(stdout_format: str, **pargs):
 
     :param str stdout_format: format string for input and output
         The format should be keyword only.
-    :param pargs: keyword arguments for print function
+    :param pargs: keyword arguments for the print function
 
     The names of the parameters are parsed from the format string.
     """
@@ -106,12 +106,11 @@ def print_inputs(stdout_format: str, **pargs):
         inputs = parse_fields(stdout_format)
 
         @wraps(func)
-        def wrapped(*args, **kwargs):
+        def wrapped(**kwargs):
             """Print input parameter."""
-            arguments = sig.bind(*args, **kwargs).arguments
-            input_dict = {k: arguments[k] for k in inputs}
+            input_dict = {k: kwargs[k] for k in inputs}
             print(stdout_format.format(**input_dict), **pargs)
-            return func(**arguments)
+            return func(**kwargs)
 
         return wrapped
 
@@ -138,10 +137,10 @@ def print_output(stdout_format: str, **pargs):
         output = parse_fields(stdout_format)[0]
 
         @wraps(func)
-        def wrapped(*args, **kwargs):
+        def wrapped(**kwargs):
             """Print output parameter."""
 
-            result = func(*args, **kwargs)
+            result = func(**kwargs)
             print(stdout_format.format(**{output: result}), **pargs)
             return result
 
