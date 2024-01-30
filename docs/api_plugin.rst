@@ -54,9 +54,11 @@ Register object
 Not all objects in a module need to be loaded by *mrfmsim*. To register objects,
 add the objects to the list ``__mrfmsim_plugin__`` in the module.
 
-For example, to register the ``experiment`` object in the module ``mrfmsim_marohn``::
+For example, to register the ``CermitESR`` and ``IBMCyclic`` objects in the module
+``mrfmsim_marohn.experiment``, define ``__mrfmsim_plugin__`` in 
+``mrfmsim_marohn/experiment.py``::
 
-    __mrfmsim_plugin__ = ['experiment']
+    __mrfmsim_plugin__ = ['CermitESR', 'IBMCyclic']
 
 :mod:`plugin` module
 ----------------------

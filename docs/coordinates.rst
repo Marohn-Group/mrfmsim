@@ -1,5 +1,5 @@
 Coordinates
-------------
+===========
 
 *mrfmsim* is flexible in setting up the coordinates for the simulation.
 Currently, the components that involve coordinates are the grid and the magnet.

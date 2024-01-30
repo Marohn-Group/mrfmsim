@@ -17,27 +17,32 @@ License
    changelog
 
 .. toctree::
-   :maxdepth: 2
-   :titlesonly:
-   :caption: User Guide
+   :maxdepth: 1
+   :caption: Experiment Setup
    :hidden:
 
-
-   ref_modifier
-   ref_shortcut
+   coordinates
+   sample
+   grid
+   magnet
+   cantilever
 
 .. toctree::
    :maxdepth: 1
-   :caption: Experimental Setup
+   :caption: Experiment
    :hidden:
 
-   ref_experiment
-   coordinates.rst
-   sample.rst
-   grid.rst
-   magnet.rst
-   cantilever.rst
+   experiment
+   collection
 
+.. toctree::
+   :maxdepth: 2
+   :titlesonly:
+   :caption: Experiment Modification
+   :hidden:
+
+   ref_modifier
+   ref_shortcut
 
 .. toctree::
    :maxdepth: 2
@@ -56,7 +61,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
-
-   
-

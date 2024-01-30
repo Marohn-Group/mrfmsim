@@ -3,27 +3,28 @@ Configuration
 
 To facilitate collaboration and better visual representation,
 ``mrfmsim`` allows using YAML configuration files to define
-experiments. 
+experiments. The configuration files also make the experiments
+more portable for sharing and archiving. 
 
-Here we create 
-For example, a simple model and graph can be defined:
+For example, an ``Experiment`` object can be defined:
 
 .. code-block:: yaml
 
     # example.yaml
-    !import:mrfmsim.model.Experiment
-    name: example_experiment
+    !Experiment
+    name: test_experiment
     graph:
-        !graph
-        name: example_graph
+        !Graph
+        name: test_graph
         grouped_edges:
             - [add, [subtract, power, log]]
             - [[subtract, power], multiply]
         node_objects:
             add:
-                func: !import numpy.add
+                func: !func:add "lambda a, h: a + h"
+                doc: Add a and h.
+                inputs: [a, h]
                 output: c
-                inputs: [a, [constant, 2]]
             subtract:
                 func: !import operator.sub
                 output: e
@@ -36,42 +37,80 @@ For example, a simple model and graph can be defined:
                 func: !import numpy.multiply
                 output: k
                 inputs: [e, g]
+                output_unit: m^2
             log:
                 func: !import math.log
                 output: m
                 inputs: [c, b]
-    replace_inputs: {component: [a, b]}
-    description: Example experiment with components.
+    components: {comp: [[a, a1], [b, b1]]}
+    doc: Test experiment with components.
     modifiers: [!import:mmodel.modifier.loop_input {parameter: d}]
+    defaults:
+        h: 2
 
-The above experiment defines a model that calculates the following:
+The above YAML string is stored in the "experiment.yaml" file.
+The above experiment's graph defines a model that calculates the following:
 
-.. math:: 
-    k = (a + 2 - d)(a + 2)^f
-    m = log(a + 2, b)
+.. math::
 
-To convert the file from YAML to a Python object::
+    k = (a + h - d)(a + h)^f
+    m = log(a + h, b)
+
+The model is equivalent to the function with the modifiers and component
+replacements, The h value is defaulted to 2:
+
+.. code-block:: python
+
+    def test_experiment(comp, d_loop, f, h=2):
+
+        a = comp.a1
+        b = comp.b1
+
+        # the following is executed in steps
+        # to show the intermediate values that the model presents
+        c = a + h
+        result = []
+        for d in d_loop:
+            e = c - d
+            g = c ** f
+            k = e * g
+            m = log(c, b)
+            result.append((k, m))
+        return result
+
+To convert the above string from YAML to a Python object:
+
+.. code-block:: python
 
     import yaml
     from mrfmsim.configuration import MrfmSimLoader
 
-    with open('example.yaml', 'r') as f:
+
+    with open('experiment.yaml', 'r') as f:
         experiment = yaml.load(f, Loader=MrfmSimLoader)
+
+
+If the YAML is defined as a string, read from the string directly.
+
 
 The ``experiment`` object is an instance of the ``Experiment`` class.
 The modifier creates a loop over the ``d`` parameter. We can print the
-experiment::
+experiment:
+
+.. code-block:: python
 
     >>> print(experiment)
-    >>> test_experiment(component, d, f)
-        returns: (k, m)
-        graph: test_graph
-        handler: MemHandler
-        modifiers:
-        - loop_input('d')
-        - replace_component({'component': ['a', 'b']})
+    test_experiment(comp, d_loop, f, h=2)
+    returns: (k, m)
+    return_units: {'k': 'm^2'}
+    graph: test_graph
+    handler: MemHandler
+    modifiers:
+    - loop_input('d')
+    components:
+    - comp: [['a', 'a1'], ['b', 'b1']]
 
-        Example experiment with components.
+    Test experiment with components.
 
 YAML Tags
 ---------
@@ -82,32 +121,73 @@ are available in ``mrfmsim``:
 
 - import a Python object
 
-    .. code-block:: yaml
+.. code-block:: yaml
 
-        !import:object
+    !import:object
 
 - import a Python class and instantiate
 
-    .. code-block:: yaml
+.. code-block:: yaml
 
-        !import:types.SimpleNamespace
-        a: 1
-        b: 2
+    !import:types.SimpleNamespace
+    a: 1
+    b: 2
 
 - create a ``mmodel.Graph`` instance
 
-    .. code-block:: yaml
+.. code-block:: yaml
 
-        !graph
-        name: example_graph
+    !graph
+    name: example_graph
+    grouped_edges:
+        - [add, [subtract, power, log]]
+        - [[subtract, power], multiply]
+    node_objects:
+        add:
+            func: !import numpy.add
+            output: c
+            inputs: [a, h]
+        subtract:
+            func: !import operator.sub
+            output: e
+            inputs: [c, d]
+        power:
+            func: !import math.pow
+            output: g
+            inputs: [c, f]
+        multiply:
+            func: !import numpy.multiply
+            output: k
+            inputs: [e, g]
+        log:
+            func: !import math.log
+            output: m
+            inputs: [c, b]
+
+- create a Python function called "test" from an expression 
+
+.. code-block:: yaml
+
+    !func:test "lambda x: x+1"
+
+- create an ``Experiment`` object
+
+.. code-block:: yaml
+
+    !Experiment
+    name: test_experiment
+    graph:
+        !Graph
+        name: test_graph
         grouped_edges:
             - [add, [subtract, power, log]]
             - [[subtract, power], multiply]
         node_objects:
             add:
-                func: !import numpy.add
+                func: !func:add "lambda a, h: a + h"
+                doc: Add a and h.
+                inputs: [a, h]
                 output: c
-                inputs: [a, [constant, 2]]
             subtract:
                 func: !import operator.sub
                 output: e
@@ -120,53 +200,73 @@ are available in ``mrfmsim``:
                 func: !import numpy.multiply
                 output: k
                 inputs: [e, g]
+                output_unit: m^2
             log:
                 func: !import math.log
                 output: m
                 inputs: [c, b]
+    components: {comp: [[a, a1], [b, b1]]}
+    doc: Test experiment with components.
+    modifiers: [!import:mmodel.modifier.loop_input {parameter: d}]
+    defaults:
+        h: 2
 
-- generate a Python function from an expression
+- create a ``Collection`` object
 
-    .. code-block:: yaml
+.. code-block:: yaml
 
-        !func "lambda x: x+1"
+        !Collection
+    name: test_collection
+    description: Test collection object.
+    node_objects:
+        add:
+            func: !func:add "lambda a, h: a + h"
+            doc: Add a and h.
+            inputs: [a, h]
+            output: c
+        subtract:
+            func: !import operator.sub
+            output: e
+            inputs: [c, d]
+        power:
+            func: !import math.pow
+            output: g
+            inputs: [c, f]
+        multiply:
+            func: !import numpy.multiply
+            output: k
+            inputs: [e, g]
+            output_unit: m^2
+        log:
+            func: !import math.log
+            output: m
+            inputs: [c, b]
+    instructions:
+        test1:
+            grouped_edges:
+                - [add, [subtract, power, log]]
+                - [[subtract, power], multiply]
+            returns: [k]
+        test2:
+            grouped_edges:
+                - [add, [subtract, power, log]]
+            doc: Shortened graph.
+            returns: [c, m]
+    settings:
+        components: {comp: [[a, a1], [b, b1]]}
+        doc: Global docstring.
+        defaults:
+            h: 2
 
-- execute a function input parameter using lambda expression
-
-    .. code-block:: yaml
-
-        !execute func(arguments)
-
-    is equivalent to
-
-    .. code-block:: python
-
-        def outerfunc(func, arguments):
-            return func(arguments)
-    
-    and 
-
-    .. code-block:: yaml
-
-        !execute func(*arguments)
-
-    is equivalent to
-
-    .. code-block:: python
-
-        def outerfunc(func, arguments):
-            return func(*arguments)
-
-    This is used to simplify the definition process.
 
 Security
 --------
 
 Since the configuration files allow direct Python function expression
 definition, there is always a risk of malicious code execution. Since
-the case of running directly Python code to define the experiment has
-the same issue, we do not consider this a major issue. We encourage
-users to always inspect the code or the experiment file before executing.
+running the Python code directly to define the experiment has
+the same issue, we do not consider this a significant problem. We encourage
+users to inspect the code or the experiment file before executing.
 
 :mod:`configuration` module
 ----------------------------
@@ -174,11 +274,3 @@ users to always inspect the code or the experiment file before executing.
 .. automodule:: mrfmsim.configuration
     :members:
     :show-inheritance:
-
-
-Configuration file
--------------------
-
-We increase the experiment model's portability by defining experiments in YAML 
-functionalities with the nodes, edges, graph, and model settings. To execute the model
-directly in the terminal, use job configuration to define the job.

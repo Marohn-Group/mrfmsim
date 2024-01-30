@@ -18,8 +18,11 @@ object with the argument:
 The resulting model inputs are ``["magnet", "field"]``.
 
 The ``Experiment`` class shares the same functionalities as the ``mmodel.Model``,
-such as creating a new model with the ``edit`` method. For more details
+such as creating a new model with the ``edit`` method. For more details,
 see the `mmodel documentation <https://marohn-group.github.io/mmodel-docs/>`__.
+
+Nodes in the experiment graph can define the optional "output_unit" attribute.
+The units defined are displayed in node and model string representations. 
 
 :mod:`model` module
 ----------------------
