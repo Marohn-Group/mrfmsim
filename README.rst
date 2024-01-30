@@ -14,54 +14,30 @@ provides various features through the plugin system, including a command line in
 unit system, and three-dimensional plotting capabilities. The detailed API and the
 available plugins are `documented <https://marohn-group.github.io/mrfmsim-docs/>`__.
 
+
 Quickstart
 ----------
 
-Selected features
-^^^^^^^^^^^^^^^^^
-
-Load plugins
-****************
-
-The ``mrfmsim`` package searches for all packages with the prefix "mrfmsim\_" and
-loads them as plugins.
-
-Configuration file
-********************
-
-We increase the experiment model's portability by defining experiments in YAML functionalities with the nodes, edges, graph, and model settings. To execute the model
-directly in the terminal, use job configuration to define the job.
-
-Experiments and Collections
-********************************
-
-The `mrfmsim-marohn
-<https://marohn-group.github.io/mrfmsim-marohn-docs/>`__ plugin is
-required to access the Marohn group experiments. The plugin contains
-individual experiments and experiment collections.
-
-Command line interface
-************************
-
-The command line interface is provided by the `mrfmsim-cli
-<https://github.com/Marohn-Group/mrfmsim-cli>`__ plugin.
-
-Run at the terminal::
-
-    mrfmsim --help
-
-to see the command line interface help.
-
-To show the experiment metadata::
-
-    mrfmsim --exp name_of_exp metadata
-
-To draw the experiment graph::
-
-    mrfmsim --exp name_of_exp visualize
-
 Installation
 ^^^^^^^^^^^^^
+
+*Graphviz* installation
+***********************
+
+To view the graph, Graphviz needs to be installed:
+`Graphviz Installation <https://graphviz.org/download/>`_
+For Windows installation, please choose "add Graphviz to the
+system PATH for all users/current users" during the setup.
+
+For macOS systems, sometimes `brew install` results
+in an unexpected installation path, it is recommended to install
+with conda::
+
+    conda install -c conda-forge pygraphviz
+
+
+*mrfmsim* installation
+***********************
 
 To install the package, run::
 
