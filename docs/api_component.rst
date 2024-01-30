@@ -13,5 +13,5 @@ Units
 -----
 
 To display the units of the parameters, the class attribute
-``_units`` should be defined when inheriting the class. See :doc:`units <api_units>` for detailed units definition.
+``_units`` should be defined when inheriting the class. 
 

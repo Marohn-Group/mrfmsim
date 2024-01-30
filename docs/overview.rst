@@ -7,9 +7,9 @@ MRFM experiment. For previous development, please see the archived package
 The previous versions of MRFM used an object-oriented design, which 
 is restrictive to modifications and specific to the Marohn group.
 The community's interest in the author's presentation at Nano-MRI: The next
-generation prompted the development of a platform that is modular and
-extendable to work with different experiment models, whether from different
-stages of prototyping or from different groups. To achieve the flexibility,
+generation prompted the development of a modular and extendable platform to
+work with different experiment models, whether from various
+prototyping stages or other groups. To achieve the flexibility,
 we developed `mmodel <https://github.com/Marohn-Group/mmodel>`__ package as a
 backend for *mrfmsim*, allowing us to use directed acyclic 
 graphs (DAG) to define experiments. The graph backend allows modular experiment
@@ -26,7 +26,7 @@ unit system, and three-dimensional plotting capabilities.
 Examples
 --------
 
-Here we use a Cornell-style CERMIT ESR experiment as an example
+Here, we use a Cornell-style CERMIT ESR experiment as an example
 (see 
 `mrfmsim-marohn documentation <https://github.com/Marohn-Group/mrfmsim-marohn-docs>`__ 
 for the explanation of the experiment). The notebook with all the codes on this page is
@@ -41,9 +41,9 @@ We define the necessary inputs for the experiment:
 
     from mrfmsim.component import SphereMagnet, Grid, Sample, Cantilever
 
-    # define the components
+
     sample = Sample(
-        spin_type="electron",
+        spin="e",
         temperature=11.0,
         T1=1.3e-3,
         T2=0.45e-6,
@@ -63,17 +63,16 @@ We define the necessary inputs for the experiment:
 Graph representation and metadata
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The graph representation of the experiment allows us to easily visualize the steps of the 
-experiment. The metadata shows the signature, returns, description and more of the experiment.
-The *mrfmsim-marohn* package contains standalone experiment models and model collections.
-The standalone experiments can be directly imported, and experiments within the collection
-can be accessed using the experiment name as the key. 
+The graph representation of the experiment allows us to visualize the steps of the 
+experiment easily. The metadata shows the experiment's signature, returns, description,
+and more. The *mrfmsim-marohn* package contains standalone experiment models and model
+collections. The standalone experiments can be directly imported, and experiments within
+the collection can be accessed using the experiment name as the key. 
 
 .. note::
 
-    The *mrfmsim-marohn* package is loaded as a plugin of the *mrfmsim* package, 
-    therefore the experiments are accessed through the 
-    ``mrfmsim.experiment`` module.
+    The *mrfmsim-marohn* package is loaded as a plugin of the *mrfmsim* package.
+    The experiments are accessed through the ``mrfmsim.experiment`` module.
 
 To access a standalone experiment model:
 
@@ -137,8 +136,8 @@ To draw the graph of the model:
 Model Modification
 ^^^^^^^^^^^^^^^^^^
 
-A key feature of modular modeling is to allow quick modification
-to existing models directly. The result is a must faster development
+A key feature of modular modeling is that it directly allows quick modification
+of existing models. The result is a much faster development
 cycle for experiment simulation.
 
 
@@ -150,7 +149,7 @@ applying modifiers to the desired nodes. To edit individual nodes,
 use the ``edit_node`` function from the model that returns a new
 model.
 
-Using the "CermitESR" experiment model we can
+Using the "CermitESR" experiment model, we can
 inspect the run time of "minimum absolute x offset" and
 "relative polarization change" performance:
 
@@ -271,8 +270,8 @@ This is equivalent to the result from the following loops:
 .. note::
 
     Note that for individual parameters, the loop shortcut can achieve
-    optimal looping. However, for multiple parameters, the users need
-    to decide which parameter to loop first. Since all nodes that are
+    optimal looping. However, for multiple parameters, users must decide
+    which parameter to loop first. Since all nodes that are
     dependent on "f_rf" also depend on "B_0", we loop "f_rf" first. 
 
 Modify nodes - print out node input and output values

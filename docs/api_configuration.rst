@@ -174,3 +174,11 @@ users to always inspect the code or the experiment file before executing.
 .. automodule:: mrfmsim.configuration
     :members:
     :show-inheritance:
+
+
+Configuration file
+-------------------
+
+We increase the experiment model's portability by defining experiments in YAML 
+functionalities with the nodes, edges, graph, and model settings. To execute the model
+directly in the terminal, use job configuration to define the job.

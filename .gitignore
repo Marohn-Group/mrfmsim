@@ -163,3 +163,6 @@ test.ipynb
 # dot grah
 *.gv
 *.gv.pdf
+
+# designer files
+*.afdesign

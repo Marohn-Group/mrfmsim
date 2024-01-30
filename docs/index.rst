@@ -6,12 +6,6 @@ License
 
 .. include:: ../LICENSE
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
 
 .. toctree::
    :maxdepth: 2
@@ -19,6 +13,7 @@ Indices and tables
    :hidden:
 
    overview
+   features
    changelog
 
 .. toctree::
@@ -27,18 +22,21 @@ Indices and tables
    :caption: User Guide
    :hidden:
 
-   ref_experiment
+
    ref_modifier
    ref_shortcut
 
 .. toctree::
    :maxdepth: 1
    :caption: Experimental Setup
+   :hidden:
 
-   component/sample.rst
-   component/grid.rst
-   component/magnet.rst
-   component/cantilever.rst
+   ref_experiment
+   coordinates.rst
+   sample.rst
+   grid.rst
+   magnet.rst
+   cantilever.rst
 
 
 .. toctree::
@@ -49,8 +47,15 @@ Indices and tables
 
    api_plugin
    api_component
-   api_units
    api_configuration
+
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
 
 
    
