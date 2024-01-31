@@ -4,12 +4,14 @@ import numba as nb
 from inspect import Parameter, signature, Signature
 from pprint import pformat
 from string import Formatter
+from collections import defaultdict
 
 
 def replace_component(replacement: dict):
     """Modify the signature with components.
 
-    The modifier is used on the model level, therefore inputs are keyword-only.
+    The modifier modifies the internal model function. The wrapper
+    function is keyword-only.
 
     :param dict[list | str] replacement: in the format of
         {component: [[original, replacement], original ...}
@@ -19,44 +21,34 @@ def replace_component(replacement: dict):
         sig = signature(func)
         params = sig.parameters  # immutable
 
-        @wraps(func)
-        def wrapped(**kwargs):
-            for comp, rep_list in replacement.items():
-                # if comp itself is an argument in the signature
-                if comp in params:
-                    comp_obj = kwargs[comp]
-                else:
-                    comp_obj = kwargs.pop(comp)
-
-                for element in rep_list:
-                    # allows simplified replacement
-                    # if the replacement rep is the same as the sig
-                    if isinstance(element, str):
-                        attr = rep = element
-                    else:
-                        attr, rep = element
-
-                    if attr in params:
-                        # skip the attribute if it is not needed
-                        # this allows the component modifier to be recycled
-                        # even if the underlying function is changed
-                        kwargs[attr] = getattr(comp_obj, rep)
-
-            return func(**kwargs)
-
-        params_dict = dict(params)  # mutable
+        new_params_dict = dict(params)  # mutable
+        replacement_dict = defaultdict(list)
         for comp, rep_list in replacement.items():
-            params_dict[comp] = Parameter(comp, 1)
+            assert (
+                comp not in params
+            ), f"Parameter {repr(comp)} is already in the signature."
+            new_params_dict[comp] = Parameter(comp, 1)
 
             for element in rep_list:
                 if isinstance(element, str):
                     attr = element
+                    replacement_dict[comp].append((attr, attr))
                 else:
                     attr = element[0]
-                params_dict.pop(attr, None)
+                    replacement_dict[comp].append(element)
+                new_params_dict.pop(attr, None)
+
+        @wraps(func)
+        def wrapped(**kwargs):
+            for comp, rep_list in replacement_dict.items():
+                comp_obj = kwargs.pop(comp)
+                for param, repl in rep_list:
+                    kwargs[param] = getattr(comp_obj, repl)
+
+            return func(**kwargs)
 
         wrapped.__signature__ = Signature(
-            parameters=sorted(params_dict.values(), key=param_sorter)
+            parameters=sorted(new_params_dict.values(), key=param_sorter)
         )
         return wrapped
 

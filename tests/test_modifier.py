@@ -48,6 +48,12 @@ class TestReplaceComponent:
             ", 'obj2': [('c', 'c2'), 'd']})"
         )
 
+    def test_duplicated_parameter(self, func):
+        """Test component parameter already exists in function."""
+
+        with pytest.raises(AssertionError, match="Parameter 'a' is already in the signature"):
+            replace_component({"a": [("b", "a")]})(func)
+
 
 class TestPrintModifiers:
     @pytest.fixture
