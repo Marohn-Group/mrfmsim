@@ -2,27 +2,98 @@ Component
 ======================
 
 An MRFM experiment typically consists of several components, such as
-a resonator, a magnet, and a sample. These components can be grouped to 
-simplify the simulation input. 
+a resonator, a magnet, and a sample. The parameters and related calculations
+of components can be encapsulated into an object to simplify the input
+process.
 
-.. autosummary::
-
-    mrfmsim.component.ComponentBase
-
-The ``ComponentBase`` class is an abstract class with a
-default metadata output. The ``attrs_to_dict`` method is to output
-all public attributes.
-
-Units
------
-
-To display the units of the parameters, the class attribute
-``_units`` should be defined when inheriting the class. See :doc:`units <api_units>` for detailed units definition.
+The ``ComponentBase`` class is an abstract ``dataclass`` with a
+formatted metadata output. It allows users to define the base unit
+of a parameter as a ``dataclass`` field. Python 
+`dataclass <https://docs.python.org/3.10/library/dataclasses.html>`_
+is used to simplify the definition process.
 
 
-:mod:`component` module
-------------------------
+Create a component class
+-----------------------------
 
-.. automodule:: mrfmsim.component
-    :members:
-    :show-inheritance:
+To create a component ``dataclass``, simply inherit from ``ComponentBase`` 
+and define the fields as ``dataclass`` fields. 
+
+For example, to create a cantilever class that stores the cantilever
+frequency "f_c" and cantilever spring constant "k_c", we can inherit
+the ``ComponentBase`` class and define the attributes as follows:
+
+.. code-block:: python
+
+    from mrfmsim.component import ComponentBase
+    from dataclasses import dataclass
+
+    @dataclass
+    class Cantilever(ComponentBase):
+        f_c: float
+        k_c: float
+
+
+    >>> cantilever = Cantilever(f_c=3000, k_c=1.0)
+    >>> cantilever.f_c
+    3000
+    >>> cantilever.k_c
+    1.0
+
+    >>> cantilever # dataclass output
+    Cantilever(f_c=3000, k_c=100.0)
+    >>> print(cantilever) # formatted output
+    Cantilever(f_c=3000
+        k_c=100.000)
+
+If we want additional attributes through calculation, instead of defining
+``__init__`` method, we can define a ``__post_init__`` method. To specify
+that these are not instantiation variables, we specify that they are
+``init=False`` in the ``dataclass`` field. See 
+`post-init processing 
+<https://docs.python.org/3.10/library/dataclasses.html#post-init-processing>`_.
+
+.. code-block:: python
+
+    from dataclasses import field
+    import numpy as np
+
+    @dataclass
+    class Cantilever(ComponentBase):
+        k_c: float
+        f_c: float = 5000
+        omega: float = field(init=False)
+
+        def __post_init__(self):
+            self.omega = 2 * np.pi * self.f_c
+
+    >>> cantilever = Cantilever(k_c=100.0)
+    >>> cantilever.omega
+    31415.926535897932
+
+    >>> print(cantilever)
+    Cantilever(f_c=5000
+        k_c=100.000
+        omega=31415.927)
+
+In the above code, the cantilever frequency defaults to 5000 Hz.
+
+To add units and formatted string output for the attributes, we can add
+"unit" and "format" to the ``dataclass`` field' metadata.
+
+.. code-block:: python
+
+    @dataclass
+    class Cantilever(ComponentBase):
+        k_c: float = field(metadata={"unit": "aN/nm", "format": ".3e"})
+        f_c: float = field(metadata={"unit": "Hz", "format": ".3e"}, default=3000)
+        omega: float = field(init=False, metadata={"unit": "rad/s", "format": ".3f"})
+
+        def __post_init__(self):
+            self.omega = 2 * np.pi * self.f_c
+
+    >>> cantilever = Cantilever(k_c=100.0)
+    >>> print(cantilever)
+    Cantilever(k_c=1.000e+02 aN/nm
+        f_c=3000 Hz
+        omega=18849.556 rad/s)

@@ -14,9 +14,9 @@ sys.path.insert(0, os.path.abspath(".."))
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'mrfmsim'
-copyright = '2023, Peter Sun'
+copyright = '2023 - 2024, Peter Sun'
 author = 'Peter Sun'
-release = '0.1.1'
+release = '0.2.0'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

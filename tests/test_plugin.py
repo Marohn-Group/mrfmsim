@@ -1,174 +1,158 @@
-from mrfmsim.plugin import load_plugin, import_plugin, create_modules, list_plugins
-import mrfmsim.plugin
+from mrfmsim.plugin import load_plugins
 import pytest
 from types import ModuleType
-import importlib
 import sys
-from textwrap import dedent
-import pkgutil
+from importlib.metadata import DistributionFinder, PathDistribution, EntryPoint
+from pathlib import PosixPath
 
 
 class TestImport:
     """Test plugin imports.
 
-    Create a mock plugin module and add testing and utils submodules.
-    One of the submodules has the __all__ attribute defined.
-    The other does not.
+    In this test, we create two modules. One is the host module with
+    some predefined functions. Another is the plugin module with the
+    correct entry_point and additional functions defined.
+
+    The goal is to test whether the core module can load the plugin
+    correctly. In the ``pkg_resources`` module, we can add additional
+    metadata to the system. However, the package is deprecated in favor of
+    ``importlib.metadata``. The new module does not seem to have a direct link
+    to the custom module to the entry points.
+    Here, the workaround is to recreate a custom DistributionFinder and
+    a custom PathDistribution class.
     """
 
+    def Finder(self, distributions):
+        """Custom define finder."""
+
+        class MockDistributionFinder(DistributionFinder):
+            """DistributionFinder that returns target distributions."""
+
+            @classmethod
+            def find_distributions(cls, context=None):
+                return distributions
+
+        return MockDistributionFinder
+
+    def Distribution(self, metadata, entry_points):
+        """metadata is a dictionary that contains the version and name.
+
+        The above information is limited to working for entry points,
+        it is unclear if other functionalities work here.
+        """
+
+        class MockPathDistribution(PathDistribution):
+            """PathDistribution that returns target distributions."""
+
+            @property
+            def metadata(self):
+                return metadata
+
+            @property
+            def entry_points(self):
+                return entry_points
+
+        return MockPathDistribution
+
     @pytest.fixture(autouse=True)
-    def mock_import_module(self):
-        """Mock import_module."""
+    def mock_module(self):
+        """Mock a host and a plugin module.
 
-        main_module = ModuleType("mock_module")
-        main_module.__path__ = [""]
-        sys.modules["mock_module"] = main_module
+        The host module contains one submodule - "test".
+        The submodule has one function - "test_func1".
+        The host module has the name "host".
 
-        plugin = ModuleType("mock_module_plugin")
-        plugin.__path__ = [""]
-        sys.modules["mock_module_plugin"] = plugin
-
-        plugin_submodule1 = ModuleType("mock_module_plugin.testing")
-        plugin_submodule2 = ModuleType("mock_module_plugin.utils")
-
-        plugin_submodule1.__all__ = ["testing_func"]
-        plugin_submodule1.testing_func = lambda: True
-
-        plugin_submodule2.__all__ = []
-        plugin_submodule2.testing_func = lambda: True
-
-        sys.modules["mock_module_plugin.testing"] = plugin_submodule1
-        sys.modules["mock_module_plugin.utils"] = plugin_submodule2
-
-        main_submodule1 = ModuleType("mock_module.testing")
-        main_submodule2 = ModuleType("mock_module.utils")
-
-        sys.modules["mock_module.testing"] = main_submodule1
-        sys.modules["mock_module.utils"] = main_submodule2
-
-        return plugin, {"testing": main_submodule1, "utils": main_submodule2}
-
-    @pytest.fixture(autouse=True)
-    def mock_pkgutils(self, monkeypatch):
-        """Mock pkgutil.
-
-        If path is None, return the plugin module. (For load_plugin testing.)
-        If path is not None, return the submodules. (For import_plugin testing.)
+        The plugin module contains one submodules - "test".
+        The submodule "test" has two functions - "test_func1", "test_func2".
+        The plugin module has the name "host_test".
         """
 
-        def mockreturn(path=None, prefix=""):
-            if prefix == "mmodel":  # skip mmodel submodules for testing
-                pass
-            if path is None:
-                yield (None, "mock_module_plugin", True)
-            for attr in ["testing", "utils"]:
-                yield (None, f"{prefix}{attr}", False)
+        # host module
+        host_module = ModuleType("host")
+        host_submodule = ModuleType("host.test")
+        setattr(host_module, "test", host_submodule)
+        host_submodule.test_func1 = lambda: "host_func1"
+        sys.modules["host"] = host_module
+        sys.modules["host.test1"] = host_submodule
 
-        monkeypatch.setattr(pkgutil, "iter_modules", mockreturn)
-        monkeypatch.setattr(mrfmsim.plugin, "MODULE_NAME", "mock_module")
-        monkeypatch.setattr(mrfmsim.plugin, "DEFUALT_MODULES", ())
+        # plugin module
+        plugin_module = ModuleType("host_test")
+        plugin_submodule = ModuleType("host_test.test")
+        setattr(plugin_module, "test", plugin_submodule)
+        plugin_submodule.__host_plugin__ = ["test_func1", "test_func2"]
+        plugin_submodule.test_func1 = lambda: "plugin_func1"
+        plugin_submodule.test_func2 = lambda: "plugin_func2"
 
-    def test_create_module(self):
-        """Test create_module.
+        sys.modules["host_test"] = plugin_module
+        sys.modules["host_test.test"] = plugin_submodule
 
-        Test the module can be created and imported and the module object attribute
-        also changes the module object in the sys.modules dictionary.
-        """
+        return host_module
 
-        module_dict = create_modules("mock_module", ["submodule", "testing", "utils"])
+    def register_entry_point(self, plugin_name, entry_name):
+        # register to finder
+        metadata = {"Name": "host_test", "Version": "0.0.1"}
+        entry_points = [EntryPoint(plugin_name, "host_test.test", entry_name)]
+        dist = self.Distribution(metadata, entry_points)(PosixPath("host_test"))
+        finder = self.Finder([dist])
+        sys.meta_path.append(finder)
 
-        # submodule does not exist in mock_module, test if it is created.
-        module = importlib.import_module(f"mock_module.submodule")
-        module.test = True
-        module_dict["submodule"].test = True
-        assert isinstance(module, ModuleType)
-        assert module.test
+        return finder
 
-    def test_import_plugin(self, mock_import_module):
-        """Test import_plugin.
+    def test_plugin_registered(self, mock_module):
+        """Test plugin is correctly added to the host module."""
 
-        Test that the plugin module can be imported and the submodules can be loaded.
-        Test the attributes of the main module.
-        """
+        # register to finder
+        finder = self.register_entry_point("test_plugin", "host_plugin")
+        load_plugins(mock_module, "host_plugin")
+        assert mock_module.test_plugin.test_func1() == "plugin_func1"
+        assert mock_module.test_plugin.test_func2() == "plugin_func2"
 
-        plugin, module_dict = mock_import_module
+        # remove the finder
+        sys.meta_path.remove(finder)
 
-        import_plugin("module_name", plugin, module_dict)
+    def test_plugin_duplicate(self, mock_module):
+        """Test when the plugin already exist in the system."""
 
-        test = importlib.import_module("mock_module.testing")
-        assert hasattr(test, "testing_func")
-
-        utils = importlib.import_module("mock_module.utils")
-        assert not hasattr(utils, "testing_func")
-
-    def test_load_plugin(self, capsys):
-        """Test load_plugin."""
-
-        load_plugin(submodule_name_list=["testing", "utils"])
-
-        test = importlib.import_module("mock_module.testing")
-        utils = importlib.import_module("mock_module.utils")
-        assert hasattr(test, "testing_func")
-        assert not hasattr(utils, "testing_func")
-
-        captured = capsys.readouterr()
-        output = "Loaded plugins from: mock_module_plugin\n"
-        assert output == captured.out
-
-    def test_load_plugin_manual(self):
-        """Test load_plugin manual plugin inputs."""
-        load_plugin(
-            plugin_name_list=["mock_module_plugin"],
-            submodule_name_list=["testing", "utils"],
-        )
-
-        test = importlib.import_module("mock_module.testing")
-        utils = importlib.import_module("mock_module.utils")
-        assert hasattr(test, "testing_func")
-        assert not hasattr(utils, "testing_func")
-
-    def test_list_plugin(self, capsys):
-        """Test list_plugin."""
-
-        load_plugin(
-            plugin_name_list=["mock_module_plugin"],
-            submodule_name_list=["testing", "utils"],
-        )
-
-        list_plugins("testing")
-        captured = capsys.readouterr()
-
-        output = dedent(
-            """\
-        List of testing loaded:
-        testing_func (mock_module_plugin)
-        """
-        )
-
-        assert output in captured.out
-
-    def test_object_collision(self, capsys):
-        """Test object name collision when loading plugins."""
+        # register to finder
+        finder = self.register_entry_point("test", "host_plugin")
 
         with pytest.warns(
             UserWarning,
             match=(
-                "Duplicated plugin name: testing_func in testing"
-                ", import as plugin_testing_func."
+                "Duplicated plugin name: test_func1 in test, "
+                "import as test_test_func1."
             ),
         ):
-            load_plugin(
-                plugin_name_list=["mock_module_plugin", "mock_module_plugin"],
-                submodule_name_list=["testing"],
-            )
-            list_plugins("testing")
-            captured = capsys.readouterr()
+            load_plugins(mock_module, "host_plugin")
 
-            output = dedent(
-                """\
-            List of testing loaded:
-            testing_func (mock_module_plugin)
-            plugin_testing_func (mock_module_plugin)
-            """
-            )
-            assert output in captured.out
+        assert mock_module.test.test_func1() == "host_func1"
+        # duplication behavior
+        assert mock_module.test.test_test_func1() == "plugin_func1"
+        assert mock_module.test.test_func2() == "plugin_func2"
+
+        # remove the finder
+        sys.meta_path.remove(finder)
+
+    def test_plugin_dict(self, mock_module, capsys):
+        """Test the plugin dictionary is correctly created."""
+
+        # register to finder
+        finder = self.register_entry_point("test_plugin", "host_plugin")
+
+        plugin_dict = load_plugins(mock_module, "host_plugin")
+        assert "test_plugin" in plugin_dict.keys()
+
+        # remove the finder
+        sys.meta_path.remove(finder)
+
+    def test_plugin_not_registered(self, mock_module):
+        """Test plugin is not registered."""
+
+        # register to finder
+        finder = self.register_entry_point("test", "client_plugin")
+
+        load_plugins(mock_module, "host_plugin")
+        assert not hasattr(mock_module.test, "test_func2")
+
+        # remove the finder
+        sys.meta_path.remove(finder)

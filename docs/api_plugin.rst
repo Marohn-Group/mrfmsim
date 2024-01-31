@@ -1,41 +1,59 @@
 Plugin
 ======================
 
-``mrfmsim`` is designed as a platform for different groups to build
-and collaborate on different simulation experiments. The MRFM community
+*mrfmsim* is designed as a platform for different groups to build
+and collaborate on simulation experiments. The MRFM community
 employs different experimental setups. The plugin system is designed to allow
-different groups to build their sub-packages and share them with the community.
-The plugin system also simplifies the user experience, by combining all
-modules under one ``mrfmsim`` namespace. Once the packages are loaded, the user
-can access all the components by import under ``mrfmsim``.
+other groups to develop their sub-packages and share them with the community.
+These plugin packages can contain experiments or additional features to add
+to the *mrfmsim* platform.
+The plugin system also simplifies the user experience by combining all
+modules under one *mrfmsim* namespace.
 
-Load Plugin
-----------------------
 
-To automatically load plugins run:
+Metadata
+---------
 
-.. code:: python
+*mrfmsim* searches the directory for packages with 
+`plugin metadata <https://packaging.python.org/en/latest/
+guides/creating-and-discovering-plugins/#using-package-metadata>`_
+specified as "mrfmsim-plugin". This can be achieved in the ``pyproject.toml``::
 
-    import mrfmsim
-    mrfmsim.load_plugin()
+    [project.entry-points.'mrfmsim-plugin']
+    test = 'mrfmsim-test'
 
-If no plugin is specified, the ``mmodel`` package and all 
-packages with the name prefix of ``mrfmsim_`` will be loaded.
-The default submodule attributes are "experiment", "modifier", "shortcut", and "component".
+Or in the poetry ``pyproject.toml``::
 
-To specify the plugin directory and submodule attribute::
+    [tool.poetry.plugins."mrfmsim-plugin"]
+    "test" = "mrfmsim_test"
 
-    import mrfmsim
-    mrfmsim.load_plugin(
-        plugin_name_list=['mmodel', 'mrfmsim_marohn'], submodule_name_list=['experiment', 'component']
-    )
+Different namespaces can be added to the ``mrfmsim-plugin`` group. For example,
 
-Create Plugin Package
-----------------------
+    [project.entry-points.'mrfmsim-plugin']
+    experiment = 'mrfmsim_marohn.experiment'
+    modifier = 'mrfmsim_marohn.modifier'
 
-To create a plugin package, the package name must start with ``mrfmsim_``. The submodule names should use the same convention "experiment", "modifier", "shortcut", and "component".
+Naming
+-------
 
-The way ``mrfmsim`` load the variables (functions, classes, etc) is by tracking the ``__all__`` attribute of each submodule. The ``__all__`` attribute is a list of strings that are commonly used to define what symbols in a module will be exported when ``from <module> import *`` is used on the module.
+It is recommended to use the name prefix ``mrfmsim_`` for the plugin package, with a
+unique name.
+For plugins that contain duplicated object names, the object name will be
+prefixed with the plugin name. For example, if the plugin package name is
+``mrfmsim_marohn``, a duplicated object name ``experiment`` will be renamed to
+``marohn_experiment``.
+
+Register object
+----------------
+
+Not all objects in a module need to be loaded by *mrfmsim*. To register objects,
+add the objects to the list ``__mrfmsim_plugin__`` in the module.
+
+For example, to register the ``CermitESR`` and ``IBMCyclic`` objects in the module
+``mrfmsim_marohn.experiment``, define ``__mrfmsim_plugin__`` in 
+``mrfmsim_marohn/experiment.py``::
+
+    __mrfmsim_plugin__ = ['CermitESR', 'IBMCyclic']
 
 :mod:`plugin` module
 ----------------------
