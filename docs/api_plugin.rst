@@ -33,11 +33,6 @@ Different namespaces can be added to the ``mrfmsim-plugin`` group. For example,
     experiment = 'mrfmsim_marohn.experiment'
     modifier = 'mrfmsim_marohn.modifier'
 
-.. note::
-
-    For packages that upload to PYPI, set the platform to "mrfmsim" to help users
-    discover the available plugins.
-
 Naming
 -------
 
