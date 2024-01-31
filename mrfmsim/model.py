@@ -2,7 +2,7 @@
 
 The class inherits from ``mmodel.Model`` class to add certain functionality and defaults.
 """
-from mmodel import MemHandler, Model, Graph
+from mmodel import MemHandler, Model
 from mrfmsim.modifier import replace_component
 import networkx as nx
 from mmodel.metadata import MetaDataFormatter, modelformatter, format_dictargs

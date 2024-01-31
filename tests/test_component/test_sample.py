@@ -5,7 +5,7 @@ from mrfmsim.component import Sample
 from textwrap import dedent
 
 
-def test_Sample_str():
+def test_sample_str():
     """Tests sample str representation without units."""
 
     sample = Sample(spin="1H", T1=1e-6, T2=5e-6, spin_density=49.0, temperature=4.2)

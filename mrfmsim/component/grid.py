@@ -4,12 +4,11 @@
 import numpy as np
 from mrfmsim.component import ComponentBase
 from dataclasses import dataclass, field
-import math
 
 
 @dataclass
 class Grid(ComponentBase):
-    """Instantiate a rectangular grid with shape, step and origin.
+    """Instantiate a rectangular grid with shape, step, and origin.
 
     The resulting grid has equal spacing in each dimension.
     The grid array uses numpy's open mesh-grid, which has speed and storage

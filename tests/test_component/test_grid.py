@@ -95,8 +95,7 @@ class TestGrid:
         assert np.array_equal(ext_grid_array[2], grid.grid_array[2])
 
     def test_extend_grid_by_length(self, grid):
-        """Test extend_xgrid_by_length.
-        """
+        """Test extend_xgrid_by_length."""
 
         grid_x = np.array(
             [-5.6, -4.5, -3.4, -2.3, -1.2, -0.1, 1.0, 2.1, 3.2, 4.3, 5.4, 6.5, 7.6]

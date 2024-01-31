@@ -1,11 +1,10 @@
-"""Test the ComponentBase class"""
+"""Test the ComponentBase class."""
 
 
 import numpy as np
 from dataclasses import dataclass, field
 from mrfmsim.component import ComponentBase
 import pytest
-import pint
 from textwrap import dedent
 
 
@@ -17,7 +16,7 @@ class Component(ComponentBase):
     list: list
     str: str
     tuple: tuple
-    B0: float = field(init=False, metadata={"unit": "mT", 'format': '.3e'})
+    B0: float = field(init=False, metadata={"unit": "mT", "format": ".3e"})
     B1: list = field(init=False)
 
     def __post_init__(self):
@@ -56,7 +55,7 @@ def test_ComponentBase_get_metadata():
 
     assert obj._get_metadata("array") == {"unit": ""}
     assert obj._get_metadata("float") == {}
-    assert obj._get_metadata("B0") == {"unit": "mT", 'format': '.3e'}
+    assert obj._get_metadata("B0") == {"unit": "mT", "format": ".3e"}
     assert obj._get_metadata("other") == {}
 
 

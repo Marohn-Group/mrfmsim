@@ -1,4 +1,4 @@
-"""Base component."""
+"""Base component class."""
 
 from dataclasses import dataclass, asdict
 
@@ -6,19 +6,21 @@ from dataclasses import dataclass, asdict
 @dataclass
 class ComponentBase:
     def __str__(self):
-        """Reformat the dataclass string output.
-        
-        The default format is 3 decimal places for floats.
-        For custom format, define format in the field metadata.
+        """Reformat the ``dataclass`` string output.
+
+        The default format is three decimal places for floats.
+        For custom format, define the format in the field metadata.
+        The ``dataclass``' ``__repr__`` is not being replaced.
         """
 
         str_lines = []
         for k, v in asdict(self).items():
             unit = self.get_unit(k)
-            format = self._get_metadata(k).get("format", ".3f")
+            # use _ to avoid name conflict
+            format_ = self._get_metadata(k).get("format", ".3f")
             if isinstance(v, float):
                 # round the float values
-                str_lines.append(f"\t{k}={v:{format}} {unit}".rstrip())
+                str_lines.append(f"\t{k}={v:{format_}} {unit}".rstrip())
             else:
                 str_lines.append(f"\t{k}={str(v)} {unit}".rstrip())
 
@@ -45,4 +47,6 @@ class ComponentBase:
         if hasattr(self, attr):
             return self._get_metadata(attr).get("unit", "")
         else:
-            raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{attr}'")
+            raise AttributeError(
+                f"'{self.__class__.__name__}' object has no attribute '{attr}'"
+            )

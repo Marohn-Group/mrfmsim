@@ -1,5 +1,3 @@
-import importlib
-import pkgutil
 from types import ModuleType
 import sys
 from collections import defaultdict

@@ -44,10 +44,10 @@ def print_shortcut(model, stdout_format_list, **pargs):
     # input algorithm
     # find the first node that contains the input
     # use the default order of the nodes
-    for input, format_string in input_dict.items():
+    for input_, format_string in input_dict.items():
         for k in G.nodes:
             node_obj = G.get_node_object(k)
-            if input in node_obj.inputs:
+            if input_ in node_obj.inputs:
                 node_mods = node_obj.modifiers
                 G = G.edit_node(
                     k, modifiers=node_mods + [print_inputs(format_string, **pargs)]

@@ -9,7 +9,6 @@ import pytest
 import math
 from mmodel.modifier import loop_input
 from mrfmsim import Experiment, Graph, Node
-from textwrap import dedent
 import numpy as np
 import operator
 

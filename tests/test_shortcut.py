@@ -54,7 +54,7 @@ class TestLoopShortcut:
         with pytest.raises(
             Exception, match="'component' is not included in the graph."
         ):
-            loop_model = loop_shortcut(experiment_mod, "component")
+            loop_shortcut(experiment_mod, "component")
 
     def test_loop_shortcut_graph(self, experiment):
         """Test loop_shortcut with graph level parameters.

@@ -102,7 +102,6 @@ def print_inputs(stdout_format: str, **pargs):
     """
 
     def stdout_inputs_modifier(func):
-        sig = signature(func)
         inputs = parse_fields(stdout_format)
 
         @wraps(func)

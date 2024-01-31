@@ -69,11 +69,7 @@ def test_graph_constructor(experiment):
     assert list(graph.nodes) == list(experiment.graph.nodes)
     assert graph.edges == graph.edges
 
-    node_obj_config = graph.nodes["add"]
-
     for nodes, attrs in graph.nodes.items():
-        model_attrs = experiment.graph.nodes[nodes]
-
         config_dict = attrs["node_object"].__dict__
         graph_dict = experiment.graph.nodes[nodes]["node_object"].__dict__
 
@@ -165,7 +161,7 @@ def expt_file(tmp_path):
 
 
 def test_parse_yaml_file(expt_file):
-    """Test if the yaml file is parsed correctly."""
+    """Test if the YAML file is parsed correctly."""
 
     with open(expt_file) as f:
         expt = yaml.load(f, MrfmSimLoader)

@@ -57,11 +57,6 @@ class TestPrintModifiers:
 
         return b_tot
 
-    def test_parse_field(self):
-        """Test the parse_field function."""
-
-        assert sorted(parse_fields("b1 {b1:.3f} [mT] b0 {b0:.3e} [mT]")) == ["b0", "b1"]
-
     def test_parse_field_with_attributes_or_slicers(self):
         """Test the parse_field that can parse field with attributes or slicers."""
 
