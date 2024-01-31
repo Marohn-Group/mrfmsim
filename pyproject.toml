@@ -8,6 +8,12 @@ repository = "https://www.github.com/Marohn-Group/mrfmsim"
 # adds all subpackages
 packages = [{ include = "mrfmsim" }]
 readme = "README.rst"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development :: Libraries :: Python Modules"
+]
 
 [build-system]
 requires = ["poetry_core>=1.0.0"]
