@@ -16,7 +16,7 @@ Changed
 - Change python requirement to 3.10.
 - Change the plugin system using package entry points. Automatically load
   plugins at import time.
-- Change yaml tags for easier function definition.
+- Change YAML tags for more accessible function definitions.
 - Change the ``print_shortcut`` behavior to add modifiers to individual
   nodes.
 
@@ -61,5 +61,5 @@ Added
 - Add ``loop_shortcut`` and ``print_shortcut`` shortcuts.
 - Add ``replace_component``, ``print_inputs`` and ``print_outputs`` modifiers.
 - Add command line interface.
-- Add configuration module to parse experiment and job yaml files. 
+- Add configuration module to parse experiment and job YAML files. 
 - Add a plugin system that combines methods from different packages.
