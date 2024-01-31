@@ -1,4 +1,4 @@
-name: Build and publish to github repo
+name: Build and publish to GitHub repo
 
 on:
   release:
@@ -11,9 +11,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Deploy
-        uses: peterhs73/sphinx-docs-action@v0.2.
+        uses: peterhs73/sphinx-docs-action@v0.2.1
         with:
-          python-version: 3.10
+          python-version: "3.10"
           docs-source: docs/
           pyproject-path: .[docs]
           external-repo: Marohn-Group/mrfmsim-docs
