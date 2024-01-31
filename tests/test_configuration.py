@@ -1,5 +1,4 @@
 from mrfmsim.configuration import import_object, MrfmSimLoader
-import inspect
 import pytest
 import yaml
 from textwrap import dedent

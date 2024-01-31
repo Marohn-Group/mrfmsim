@@ -88,7 +88,7 @@ def collection_constructor(loader, node):
     return ExperimentCollection(node_objects=node_objects, **param_dict)
 
 
-def func_multi_constructor(loader: yaml.BaseLoader, tag_suffix, node):
+def func_multi_constructor(loader, tag_suffix, node):
     """Load the "!func:" tag from yaml string.
 
     The constructor parses !func:function "lambda a, b: a + b".
