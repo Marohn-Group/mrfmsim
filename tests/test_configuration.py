@@ -182,7 +182,7 @@ def test_collection_constructor():
     yaml_str = """\
     !Collection
     name: test_collection
-    description: Test collection object.
+    doc: Test collection object.
     node_objects:
         add:
             func: !func:add "lambda a, h: a + h"
@@ -227,7 +227,7 @@ def test_collection_constructor():
     collection = yaml.load(dedent(yaml_str), MrfmSimLoader)
 
     assert collection.name == "test_collection"
-    assert collection.description == "Test collection object."
+    assert collection.doc == "Test collection object."
     assert list(collection.nodes.keys()) == [
         "add",
         "subtract",

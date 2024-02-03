@@ -29,10 +29,10 @@ _format_dict.update(
         "experiments": format_dictkeys,
         "nodes": format_dictkeys,
         "settings": format_dictargs,
-        "description": format_value,
+        "doc": format_value,
     }
 )
-_meta_order = ["name", "experiments", "nodes", "settings", "_", "description"]
+_meta_order = ["name", "experiments", "nodes", "settings", "_", "doc"]
 collectionformatter = MetaDataFormatter(
     _format_dict,
     _meta_order,
@@ -52,7 +52,7 @@ class ExperimentCollection:
     def __init__(
         self,
         name,
-        description="",
+        doc="",
         node_objects=None,
         instructions=None,
         settings=None,
@@ -65,9 +65,11 @@ class ExperimentCollection:
         :param dict settings: default experiment settings. They can
             be overwritten by the individual experiment settings provided in the
             instructions.
+        :param str doc: description of the collection
+            The description is stored in the __doc__ attribute for better documentation.
         """
 
-        self.description = description
+        self.__doc__ = self.doc = doc
         self.name = name
 
         node_objects = node_objects or []

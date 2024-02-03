@@ -60,7 +60,8 @@ def test_instruction(node_objects, grouped_edges):
     )
 
     assert collection.instructions == {"test": instruction}
-    assert collection.description == "Test collection description."
+    assert collection.doc == "Test collection description."
+    assert collection.__doc__ == "Test collection description."
     assert collection["test"].doc == "Test individual docstring."
     assert collection["test"].graph.name == "test_graph"
     assert collection["test"].collection == "test_collection_object"
@@ -144,7 +145,7 @@ def test_collection_str_representation(node_objects, grouped_edges):
 def test_experiment_str_representation(node_objects, grouped_edges):
     """Test the str representation of the experiment.
 
-    Test the collection information is added to experiment object.
+    Test the collection information is added to the experiment object.
     """
 
     experiment_str = """\
@@ -205,7 +206,7 @@ def test_edit(node_objects, grouped_edges):
     instruction = {"grouped_edges": grouped_edges}
     collection = ExperimentCollection(
         "Test_collection",
-        description="Test collection description.",
+        doc="Test collection description.",
         node_objects=node_objects,
         instructions={"test": instruction},
         settings={"doc": "Test experiment doc."},
