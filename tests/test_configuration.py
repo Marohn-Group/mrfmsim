@@ -77,8 +77,8 @@ def test_graph_constructor(experiment):
             == graph_dict.pop("_base_func").__dict__
         )
         assert (
-            config_dict.pop("node_func").__dict__
-            == graph_dict.pop("node_func").__dict__
+            config_dict.pop("_node_func").__dict__
+            == graph_dict.pop("_node_func").__dict__
         )
         assert config_dict == graph_dict
 
