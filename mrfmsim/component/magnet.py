@@ -71,7 +71,7 @@ class SphereMagnet(ComponentBase):
         )
 
     def Bzx_method(self, x, y, z):
-        r"""Calcualte magnetic field gradient :math:`B_{zx}`.
+        r"""Calculate magnetic field gradient :math:`B_{zx}`.
 
         :math:`B_{zx} \equiv \partial B_z / \partial x`
         [ :math:`\mathrm{mT} \: \mathrm{nm}^{-1}` ].

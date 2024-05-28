@@ -9,11 +9,13 @@ from textwrap import dedent
 @pytest.fixture
 def node_objects():
     return [
-        Node("add", np.add, inputs=["a", "h"], output="c"),
-        Node("subtract", operator.sub, inputs=["c", "d"], output="e"),
-        Node("power", math.pow, inputs=["c", "f"], output="g"),
-        Node("multiply", np.multiply, inputs=["e", "g"], output="k", output_unit="m^2"),
-        Node("log", math.log, inputs=["c", "b"], output="m"),
+        Node("add", np.add, arglist=["a", "h"], output="c"),
+        Node("subtract", operator.sub, arglist=["c", "d"], output="e"),
+        Node("power", math.pow, arglist=["c", "f"], output="g"),
+        Node(
+            "multiply", np.multiply, arglist=["e", "g"], output="k", output_unit="m^2"
+        ),
+        Node("log", math.log, arglist=["c", "b"], output="m"),
     ]
 
 
@@ -65,7 +67,6 @@ def test_instruction(node_objects, grouped_edges):
     assert collection["test"].doc == "Test individual docstring."
     assert collection["test"].graph.name == "test_graph"
     assert collection["test"].collection == "test_collection_object"
-    print(collection["test"])
 
 
 def test_instruction_duplicate(node_objects, grouped_edges):

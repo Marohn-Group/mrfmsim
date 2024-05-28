@@ -22,11 +22,11 @@ parameters can be added, and they overwrite the "settings" dictionary.
     from mrfmsim import ExperimentCollection
 
     node_objects = [
-        Node("add", np.add, inputs=["a", "h"], output="c"),
-        Node("subtract", operator.sub, inputs=["c", "d"], output="e"),
-        Node("power", math.pow, inputs=["c", "f"], output="g"),
-        Node("multiply", np.multiply, inputs=["e", "g"], output="k", output_unit="m^2"),
-        Node("log", math.log, inputs=["c", "b"], output="m"),
+        Node("add", np.add, arglist=["a", "h"], output="c"),
+        Node("subtract", operator.sub, arglist=["c", "d"], output="e"),
+        Node("power", math.pow, arglist=["c", "f"], output="g"),
+        Node("multiply", np.multiply, arglist=["e", "g"], output="k", output_unit="m^2"),
+        Node("log", math.log, arglist=["c", "b"], output="m"),
     ]
 
     grouped_edges = [

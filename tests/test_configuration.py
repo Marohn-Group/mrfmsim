@@ -39,24 +39,24 @@ def test_graph_constructor(experiment):
         add:
             func: !import numpy.add
             output: c
-            inputs: [a, h]
+            arglist: [a, h]
         subtract:
             func: !import operator.sub
             output: e
-            inputs: [c, d]
+            arglist: [c, d]
         power:
             func: !import math.pow
             output: g
-            inputs: [c, f]
+            arglist: [c, f]
         multiply:
             func: !import numpy.multiply
             output: k
-            inputs: [e, g]
+            arglist: [e, g]
             output_unit: m^2
         log:
             func: !import math.log
             output: m
-            inputs: [c, b]
+            arglist: [c, b]
     """
 
     graph = yaml.load(dedent(graph_yaml), MrfmSimLoader)
@@ -126,25 +126,25 @@ def expt_file(tmp_path):
             add:
                 func: !func:add "lambda a, h: a + h"
                 doc: Add a and h.
-                inputs: [a, h]
+                arglist: [a, h]
                 output: c
             subtract:
                 func: !import operator.sub
                 output: e
-                inputs: [c, d]
+                arglist: [c, d]
             power:
                 func: !import math.pow
                 output: g
-                inputs: [c, f]
+                arglist: [c, f]
             multiply:
                 func: !import numpy.multiply
                 output: k
-                inputs: [e, g]
+                arglist: [e, g]
                 output_unit: m^2
             log:
                 func: !import math.log
                 output: m
-                inputs: [c, b]
+                arglist: [c, b]
     components: {comp: [[a, a1], [b, b1]]}
     doc: Test experiment with components.
     modifiers: [!import:mmodel.modifier.loop_input {parameter: d}]
@@ -187,25 +187,25 @@ def test_collection_constructor():
         add:
             func: !func:add "lambda a, h: a + h"
             doc: Add a and h.
-            inputs: [a, h]
+            arglist: [a, h]
             output: c
         subtract:
             func: !import operator.sub
             output: e
-            inputs: [c, d]
+            arglist: [c, d]
         power:
             func: !import math.pow
             output: g
-            inputs: [c, f]
+            arglist: [c, f]
         multiply:
             func: !import numpy.multiply
             output: k
-            inputs: [e, g]
+            arglist: [e, g]
             output_unit: m^2
         log:
             func: !import math.log
             output: m
-            inputs: [c, b]
+            arglist: [c, b]
     instructions:
         test1:
             grouped_edges:

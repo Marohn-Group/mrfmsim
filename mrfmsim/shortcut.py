@@ -47,7 +47,7 @@ def print_shortcut(model, stdout_format_list, **pargs):
     for input_, format_string in input_dict.items():
         for k in G.nodes:
             node_obj = G.get_node_object(k)
-            if input_ in node_obj.inputs:
+            if input_ in node_obj.arglist + node_obj.kwarglist:
                 node_mods = node_obj.modifiers
                 G = G.edit_node(
                     k, modifiers=node_mods + [print_inputs(format_string, **pargs)]
@@ -95,7 +95,7 @@ def loop_shortcut(model, parameter: str, name=None):
 
     # If the parameter is in the signature but not in the graph.
     # This is due to the signature modifier on the model.
-    # Use regular loop or change the modifiers.
+    # Use a regular loop or change the modifiers.
 
     if parameter not in modelgraph_signature(G).parameters:
         raise Exception(

@@ -106,4 +106,6 @@ class TestLoopShortcut:
     def test_loop_shortcut_middle_execution(self, experiment):
         """Test loop_shorcut submodel execution."""
         loop_model = loop_shortcut(experiment, "d", "loop_model")
+        loop_model.get_node_object('subnode_d').func.visualize(outfile='subnode.png')
+
         assert loop_model(a=0, b=2, d_loop=[1, 2], f=3, h=2) == ([8, 0], 1.0)

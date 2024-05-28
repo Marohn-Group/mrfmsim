@@ -23,25 +23,25 @@ For example, an ``Experiment`` object can be defined:
             add:
                 func: !func:add "lambda a, h: a + h"
                 doc: Add a and h.
-                inputs: [a, h]
+                arglist: [a, h]
                 output: c
             subtract:
                 func: !import operator.sub
                 output: e
-                inputs: [c, d]
+                arglist: [c, d]
             power:
                 func: !import math.pow
                 output: g
-                inputs: [c, f]
+                arglist: [c, f]
             multiply:
                 func: !import numpy.multiply
                 output: k
-                inputs: [e, g]
+                arglist: [e, g]
                 output_unit: m^2
             log:
                 func: !import math.log
                 output: m
-                inputs: [c, b]
+                arglist: [c, b]
     components: {comp: [[a, a1], [b, b1]]}
     doc: Test experiment with components.
     modifiers: [!import:mmodel.modifier.loop_input {parameter: d}]
@@ -146,23 +146,23 @@ are available in ``mrfmsim``:
         add:
             func: !import numpy.add
             output: c
-            inputs: [a, h]
+            arglist: [a, h]
         subtract:
             func: !import operator.sub
             output: e
-            inputs: [c, d]
+            arglist: [c, d]
         power:
             func: !import math.pow
             output: g
-            inputs: [c, f]
+            arglist: [c, f]
         multiply:
             func: !import numpy.multiply
             output: k
-            inputs: [e, g]
+            arglist: [e, g]
         log:
             func: !import math.log
             output: m
-            inputs: [c, b]
+            arglist: [c, b]
 
 - create a Python function called "test" from an expression 
 
@@ -186,25 +186,25 @@ are available in ``mrfmsim``:
             add:
                 func: !func:add "lambda a, h: a + h"
                 doc: Add a and h.
-                inputs: [a, h]
+                arglist: [a, h]
                 output: c
             subtract:
                 func: !import operator.sub
                 output: e
-                inputs: [c, d]
+                arglist: [c, d]
             power:
                 func: !import math.pow
                 output: g
-                inputs: [c, f]
+                arglist: [c, f]
             multiply:
                 func: !import numpy.multiply
                 output: k
-                inputs: [e, g]
+                arglist: [e, g]
                 output_unit: m^2
             log:
                 func: !import math.log
                 output: m
-                inputs: [c, b]
+                arglist: [c, b]
     components: {comp: [[a, a1], [b, b1]]}
     doc: Test experiment with components.
     modifiers: [!import:mmodel.modifier.loop_input {parameter: d}]
@@ -222,25 +222,25 @@ are available in ``mrfmsim``:
         add:
             func: !func:add "lambda a, h: a + h"
             doc: Add a and h.
-            inputs: [a, h]
+            arglist: [a, h]
             output: c
         subtract:
             func: !import operator.sub
             output: e
-            inputs: [c, d]
+            arglist: [c, d]
         power:
             func: !import math.pow
             output: g
-            inputs: [c, f]
+            arglist: [c, f]
         multiply:
             func: !import numpy.multiply
             output: k
-            inputs: [e, g]
+            arglist: [e, g]
             output_unit: m^2
         log:
             func: !import math.log
             output: m
-            inputs: [c, b]
+            arglist: [c, b]
     instructions:
         test1:
             grouped_edges:
