@@ -7,6 +7,17 @@ The format is based on
 and this project adheres to
 `Semantic Versioning <https://semver.org/spec/v2.0.0.html>`_
 
+[Unreleased]
+------------
+
+Changed
+^^^^^^^
+- Change the plugin system from implicit to explicit loading. The user must
+  import the plugin package to load the plugin.
+- Change the plugin entry point syntax to allow endpoint and module attributes
+  at the module level.
+- Change the plugin system to lazy import the modules and attributes.
+
 
 [0.2.0]
 -------------------------
