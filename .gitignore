@@ -157,7 +157,7 @@ cython_debug/
 .vscode
 
 # other
-test.ipynb
+test*.ipynb
 .DS_store
 .DS_Store
 
