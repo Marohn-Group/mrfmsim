@@ -5,6 +5,7 @@ from inspect import Parameter, signature, Signature
 from pprint import pformat
 from string import Formatter
 from collections import defaultdict
+from mmodel.modifier import modifier
 
 
 def replace_component(replacement: dict):
@@ -69,8 +70,8 @@ def parse_fields(format_str):
     name split, the function returns unique elements.
     """
 
-    # this is a internal function for Formatter
-    # consider rewrite with custom function to prevent breaking
+    # this is an internal function for Formatter
+    # consider rewriting with custom function to prevent breaking
     # the function ignores slicing and attribute access
     # B0.value -> B0, B0[0] -> B0
     from _string import formatter_field_name_split
@@ -83,7 +84,7 @@ def parse_fields(format_str):
     return list(set(fields))  # return unique elements
 
 
-def print_inputs(stdout_format: str, **pargs):
+def print_inputs(format_str: str, **pargs):
     """Print the node input to the console.
 
     :param str stdout_format: format string for input and output
@@ -93,24 +94,23 @@ def print_inputs(stdout_format: str, **pargs):
     The names of the parameters are parsed from the format string.
     """
 
+    @modifier("print_inputs", format_str=format_str, **pargs)
     def stdout_inputs_modifier(func):
-        inputs = parse_fields(stdout_format)
+        inputs = parse_fields(format_str)
 
         @wraps(func)
         def wrapped(**kwargs):
             """Print input parameter."""
             input_dict = {k: kwargs[k] for k in inputs}
-            print(stdout_format.format(**input_dict), **pargs)
+            print(format_str.format(**input_dict), **pargs)
             return func(**kwargs)
 
         return wrapped
 
-    params = [repr(stdout_format)] + [f"{k}={repr(v)}" for k, v in pargs.items()]
-    stdout_inputs_modifier.metadata = f"print_inputs({', '.join(params)})"
     return stdout_inputs_modifier
 
 
-def print_output(stdout_format: str, **pargs):
+def print_output(format_str: str, **pargs):
     """Print the node output to the console.
 
     :param str stdout_format: format string for input and output
@@ -124,21 +124,20 @@ def print_output(stdout_format: str, **pargs):
     output field is allowed and the field name is used as the return name.
     """
 
+    @modifier("print_output", format_str=format_str, **pargs)
     def stdout_output_modifier(func):
-        output = parse_fields(stdout_format)[0]
+        output = parse_fields(format_str)[0]
 
         @wraps(func)
         def wrapped(**kwargs):
             """Print output parameter."""
 
             result = func(**kwargs)
-            print(stdout_format.format(**{output: result}), **pargs)
+            print(format_str.format(**{output: result}), **pargs)
             return result
 
         return wrapped
 
-    params = [repr(stdout_format)] + [f"{k}={repr(v)}" for k, v in pargs.items()]
-    stdout_output_modifier.metadata = f"print_output({', '.join(params)})"
     return stdout_output_modifier
 
 
@@ -150,10 +149,9 @@ def numba_jit(**kwargs):
     Use the decorator the same way as numba.jit().
     """
 
+    @modifier("numba_jit", **kwargs)
     def decorator(func):
         func = nb.jit(**kwargs)(func)
         return func
 
-    meta = ", ".join(f"{k}={v}" for k, v in kwargs.items())
-    decorator.metadata = f"numba_jit({meta})"
     return decorator

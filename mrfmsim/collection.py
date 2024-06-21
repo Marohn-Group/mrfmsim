@@ -7,6 +7,7 @@ from mmodel.metadata import (
     format_dictargs,
     format_value,
 )
+from mrfmsim.utility import ConfigBase
 
 
 def format_dictkeys(key, value):
@@ -41,7 +42,7 @@ collectionformatter = MetaDataFormatter(
 )
 
 
-class ExperimentCollection:
+class ExperimentCollection(ConfigBase):
     """Create a collection of experiments.
 
     The class is used to avoid redefining experiment nodes. The experiment

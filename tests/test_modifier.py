@@ -51,7 +51,9 @@ class TestReplaceComponent:
     def test_duplicated_parameter(self, func):
         """Test component parameter already exists in function."""
 
-        with pytest.raises(AssertionError, match="Parameter 'a' is already in the signature"):
+        with pytest.raises(
+            AssertionError, match="Parameter 'a' is already in the signature"
+        ):
             replace_component({"a": [("b", "a")]})(func)
 
 
@@ -91,8 +93,8 @@ class TestPrintModifiers:
         captured = capsys.readouterr()
         assert captured.out == "b1 1.000 [mT] b0 2.000e+00 [mT] bz 3--"
         assert (
-            mod.metadata
-            == "print_inputs('b1 {b1:.3f} [mT] b0 {b0:.3e} [mT] bz {bz}', end='--')"
+            mod.metadata == "print_inputs(format_str='b1 {b1:.3f} "
+            "[mT] b0 {b0:.3e} [mT] bz {bz}', end='--')"
         )
 
     def test_print_output_modifier(self, capsys, func):
@@ -103,7 +105,7 @@ class TestPrintModifiers:
         mod_func(b1=1, b0=2, bz=3)
         captured = capsys.readouterr()
         assert captured.out == "b_tot 6.0 [mT]\n"
-        assert mod.metadata == "print_output('b_tot {b_tot:.1f} [mT]')"
+        assert mod.metadata == "print_output(format_str='b_tot {b_tot:.1f} [mT]')"
 
 
 def test_numba_jit():

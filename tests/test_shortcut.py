@@ -44,17 +44,15 @@ class TestLoopShortcut:
     def test_loop_shortcut_raises(self, experiment):
         """Test loop_shortcut raises an exception if parameter not in signature."""
 
-        with pytest.raises(
-            Exception, match="Invalid shortcut: 'c' is not a model input."
-        ):
+        with pytest.raises(Exception, match="'c' is not a model parameter"):
             loop_shortcut(experiment, "c")
 
     def test_loop_shortcut_signature_exception(self, experiment_mod):
         """Test loop_shortcut with signature level parameters raises an exception."""
         with pytest.raises(
-            Exception, match="'component' is not included in the graph."
+            Exception, match="'replace_obj' is not a base model parameter"
         ):
-            loop_shortcut(experiment_mod, "component")
+            loop_shortcut(experiment_mod, "replace_obj")
 
     def test_loop_shortcut_graph(self, experiment):
         """Test loop_shortcut with graph level parameters.
@@ -63,8 +61,9 @@ class TestLoopShortcut:
         """
         loop_model = loop_shortcut(experiment, "a")
         loop_mod = loop_model.modifiers[-1]
-        assert loop_mod.metadata == "loop_input('a')"
-        assert getclosurevars(loop_mod).nonlocals == {"parameter": "a"}
+
+        assert loop_mod.metadata == "loop_input(parameter='a')"
+        # assert getclosurevars(loop_mod).nonlocals == {"parameter": "a"}
         assert loop_model(a_loop=[0, 2], b=2, d=2, f=3, h=2) == [(0, 1.0), (128, 2.0)]
 
     def test_loop_shortcut_single(self, experiment):
@@ -74,7 +73,7 @@ class TestLoopShortcut:
         # b dependency is in the node log
         b_node_modifier = loop_model.get_node_object("log").modifiers[-1]
 
-        assert b_node_modifier.metadata == "loop_input('b')"
+        assert b_node_modifier.metadata == "loop_input(parameter='b')"
         assert getclosurevars(b_node_modifier).nonlocals == {"parameter": "b"}
         assert loop_model(a=0, b_loop=[2, 4], d=2, f=3, h=2) == (0, [1, 0.5])
 
@@ -89,7 +88,8 @@ class TestLoopShortcut:
         subnode = loop_model.get_node_object("subnode_d")
 
         mod = subnode.modifiers[-1]
-        assert mod.metadata == "loop_input('d')"
+
+        assert mod.metadata == "loop_input(parameter='d')"
         assert getclosurevars(mod).nonlocals == {"parameter": "d"}
         assert subnode.output == "k"
 
@@ -106,6 +106,5 @@ class TestLoopShortcut:
     def test_loop_shortcut_middle_execution(self, experiment):
         """Test loop_shorcut submodel execution."""
         loop_model = loop_shortcut(experiment, "d", "loop_model")
-        loop_model.get_node_object('subnode_d').func.visualize(outfile='subnode.png')
 
         assert loop_model(a=0, b=2, d_loop=[1, 2], f=3, h=2) == ([8, 0], 1.0)

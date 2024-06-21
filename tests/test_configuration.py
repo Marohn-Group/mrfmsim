@@ -1,10 +1,206 @@
-from mrfmsim.configuration import import_object, MrfmSimLoader
+from mrfmsim.configuration import (
+    import_object,
+    MrfmSimLoader,
+    MrfmSimDumper,
+    yaml_dumper,
+    func_representer,
+    ufunc_representer,
+    list_representer,
+    BlockList,
+    blocklist_representer,
+)
 import pytest
 import yaml
 from textwrap import dedent
 import numpy as np
 from types import SimpleNamespace as SNs
 import math
+import types
+import operator
+import numba as nb
+
+
+### YAML TEST STRINGS ###
+
+
+@pytest.fixture
+def graph_yaml_str():
+    graph_yaml = """\
+    !Graph:test_graph
+    grouped_edges:
+    - [add, [subtract, power, log]]
+    - [[subtract, power], multiply]
+    node_objects: !nodes
+        add:
+            func: !func:add 'lambda a, h: a + h'
+            output: c
+        subtract:
+            func: !import '_operator.sub'
+            arglist: [c, d]
+            output: e
+        power:
+            func: !import 'math.pow'
+            arglist: [c, f]
+            output: g
+        log:
+            func: !import 'math.log'
+            arglist: [c, b]
+            output: m
+        multiply:
+            func: !import 'numpy.multiply'
+            arglist: [e, g]
+            output: k
+            output_unit: m^2
+    type: mrfmsim
+    """
+    return dedent(graph_yaml)
+
+
+@pytest.fixture
+def expt_yaml_str():
+    """Return an experiment yaml string.
+
+    The content matches the experiment fixture.
+    """
+
+    expt_yaml = """\
+    !Experiment:test_experiment_plain
+    graph: !Graph:test_graph
+        grouped_edges:
+        - [add, [subtract, power, log]]
+        - [[subtract, power], multiply]
+        node_objects: !nodes
+            add:
+                func: !func:add 'lambda a, h: a + h'
+                output: c
+            subtract:
+                func: !import '_operator.sub'
+                arglist: [c, d]
+                output: e
+            power:
+                func: !import 'math.pow'
+                arglist: [c, f]
+                output: g
+            log:
+                func: !import 'math.log'
+                arglist: [c, b]
+                output: m
+            multiply:
+                func: !import 'numpy.multiply'
+                arglist: [e, g]
+                output: k
+                output_unit: m^2
+        type: mrfmsim
+    defaults:
+        h: 2
+    """
+    return dedent(expt_yaml)
+
+
+@pytest.fixture
+def expt_mod_yaml_str():
+    """Return an experiment yaml string.
+
+    The content matches the experiment_mod fixture.
+    """
+
+    expt_yaml = """\
+    !Experiment:test_experiment
+    graph: !Graph:test_graph
+        grouped_edges:
+        - [add, [subtract, power, log]]
+        - [[subtract, power], multiply]
+        node_objects: !nodes
+            add:
+                func: !func:add 'lambda a, h: a + h'
+                output: c
+            subtract:
+                func: !import '_operator.sub'
+                arglist: [c, d]
+                output: e
+            power:
+                func: !import 'math.pow'
+                arglist: [c, f]
+                output: g
+            log:
+                func: !import 'math.log'
+                arglist: [c, b]
+                output: m
+            multiply:
+                func: !import 'numpy.multiply'
+                arglist: [e, g]
+                output: k
+                output_unit: m^2
+        type: mrfmsim
+    components:
+        replace_obj: [[a, a1], [b, b1]]
+    modifiers: [!import:mmodel.modifier.loop_input {parameter: d}]
+    doc: Test experiment with components.
+    defaults:
+        h: 2
+    """
+    return dedent(expt_yaml)
+
+
+@pytest.fixture
+def expt_file(tmp_path, expt_mod_yaml_str):
+    """Create a custom module for testing."""
+
+    module_path = tmp_path / "expt.yaml"
+    module_path.write_text(expt_mod_yaml_str)
+    return module_path
+
+
+@pytest.fixture
+def collection_yaml_str():
+    """Return a collection yaml string."""
+
+    yaml_str = """\
+    !Collection:test_collection
+    doc: Test collection object.
+    node_objects: !nodes
+        add:
+            func: !func:add 'lambda a, h: a + h'
+            output: c
+        subtract:
+            func: !import '_operator.sub'
+            output: e
+            arglist: [c, d]
+        power:
+            func: !import 'math.pow'
+            output: g
+            arglist: [c, f]
+        multiply:
+            func: !import 'numpy.multiply'
+            output: k
+            arglist: [e, g]
+            output_unit: m^2
+        log:
+            func: !import 'math.log'
+            output: m
+            arglist: [c, b]
+    instructions:
+        test1:
+            grouped_edges:
+            - [add, [subtract, power, log]]
+            - [[subtract, power], multiply]
+            returns: [k]
+        test2:
+            grouped_edges:
+            - [add, [subtract, power, log]]
+            doc: Shortened graph.
+            returns: [c, m]
+    settings:
+        components:
+            replace_obj: [[a, a1], [b, b1]]
+        doc: Global docstring.
+        defaults:
+            h: 2
+    """
+    return dedent(yaml_str)
+
+
+### Test Loader ###
 
 
 def test_import_object():
@@ -22,68 +218,43 @@ def test_import_object():
 def test_import_object_error():
     """Test if it raises an error when the object is not found."""
 
-    with pytest.raises(ModuleNotFoundError, match="Cannot import 'module.addition'."):
+    with pytest.raises(ModuleNotFoundError, match="No module named 'module.addition'"):
         import_object("module.addition")
 
 
-def test_graph_constructor(experiment):
-    """Test the graph constructor parsing the graph correctly."""
-    graph_yaml = """
-    # graph tag
-    !Graph
-    name: test_graph
-    grouped_edges:
-        - [add, [subtract, power, log]]
-        - [[subtract, power], multiply]
-    node_objects:
-        add:
-            func: !import numpy.add
-            output: c
-            arglist: [a, h]
-        subtract:
-            func: !import operator.sub
-            output: e
-            arglist: [c, d]
-        power:
-            func: !import math.pow
-            output: g
-            arglist: [c, f]
-        multiply:
-            func: !import numpy.multiply
-            output: k
-            arglist: [e, g]
-            output_unit: m^2
-        log:
-            func: !import math.log
-            output: m
-            arglist: [c, b]
+def test_graph_constructor(experiment, graph_yaml_str):
+    """Test the graph constructor parsing the graph correctly.
+
+    If the node function is a lambda, skip the function comparison because
+    the functions are not the same.
     """
 
-    graph = yaml.load(dedent(graph_yaml), MrfmSimLoader)
+    graph = yaml.load(graph_yaml_str, MrfmSimLoader)
 
     # Check if the two graphs are the same
     # however the function is directly parsed. Therefore
     # we can only check if the function names are the same.
 
+    assert graph.name == "test_graph"
+    assert graph.graph["type"] == "mrfmsim"
     assert list(graph.nodes) == list(experiment.graph.nodes)
     assert graph.edges == graph.edges
 
-    for nodes, attrs in graph.nodes.items():
+    for node, attrs in graph.nodes.items():
         config_dict = attrs["node_object"].__dict__
-        graph_dict = experiment.graph.nodes[nodes]["node_object"].__dict__
+        parsed_dict = attrs["node_object"]._mapped_parameters
+        expt_dict = experiment.graph.nodes[node]["node_object"]._mapped_parameters
 
-        assert (
-            config_dict.pop("_base_func").__dict__
-            == graph_dict.pop("_base_func").__dict__
-        )
-        assert (
-            config_dict.pop("_node_func").__dict__
-            == graph_dict.pop("_node_func").__dict__
-        )
-        assert config_dict == graph_dict
+        if isinstance(config_dict["func"], types.LambdaType):
+
+            parsed_dict.pop("func")
+            expt_dict.pop("func")
+            assert config_dict["doc"] == "lambda a, h: a + h"
+
+        assert parsed_dict == expt_dict
 
 
-def test_func_constructor():
+def test_lambda_func_constructor():
     """Test if it can load lambda function correctly."""
 
     lambda_yaml = """\
@@ -93,6 +264,8 @@ def test_func_constructor():
     lambda_func = yaml.load(dedent(lambda_yaml), MrfmSimLoader)
     assert lambda_func(1, 2) == 3
     assert lambda_func.__name__ == "test"
+    assert lambda_func.__expr__ == "lambda a, b: a + b"
+    assert lambda_func.__doc__ == "lambda a, b: a + b"
 
 
 def test_import_multi_obj_constructor():
@@ -109,56 +282,6 @@ def test_import_multi_obj_constructor():
     assert dataobj.b == "test"
 
 
-@pytest.fixture
-def expt_file(tmp_path):
-    """Create a custom module for testing."""
-
-    expt_yaml = """\
-    !Experiment
-    name: test_experiment
-    graph:
-        !Graph
-        name: test_graph
-        grouped_edges:
-            - [add, [subtract, power, log]]
-            - [[subtract, power], multiply]
-        node_objects:
-            add:
-                func: !func:add "lambda a, h: a + h"
-                doc: Add a and h.
-                arglist: [a, h]
-                output: c
-            subtract:
-                func: !import operator.sub
-                output: e
-                arglist: [c, d]
-            power:
-                func: !import math.pow
-                output: g
-                arglist: [c, f]
-            multiply:
-                func: !import numpy.multiply
-                output: k
-                arglist: [e, g]
-                output_unit: m^2
-            log:
-                func: !import math.log
-                output: m
-                arglist: [c, b]
-    components: {comp: [[a, a1], [b, b1]]}
-    doc: Test experiment with components.
-    modifiers: [!import:mmodel.modifier.loop_input {parameter: d}]
-    defaults:
-        h: 2
-    """
-
-    expt_yaml = dedent(expt_yaml)
-
-    module_path = tmp_path / "expt.yaml"
-    module_path.write_text(expt_yaml)
-    return module_path
-
-
 def test_parse_yaml_file(expt_file):
     """Test if the YAML file is parsed correctly."""
 
@@ -168,63 +291,26 @@ def test_parse_yaml_file(expt_file):
     assert expt.name == "test_experiment"
     assert expt.doc == "Test experiment with components."
     assert expt.graph.name == "test_graph"
-    assert expt(comp=SNs(a1=1, b1=2), d_loop=[1, 2], f=2) == [
+    assert expt(replace_obj=SNs(a1=1, b1=2), d_loop=[1, 2], f=2) == [
         (18, math.log(3, 2)),
         (9, math.log(3, 2)),
     ]
-    assert expt(comp=SNs(a1=1, b1=2), d_loop=[1, 2], f=2, h=3) == [(48, 2), (32, 2)]
+    assert expt(replace_obj=SNs(a1=1, b1=2), d_loop=[1, 2], f=2, h=3) == [
+        (48, 2),
+        (32, 2),
+    ]
     assert expt.defaults == {"h": 2}  # check default is an int
-    assert expt.get_node_object("add").doc == "Add a and h."
+    # assert expt.get_node_object("add").doc == "Add a and h."
     assert expt.get_node_object("add").__name__ == "add"
+    func = expt.get_node_object("add")._base_func
+    assert func.__name__ == "add"
+    assert func.__doc__ == "lambda a, h: a + h"
 
 
-def test_collection_constructor():
-    yaml_str = """\
-    !Collection
-    name: test_collection
-    doc: Test collection object.
-    node_objects:
-        add:
-            func: !func:add "lambda a, h: a + h"
-            doc: Add a and h.
-            arglist: [a, h]
-            output: c
-        subtract:
-            func: !import operator.sub
-            output: e
-            arglist: [c, d]
-        power:
-            func: !import math.pow
-            output: g
-            arglist: [c, f]
-        multiply:
-            func: !import numpy.multiply
-            output: k
-            arglist: [e, g]
-            output_unit: m^2
-        log:
-            func: !import math.log
-            output: m
-            arglist: [c, b]
-    instructions:
-        test1:
-            grouped_edges:
-                - [add, [subtract, power, log]]
-                - [[subtract, power], multiply]
-            returns: [k]
-        test2:
-            grouped_edges:
-                - [add, [subtract, power, log]]
-            doc: Shortened graph.
-            returns: [c, m]
-    settings:
-        components: {comp: [[a, a1], [b, b1]]}
-        doc: Global docstring.
-        defaults:
-            h: 2
-    """
+def test_collection_constructor(collection_yaml_str):
+    """Test if the collection is loaded correctly."""
 
-    collection = yaml.load(dedent(yaml_str), MrfmSimLoader)
+    collection = yaml.load(collection_yaml_str, MrfmSimLoader)
 
     assert collection.name == "test_collection"
     assert collection.doc == "Test collection object."
@@ -237,7 +323,111 @@ def test_collection_constructor():
     ]
 
     assert collection["test1"].doc == "Global docstring."
-    assert collection["test1"](comp=SNs(a1=1, b1=2), d=1, f=2) == 18
+    assert collection["test1"](replace_obj=SNs(a1=1, b1=2), d=1, f=2) == 18
 
     assert collection["test2"].doc == "Shortened graph."
-    assert collection["test2"](comp=SNs(a1=1, b1=2), d=1, f=2) == (3, math.log(3, 2))
+    assert collection["test2"](replace_obj=SNs(a1=1, b1=2), d=1, f=2) == (
+        3,
+        math.log(3, 2),
+    )
+
+
+### Test Dumper ###
+
+
+def test_func_representer():
+    """Test if the function is dumped correctly."""
+
+    dumper = yaml_dumper(
+        [
+            (types.FunctionType, func_representer),
+            (types.BuiltinFunctionType, func_representer),
+        ]
+    )
+
+    func = lambda a, b: a + b
+    yaml_str = yaml.dump(operator.add, Dumper=dumper)
+    assert yaml_str == "!import '_operator.add'\n"
+
+
+def test_func_representer_numba():
+    """Test if the numba function is dumped correctly."""
+
+    dumper = yaml_dumper([(nb.core.registry.CPUDispatcher, func_representer)])
+
+    @nb.jit
+    def add(a, b):
+        return a + b
+
+    yaml_str = yaml.dump(add, Dumper=dumper)
+    # current module name would be the test module
+    assert yaml_str == "!import 'tests.test_configuration.add'\n"
+
+
+def test_ufunc_representer():
+    """Test if the numpy ufunc is dumped correctly."""
+
+    dumper = yaml_dumper([(np.ufunc, ufunc_representer)])
+
+    func = np.add
+    yaml_str = yaml.dump(func, Dumper=dumper)
+    assert yaml_str == "!import 'numpy.add'\n"
+
+
+def test_mixed_list_representation():
+    """Test if the list is represented correctly."""
+
+    dumper = yaml_dumper([(list, list_representer), (BlockList, blocklist_representer)])
+
+    nested_rep = {"block": BlockList(["i", "j", "k"]), "list": ["i", "j", "k"]}
+
+    yaml_str = """\
+    block:
+    - i
+    - j
+    - k
+    list: [i, j, k]
+    """
+
+    yaml_dump_str = yaml.dump(nested_rep, Dumper=dumper)
+    assert yaml_dump_str == dedent(yaml_str)
+
+
+def test_graph_dumper(modelgraph, graph_yaml_str):
+    """Test if the graph is dumped correctly."""
+
+    yaml_dump_str = yaml.dump(
+        modelgraph, Dumper=MrfmSimDumper, sort_keys=False, indent=4
+    )
+    assert yaml_dump_str == graph_yaml_str
+
+
+def test_dumper(experiment, expt_yaml_str):
+    """Test if the experiment is dumped correctly."""
+
+    yaml_dump_str = yaml.dump(
+        experiment, Dumper=MrfmSimDumper, sort_keys=False, indent=4
+    )
+    assert yaml_dump_str == expt_yaml_str
+
+
+def test_dump_additional_info(experiment_mod, expt_mod_yaml_str):
+    """Test if the experiment with additional information is dumped correctly."""
+
+    yaml_dump_str = yaml.dump(
+        experiment_mod, Dumper=MrfmSimDumper, sort_keys=False, indent=4
+    )
+
+    assert yaml_dump_str == expt_mod_yaml_str
+
+
+def test_collection_dumper(collection_yaml_str):
+    """Test if the collection is dumped correctly."""
+
+    collection = yaml.load(collection_yaml_str, MrfmSimLoader)
+
+    yaml_dump_str = yaml.dump(
+        collection, Dumper=MrfmSimDumper, sort_keys=False, indent=4
+    )
+
+    assert yaml_dump_str == collection_yaml_str

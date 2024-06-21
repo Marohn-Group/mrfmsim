@@ -4,7 +4,6 @@ The configuration file provides several default graph fixtures
 and test functions.
 """
 
-
 import pytest
 import math
 from mmodel.modifier import loop_input
@@ -29,11 +28,19 @@ def modelgraph():
         (["subtract", "power"], "multiply"),
     ]
 
+    # Lambda node object
+    add = lambda a, h: a + h
+    add.__expr__ = "lambda a, h: a + h"
+    add.__name__ = "add"
+    add_node = Node("add", add, output="c")
+
     node_objects = [
-        Node("add", np.add, arglist=["a", "h"], output="c"),
+        add_node,
         Node("subtract", operator.sub, arglist=["c", "d"], output="e"),
         Node("power", math.pow, arglist=["c", "f"], output="g"),
-        Node("multiply", np.multiply, arglist=["e", "g"], output="k", output_unit="m^2"),
+        Node(
+            "multiply", np.multiply, arglist=["e", "g"], output="k", output_unit="m^2"
+        ),
         Node("log", math.log, arglist=["c", "b"], output="m"),
     ]
 
@@ -57,7 +64,7 @@ def experiment_mod(modelgraph):
     return Experiment(
         "test_experiment",
         modelgraph,
-        components={"component": [("a", "a1"), ("b", "b1")]},
+        components={"replace_obj": [("a", "a1"), ("b", "b1")]},
         modifiers=[loop_input(parameter="d")],
         doc="Test experiment with components.",
         defaults={"h": 2},

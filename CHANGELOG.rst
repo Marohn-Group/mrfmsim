@@ -18,6 +18,12 @@ Changed
   at the module level.
 - Change the plugin system to lazy import the modules and attributes.
 
+Added
+^^^^^
+
+- Add the representations of Graph, Experiment, and Collection into yaml strings.
+- Add ConfigBase class to store construction parameters at instantiation.
+
 
 [0.2.0]
 -------------------------
