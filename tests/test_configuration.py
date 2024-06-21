@@ -51,7 +51,7 @@ def graph_yaml_str():
             arglist: [e, g]
             output: k
             output_unit: m^2
-    type: mrfmsim
+    graph_type: mrfmsim
     """
     return dedent(graph_yaml)
 
@@ -90,7 +90,7 @@ def expt_yaml_str():
                 arglist: [e, g]
                 output: k
                 output_unit: m^2
-        type: mrfmsim
+        graph_type: mrfmsim
     defaults:
         h: 2
     """
@@ -131,7 +131,7 @@ def expt_mod_yaml_str():
                 arglist: [e, g]
                 output: k
                 output_unit: m^2
-        type: mrfmsim
+        graph_type: mrfmsim
     components:
         replace_obj: [[a, a1], [b, b1]]
     modifiers: [!import:mmodel.modifier.loop_input {parameter: d}]
@@ -236,7 +236,7 @@ def test_graph_constructor(experiment, graph_yaml_str):
     # we can only check if the function names are the same.
 
     assert graph.name == "test_graph"
-    assert graph.graph["type"] == "mrfmsim"
+    assert graph.graph["graph_type"] == "mrfmsim"
     assert list(graph.nodes) == list(experiment.graph.nodes)
     assert graph.edges == graph.edges
 
