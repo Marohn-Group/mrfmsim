@@ -1,5 +1,6 @@
 import mmodel
 from mmodel.metadata import MetaDataFormatter, nodeformatter
+from mrfmsim.utility import ConfigBase
 
 _meta_order = [
     "name",
@@ -20,7 +21,9 @@ mrfm_nodeformatter = MetaDataFormatter(
 )
 
 
-class Node(mmodel.Node):
+class Node(mmodel.Node, ConfigBase):
+    """Node object with mrfmsim metadata formatting."""
+
     def __str__(self):
         """Modify the string representation to include unit."""
         return mrfm_nodeformatter(self)

@@ -2,10 +2,12 @@
 
 The class inherits from ``mmodel.Model`` class to add certain functionality and defaults.
 """
+
 from mmodel import MemHandler, Model
 from mrfmsim.modifier import replace_component
 import networkx as nx
 from mmodel.metadata import MetaDataFormatter, modelformatter, format_dictargs
+from mrfmsim.utility import ConfigBase
 
 # adjust model formatter for metadata output
 _format_dict = modelformatter.format_dict.copy()
@@ -31,7 +33,7 @@ exptformatter = MetaDataFormatter(
 )
 
 
-class Experiment(Model):
+class Experiment(Model, ConfigBase):
     """Experiment class for mrfmsim.
 
     The class inherits from mmodel.Model with minor modifications.
