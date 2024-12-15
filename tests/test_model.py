@@ -41,3 +41,12 @@ def test_experiment_execution(experiment_mod, experiment):
         (8, 1),
         (0, 1),
     ]
+
+def test_experiment_component_deepcopy(experiment_mod):
+    """Test the experiment components are deepcopied."""
+
+    components = experiment_mod.components
+    components["replace_obj"].append(("c", "c1"))
+
+    assert components['replace_obj'] == [('a', 'a1'), ('b', 'b1'), ('c', 'c1')]
+    assert experiment_mod.components['replace_obj'] == [('a', 'a1'), ('b', 'b1')]

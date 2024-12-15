@@ -48,13 +48,50 @@ class TestReplaceComponent:
             ", 'obj2': [('c', 'c2'), 'd']})"
         )
 
+    # test name duplication behaviors
+
     def test_duplicated_parameter(self, func):
         """Test component parameter already exists in function."""
 
+        def func(a, b, obj):
+            return a + b, obj
+
         with pytest.raises(
-            AssertionError, match="Parameter 'a' is already in the signature"
+            AssertionError, match="Parameter 'obj' is already in the signature"
         ):
-            replace_component({"a": [("b", "a")]})(func)
+            replace_component({"obj": ["a", "b"]})(func)
+
+    def test_self_parameter(self, func):
+        """Test component parameter with duplicated component name.
+
+        THe function should allow signature that already exists.
+        """
+
+        def func(a, b, obj):
+            return a + b, obj
+
+        mod = replace_component({"obj": ["a", "b"]}, True)
+        sig_parameters = list(inspect.signature(mod(func)).parameters.keys())
+        assert sig_parameters == ["obj"]
+
+    def test_self_parameter_with_duplicated(self, func):
+        """Test component parameter with duplicated attribute.
+
+        The function should raise an error.
+        """
+
+        def func(a, b, obj):
+            return a + b, obj
+
+        with pytest.raises(
+            ValueError, match="Parameter 'obj' name is the same as attribute."
+        ):
+            replace_component({"obj": ["a", "b", "obj"]}, True)(func)
+
+        with pytest.raises(
+            ValueError, match="Parameter 'obj' name is the same as attribute."
+        ):
+            replace_component({"obj": ["a", "b", "obj"]}, False)(func)
 
 
 class TestPrintModifiers:

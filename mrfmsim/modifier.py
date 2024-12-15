@@ -8,11 +8,57 @@ from collections import defaultdict
 from mmodel.modifier import modifier
 
 
-def replace_component(replacement: dict):
+def replace_component(replacement: dict, allow_duplicate=False):
     """Modify the signature with components.
 
     The modifier modifies the internal model function. The wrapper
-    function is keyword-only.
+    function is keyword-only. The function by default does not
+    allow duplicated signature. If we want to replace several
+    atrributes with a component, the component name cannot exist
+    in the original signature. For example, if we have a function
+
+        def func(a, b, obj):
+            return a + b, obj
+
+    and we want to replace a and b with a component, we cannot
+    name the component "obj".
+
+    In rares that we do want to replace a, b with a component,
+
+        def func(obj):
+            return obj.a + obj.b, obj
+
+        func(obj=obj)
+
+    we would have to use "obj_obj" as the component name. The
+    result function is equivalent to
+
+        def func(obj_obj, obj):
+            return obj_obj.a + obj_obj.b + obj
+
+        func(obj_obj=obj, obj=obj)
+
+    The behavior is very confusing to users. The solution is to
+    replace the components, but leave the original "obj" signature
+    as it is. In the final signature, the duplicated signatures
+    are combined into one. The solution here is to add a boolean
+    flag allow_duplicate. If the flag is set to True, the function
+    allows duplicated signatures.
+
+    The solution, however, leaves another ambiguity. If we indeed
+    want to replace the component with the same name, but use
+    the original name with an attribute:
+
+        def func(obj):
+            return obj.a + obj.b, obj.obj
+
+        func(obj=obj)
+
+    We have decided that this behavior is not allowed regardless the flag.
+    Becuase in this case, in an inspection attempt, it is confusing to
+    understand if the obj is the original obj or an attribute to the new obj.
+    In this case, a new object name should be used.
+
 
     :param dict[list | str] replacement: in the format of
         {component: [[original, replacement], original ...}
@@ -25,10 +71,6 @@ def replace_component(replacement: dict):
         new_params_dict = dict(params)  # mutable
         replacement_dict = defaultdict(list)
         for comp, rep_list in replacement.items():
-            assert (
-                comp not in params
-            ), f"Parameter {repr(comp)} is already in the signature."
-            new_params_dict[comp] = Parameter(comp, 1)
 
             for element in rep_list:
                 if isinstance(element, str):
@@ -37,7 +79,21 @@ def replace_component(replacement: dict):
                 else:
                     attr = element[0]
                     replacement_dict[comp].append(element)
+                # check attr
+                # the error is related to the component dictionary
+                # definition, regardless of the target function signature
+                if attr == comp:
+                    raise ValueError(
+                        f"Parameter {repr(comp)} name is the same as attribute."
+                    )
                 new_params_dict.pop(attr, None)
+
+            if not allow_duplicate:
+                # check duplication last
+                assert (
+                    comp not in params
+                ), f"Parameter {repr(comp)} is already in the signature."
+            new_params_dict[comp] = Parameter(comp, 1)
 
         @wraps(func)
         def wrapped(**kwargs):
