@@ -92,11 +92,11 @@ class TestXTrapzFxDtheta:
         # range from -pi, 0
         integral = xtrapz_fxdtheta(method, ogrid, trapz_pts, [-np.pi, 0], x0)
         assert integral.shape == (3,)
-        assert np.allclose(integral, (0, 0, 0), rtol=1e-3)
+        assert pytest.approx(integral, 1e-3) == (0, 0, 0)
 
         # range from -pi/2, 0
         integral = xtrapz_fxdtheta(method, ogrid, trapz_pts, [-np.pi / 2, 0], x0)
-        assert np.allclose(integral, (3, 3, 3), rtol=1e-3)
+        assert pytest.approx(integral, 1e-3) == (3, 3, 3)
 
     def test_xtrapz_xtrapz_fxdtheta_xcos(self):
         r"""Test xtrapz_fxdtheta against :math: `x \cos{x}`.
@@ -123,15 +123,19 @@ class TestXTrapzFxDtheta:
         # range from -pi/2, 0
         integral = xtrapz_fxdtheta(method, ogrid, trapz_pts, [-np.pi / 2, 0], x0)
         assert integral.shape == (3,)
-        assert np.allclose(
-            integral, (-9 * np.pi / 4, 3 - 9 * np.pi / 4, 6 - 9 * np.pi / 4), rtol=5e-3
+        assert pytest.approx(integral, 5e-3) == (
+            -9 * np.pi / 4,
+            3 - 9 * np.pi / 4,
+            6 - 9 * np.pi / 4,
         )
 
         # range from -pi, 0
         integral = xtrapz_fxdtheta(method, ogrid, trapz_pts, [-np.pi, 0], x0)
         assert integral.shape == (3,)
-        assert np.allclose(
-            integral, (-9 / 2 * np.pi, -9 / 2 * np.pi, -9 / 2 * np.pi), rtol=5e-3
+        assert pytest.approx(integral, 5e-3) == (
+            -9 / 2 * np.pi,
+            -9 / 2 * np.pi,
+            -9 / 2 * np.pi,
         )
 
     def test_xtrapz_xtrapz_fxdtheta_x2cos(self):
@@ -159,14 +163,12 @@ class TestXTrapzFxDtheta:
         # range from -pi/2, 0
         integral = xtrapz_fxdtheta(method, ogrid, trapz_pts, [-np.pi / 2, 0], x0)
         assert integral.shape == (3,)
-        assert np.allclose(
-            integral, (18, 21 - 9 / 2 * np.pi, 30 - 9 * np.pi), rtol=5e-3
-        )
+        assert pytest.approx(integral, 5e-3) == (18, 21 - 9 / 2 * np.pi, 30 - 9 * np.pi)
 
         # range from -pi, 0
         integral = xtrapz_fxdtheta(method, ogrid, trapz_pts, [-np.pi, 0], x0)
         assert integral.shape == (3,)
-        assert np.allclose(integral, (0, -9 * np.pi, -18 * np.pi), rtol=5e-3)
+        assert pytest.approx(integral, 5e-3) == (0, -9 * np.pi, -18 * np.pi)
 
     def test_xtrapz_fxdtheta_multidim(self):
         r"""Test xtrapz_fxdtheta against :math: `x \cos{x}` for multi-dimensions."""
@@ -182,15 +184,11 @@ class TestXTrapzFxDtheta:
         # range from -pi/2, 0
         integral = xtrapz_fxdtheta(method, ogrid, trapz_pts, [-np.pi / 2, 0], x0)
         assert integral.shape == (3, 2)
-        assert np.allclose(
-            integral,
-            [
-                [-np.pi / 4, 0.5 - np.pi / 4],
-                [1 - np.pi / 4, 1.5 - np.pi / 4],
-                [2 - np.pi / 4, 2.5 - np.pi / 4],
-            ],
-            rtol=5e-3,
-        )
+        assert pytest.approx(integral, 5e-3) == [
+            [-np.pi / 4, 0.5 - np.pi / 4],
+            [1 - np.pi / 4, 1.5 - np.pi / 4],
+            [2 - np.pi / 4, 2.5 - np.pi / 4],
+        ]
 
 
 class TestXTrapzFieldGradient:
@@ -226,12 +224,12 @@ class TestXTrapzFieldGradient:
         real = -magnet.Bzxx_method(*grid.grid_array)
 
         assert gradient.shape == (3, 2, 1)
-        assert np.allclose(gradient, real, atol=1e-6)
+        assert pytest.approx(gradient, 1e-6) == real
 
     def test_xtrapz_field_gradient_large_distance(self):
         """Test gradient against a large tip-sample separation.
 
-        When the distance is very large, the change of Bzx in between the 
+        When the distance is very large, the change of Bzx in between the
         grid points are small.
         """
 
@@ -253,7 +251,7 @@ class TestXTrapzFieldGradient:
         )
 
         real = -magnet.Bzxx_method(*grid.grid_array)
-        assert np.allclose(gradient, real, atol=1e-6)
+        assert pytest.approx(gradient, 1e-3) == real
 
 
 def test_field_func():

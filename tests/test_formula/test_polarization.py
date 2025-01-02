@@ -30,7 +30,7 @@ def test_rel_dpol_sat_steadystate(sample_e):
     # polarized
     p3 = pol.rel_dpol_sat_steadystate(100.0, 1.0e-3, sample_e.dB_sat, sample_e.dB_hom)
 
-    assert np.allclose([0.0, -1.0, 0.0], [p1, p2, p3])
+    assert pytest.approx([0.0, -1.0, 0.0], abs=1e-10) == [p1, p2, p3]
 
 
 def test_rel_dpol_ibm_cyclic(sample_h):
@@ -47,7 +47,7 @@ def test_rel_dpol_ibm_cyclic(sample_h):
     # above resonance
     n3 = pol.rel_dpol_ibm_cyclic(100.0, 2.0e6, sample_h.Gamma)
 
-    assert np.allclose([n1, n2, n3], [-1.0, 0.0, 0.0])
+    assert pytest.approx([n1, n2, n3], abs=1e-10) == [-1.0, 0.0, 0.0]
 
 
 def test_rel_dpol_nut(sample_h):
@@ -66,7 +66,7 @@ def test_rel_dpol_nut(sample_h):
     # pi pulse
     rpol_180 = pol.rel_dpol_nut(0.0, 1.0, sample_h.Gamma, 0.50 * rabi * 1.0e-6)
 
-    assert np.allclose([rpol_090, rpol_180], [-1.0, -2.0])
+    assert pytest.approx([rpol_090, rpol_180], abs=1e-10) == [-1.0, -2.0]
 
 
 def test_rel_dpol_arp(sample_h):
@@ -84,7 +84,7 @@ def test_rel_dpol_arp(sample_h):
 
     rpol_0 = pol.rel_dpol_arp(10000.0, 0.1, 0.1, sample_h.Gamma)
 
-    assert np.isclose(0.0, rpol_0)
+    assert pytest.approx(0.0, abs=5e-10) == rpol_0
 
 
 def test_rel_dpol_periodic_irrad_cont(sample_e):
@@ -106,7 +106,7 @@ def test_rel_dpol_periodic_irrad_cont(sample_e):
     )
     rpol = pol.rel_dpol_sat_steadystate(0, 1.0, sample_e.dB_sat, sample_e.dB_hom)
 
-    assert np.isclose(rpol_cont, rpol)
+    assert pytest.approx(rpol_cont) == rpol
 
 
 def test_rel_dpol_periodic_irrad_no_irrad(sample_e):
@@ -119,7 +119,7 @@ def test_rel_dpol_periodic_irrad_no_irrad(sample_e):
         0, 1.0, sample_e.dB_sat, sample_e.dB_hom, sample_e.T1, t_on=0, t_off=2e-4
     )
 
-    assert np.equal(rpol_0, 0.0)
+    assert rpol_0 == 0.0
 
 
 def test_rel_dpol_periodic_irrad_off_res(sample_e):
@@ -139,7 +139,7 @@ def test_rel_dpol_periodic_irrad_off_res(sample_e):
         t_off=2e-4,
     )
 
-    assert np.isclose(rpol_off_res, 0.0)
+    assert pytest.approx(rpol_off_res, abs=5e-10) ==  0.0
 
 
 def test_rel_dpol_sat_td(sample_e):
@@ -231,7 +231,7 @@ def test_rel_dpol_multipulse_short(sample_e):
     """
 
     rpol = pol.rel_dpol_multipulse(-1, sample_e.T1, 0.001)
-    assert np.isclose(rpol, -1, atol=0.001)
+    assert pytest.approx(rpol, abs=0.001) == -1
 
 
 def test_rel_dpol_multipulse_long(sample_e):
@@ -242,4 +242,4 @@ def test_rel_dpol_multipulse_long(sample_e):
     """
 
     rpol = pol.rel_dpol_multipulse(-0.5, sample_e.T1, 500.0)
-    assert np.isclose(rpol, 0, atol=0.001)
+    assert pytest.approx(rpol, abs=0.001) == 0

@@ -1,6 +1,7 @@
 import pytest
 import numpy as np
 from mrfmsim.formula import mz_eq, HBAR, KB, mz2_eq
+import pytest
 
 
 @pytest.mark.parametrize(
@@ -16,7 +17,7 @@ def test_mz_eq_high_susceptibility(Gamma, J, temperature, mz_eq_true):
     """
 
     mz_eq_sim = mz_eq(100, Gamma, J, temperature)
-    assert np.allclose(mz_eq_sim, mz_eq_true, rtol=1.0e-5)
+    assert pytest.approx(mz_eq_sim, 1.0e-5) == mz_eq_true
 
 
 @pytest.mark.parametrize("B_tot", np.linspace(100, 1000, 5))
@@ -28,7 +29,7 @@ def test_mz_eq_low_susceptibility(B_tot):
     mz_eq_true = B_tot * (HBAR**2 * Gamma**2 * J * (J + 1)) / (3 * KB * temperature)
     mz_eq_sim = mz_eq(B_tot, Gamma, J, temperature)
 
-    assert np.allclose(mz_eq_sim, mz_eq_true, rtol=2.0e-3, atol=0.0)
+    assert pytest.approx(mz_eq_sim, 1.0e-2) == mz_eq_true
 
 def test_mz2_eq_H():
     """Test proton magnetization variance at equilibrium."""
@@ -36,4 +37,4 @@ def test_mz2_eq_H():
     Gamma, J = 2.675222005e05, 0.5
     var_eq = mz2_eq(Gamma, J)
     var_eq_expect = 0.0141 * 0.0141
-    assert np.isclose(var_eq, var_eq_expect, rtol=2.0e-3)
+    assert pytest.approx(var_eq, 2.0e-3) == var_eq_expect

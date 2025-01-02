@@ -1,6 +1,5 @@
 from mrfmsim.formula.math import slice_matrix, as_strided_x
 import numpy as np
-import pytest
 
 
 def test_slice_matrix():
