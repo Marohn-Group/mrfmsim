@@ -3,16 +3,12 @@ MrfmSim
 
 |GitHub version| |Unit tests| |DOI|
 
-MrfmSim is a Python framework for simulating magnetic resonance force microscopy (MRFM)
+*mrfmsim* is a Python framework for simulating magnetic resonance force microscopy (MRFM)
 experiments. The package is based on the
 `mmodel <https://marohn-group.github.io/mmodel-docs/>`_ framework, which provides
-modular modeling capabilities for the experiments. The framework offers additional
-functionalities for interacting and modifying the experiment models, for example,
-scripting using YAML files, creating optimized loops, printing out intermediate
-results, and grouping experiments using experiment collections. The package also
-provides various features through the plugin system, including a command line interface,
-unit system, and three-dimensional plotting capabilities. The detailed API and the
-available plugins are `documented <https://marohn-group.github.io/mrfmsim-docs/>`__.
+modular modeling capabilities for the experiments. 
+*mrfmsim* extends the *mmodel* framework by adding physical models and calculations
+specific to MRFM experiments.
 
 
 Quickstart

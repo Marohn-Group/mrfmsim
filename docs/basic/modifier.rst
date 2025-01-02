@@ -1,15 +1,49 @@
-Shortcut
+Modifiers and shorcuts
 ======================
 
-The shortcuts are used to modify the Experiment/Model object directly. The 
-*mrfmsim* package provides the following shortcuts:
+*mrfmsim* adds additional modifiers and shortcuts specific to the experimental
+simulation to the *mmodel* modifiers. See
+`mmodel.modifier <https://marohn-group.github.io/mmodel-docs/ref_modifier.html>`_
+for details. 
+The shortcuts are used to modify the Experiment/Model object directly, which consists
+of applying modifiers to individual nodes or the model/experiment.
 
-- ``loop_shortcut``: loop over a parameter during the experiment execution. 
-  The shortcut finds the optimal location in the graph to create the 
-  subgraph and create the loop.
-- ``print_shortcut``: automatically apply ``print_inputs`` and 
-  ``print_output`` shortcuts to individual nodes that print out intermediate
-  variable values during node execution.
+
+List of modifiers and shortcuts for the *mrfmsim* and *mmodel* package.
+
+.. list-table::
+   :widths: 10 10 90
+   :header-rows: 1
+
+   * - Modifiers/Shorcuts
+     - Module
+     - Description
+   * - loop_input
+     - mmodel.modifier
+     - Modify function to iterate one given parameter.
+   * - zip_loop_inputs
+     - mmodel.modifier
+     - Modify function to iterate the parameters pairwise.
+   * - profile_time
+     - mmodel.modifier
+     - Profile the execution time of a function.
+   * - :mod:`print_inputs <mrfmsim.modifier.print_inputs>`
+     - :mod:`mrfmsim.modifier`
+     - Print the inputs of the function with units.
+   * - :mod:`print_output <mrfmsim.modifier.print_output>`
+     - :mod:`mrfmsim.modifier`
+     - Print the outputs of the function with units.
+   * - :mod:`replace_component <mrfmsim.modifier.replace_component>`
+     - :mod:`mrfmsim.modifier`
+     - Replace the component in the model.
+   * - :mod:`loop_shortcut <mrfmsim.shortcut.loop_shortcut>`
+     - :mod:`mrfmsim.shortcut`
+     - Loop over a parameter during the experiment execution. 
+   * - :mod:`print_shortcut <mrfmsim.shortcut.print_shortcut>`
+     - :mod:`mrfmsim.shortcut`
+     - Apply ``print_inputs`` and ``print_output`` shortcuts to individual nodes
+       that print out intermediate variable values during node execution.
+
 
 Loop Shortcut
 ----------------
@@ -128,6 +162,12 @@ the print-related shortcuts quickly. Users are encouraged to create
 additional nodes for monitoring the execution process, which can benefit from 
 the ``print_shortcut`` as well.
 
+:mod:`modifier` module
+----------------------
+
+.. automodule:: mrfmsim.modifier
+    :members:
+    :show-inheritance:
 
 :mod:`shortcut` module
 ----------------------

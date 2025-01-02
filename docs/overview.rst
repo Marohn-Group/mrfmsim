@@ -13,26 +13,16 @@ prototyping stages or other groups. To achieve the flexibility,
 we developed `mmodel <https://github.com/Marohn-Group/mmodel>`__ package as a
 backend for *mrfmsim*, allowing us to use directed acyclic 
 graphs (DAG) to define experiments. The graph backend allows modular experiment
-definition and fast modification to existing models. For a detailed explanation of 
-the "graph", "model", "modifier", and "shortcut" functionalities,
-see `mmodel documentation <https://github.com/Marohn-Group/mmodel-docs>`__. 
-The *mrfmsim* package offers additional functionalities for interacting and
-modifying the experiment models, for example,
-scripting using YAML files, creating optimized loops, printing out intermediate
-results, and grouping experiments using experiment collections. The package also
-provides various features through the plugin system, including a command line interface,
-unit system, and three-dimensional plotting capabilities.
+definition and fast modification to existing models. 
+*mrfmsim* extends the *mmodel* framework by adding physical models and calculations
+specific to MRFM experiments.
 
 Examples
 --------
 
 Here, we use a Cornell-style CERMIT ESR experiment as an example
-(see 
-`mrfmsim-marohn documentation <https://github.com/Marohn-Group/mrfmsim-marohn-docs>`__ 
-for the explanation of the experiment). The notebook with all the codes on this page is
-available at
+The notebook with all the codes on this page is available at
 :download:`mrfmsim_overview </_downloads/mrfmsim_overview.ipynb>`.
-The *mrfmsim-marohn* package is required for the following examples.
 
 
 We define the necessary inputs for the experiment:
@@ -65,14 +55,7 @@ Graph representation and metadata
 
 The graph representation of the experiment allows us to visualize the steps of the 
 experiment easily. The metadata shows the experiment's signature, returns, description,
-and more. The *mrfmsim-marohn* package contains standalone experiment models and model
-collections. The standalone experiments can be directly imported, and experiments within
-the collection can be accessed using the experiment name as the key. 
-
-.. note::
-
-    The *mrfmsim-marohn* package is loaded as a plugin of the *mrfmsim* package.
-    The experiments are accessed through the ``mrfmsim.experiment`` module.
+and more. 
 
 To access a standalone experiment model:
 
@@ -92,19 +75,19 @@ To access a standalone experiment model:
     Simulate an IBM-style cyclic-inversion magnetic resonance force microscope
     experiment.
 
-To access an experiment model from a collection:
+To access an experiment model from a experiment group:
 
 .. code:: python
 
-    # print collection summary
-    # print(CermitESRCollection)
+    # print c summary
+    print(CermitESRGroup)
     # list experiments
-    # print(list(CermitESRCollection.experiments.keys()))
+    print(list(CermitESRGroup.experiments.keys()))
 
-    CermitESR = CermitESRCollection['CermitESR']
+    CermitESR = CermitESRGroup['CermitESR']
 
 To printout the metadata of the model:
-    
+
 .. code:: python
 
     >>> print(CermitESR)
@@ -120,7 +103,7 @@ To printout the metadata of the model:
     - grid: ['grid_array', ['grid_shape', 'shape'], ['grid_step', 'step'], [...]
     - cantilever: ['k2f_modulated']
 
-        CERMIT ESR experiment for a large tip.
+    CERMIT ESR experiment for a large tip.
 
 To draw the graph of the model:
 
@@ -155,9 +138,9 @@ inspect the run time of "minimum absolute x offset" and
 
 .. code:: python
 
-    >>> from mrfmsim.modifier import profile_time
-    >>> mods = CermitESR.get_node_object("rel_dpol").modifiers
-    >>> CermitESR_profile = CermitESR.edit_node("rel_dpol", modifiers=mods + [profile_time(10)])
+    >>> from mmodel.modifier import profile_time
+    >>> mods = CermitESR.get_node_object("rel_dpol sat").modifiers
+    >>> CermitESR_profile = CermitESR.edit_node("rel_dpol sat", modifiers=mods + [profile_time(10)])
     >>> signal = CermitESR_profile(B0, B1, cantilever, f_rf, grid, h, magnet, mw_x_0p, sample)
 
     rel_dpol_sat_steadystate - 10 loops, best of 1: 30.27 ms per loop

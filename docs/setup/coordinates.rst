@@ -4,7 +4,7 @@ Coordinates
 *mrfmsim* is flexible in setting up the coordinates for the simulation.
 Currently, the components that involve coordinates are the grid and the magnet.
 
-.. image:: _static/mrfmsim_coordinates.pdf
+.. image:: ../_static/mrfmsim_coordinates.pdf
     :width: 800px
     :align: center
 

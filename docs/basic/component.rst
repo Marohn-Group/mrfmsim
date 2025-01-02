@@ -1,19 +1,4 @@
-Component
-======================
-
-An MRFM experiment typically consists of several components, such as
-a resonator, a magnet, and a sample. The parameters and related calculations
-of components can be encapsulated into an object to simplify the input
-process.
-
-The ``ComponentBase`` class is an abstract ``dataclass`` with a
-formatted metadata output. It allows users to define the base unit
-of a parameter as a ``dataclass`` field. Python 
-`dataclass <https://docs.python.org/3.10/library/dataclasses.html>`_
-is used to simplify the definition process.
-
-
-Create a component class
+Components
 -----------------------------
 
 To create a component ``dataclass``, simply inherit from ``ComponentBase`` 

@@ -1,7 +1,7 @@
 Plugin features
 =================
 
-Here, we showcase several plugin packages. See :doc:`api_plugin` for more details.
+Here, we showcase several plugin packages.
 The plugin packages are automatically loaded if they are installed in the same
 environment as the *mrfmsim* package.
 
