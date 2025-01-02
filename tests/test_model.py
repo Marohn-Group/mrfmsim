@@ -2,6 +2,7 @@
 
 from types import SimpleNamespace
 from textwrap import dedent
+import pytest
 
 
 def test_experiment_str(experiment_mod, experiment):

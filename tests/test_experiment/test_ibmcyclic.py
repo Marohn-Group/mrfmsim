@@ -1,6 +1,7 @@
 from mrfmsim.experiment import IBMCyclic
 from mrfmsim.component import Grid, Sample, SphereMagnet
 import numpy as np
+import pytest
 
 
 class TestIBMCyclic:
@@ -24,9 +25,7 @@ class TestIBMCyclic:
             spin_density=1.0e9,
         )
         x_opt = 27.2507  # optimal lateral location [nm]
-        magnet = SphereMagnet(
-            radius=50.0, mu0_Ms=1800.0, origin=[x_opt, 0.0, 50.0]
-        )
+        magnet = SphereMagnet(radius=50.0, mu0_Ms=1800.0, origin=[x_opt, 0.0, 50.0])
         grid = Grid(
             shape=[2, 2, 2],
             step=[0.5e-3, 0.5e-3, 0.5e-3],
@@ -35,7 +34,7 @@ class TestIBMCyclic:
 
         _, dF_spin = IBMCyclic(B0, df_fm, f_rf, grid, h, magnet, sample)
 
-        assert np.isclose(dF_spin, -79.231, rtol=2e-2)
+        assert pytest.approx(dF_spin, 0.02) == -79.231
 
     def test_IBMCyclic_dF2_spin(self):
         """Test IBM cyclic force variance signal for nucleus.
@@ -50,9 +49,7 @@ class TestIBMCyclic:
             origin=[0, 0, -20],
         )
 
-        magnet = SphereMagnet(
-            radius=100.0, mu0_Ms=1800, origin=[0.0, 0.0, 100.0]
-        )
+        magnet = SphereMagnet(radius=100.0, mu0_Ms=1800, origin=[0.0, 0.0, 100.0])
 
         sample = Sample(spin="1H", temperature=4.2, T1=10, T2=5e-6, spin_density=49.0)
         B0 = 2630.5
@@ -62,4 +59,4 @@ class TestIBMCyclic:
 
         dF2_spin, _ = IBMCyclic(B0, df_fm, f_rf, grid, h, magnet, sample)
 
-        assert np.isclose(dF2_spin, -477.032, rtol=5e-4)
+        assert pytest.approx(dF2_spin, 5e-4) == -477.032

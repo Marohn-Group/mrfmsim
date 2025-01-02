@@ -1,5 +1,6 @@
 from mrfmsim.formula.misc import convert_grid_pts, sum_of_product
 import numpy as np
+import pytest
 
 
 def test_convert_grid_pts():

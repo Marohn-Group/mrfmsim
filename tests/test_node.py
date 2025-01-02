@@ -1,4 +1,5 @@
 from textwrap import dedent
+import pytest
 
 
 def test_node_str(experiment):

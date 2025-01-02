@@ -6,6 +6,7 @@ from mrfmsim.formula import (
     field_func,
 )
 import numpy as np
+import pytest
 
 
 def test_B_offset():

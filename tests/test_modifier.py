@@ -50,7 +50,7 @@ class TestReplaceComponent:
 
     # test name duplication behaviors
 
-    def test_duplicated_parameter(self, func):
+    def test_duplicated_parameter(self):
         """Test component parameter already exists in function."""
 
         def func(a, b, obj):
@@ -61,7 +61,7 @@ class TestReplaceComponent:
         ):
             replace_component({"obj": ["a", "b"]})(func)
 
-    def test_self_parameter(self, func):
+    def test_self_parameter(self):
         """Test component parameter with duplicated component name.
 
         THe function should allow signature that already exists.
@@ -74,7 +74,7 @@ class TestReplaceComponent:
         sig_parameters = list(inspect.signature(mod(func)).parameters.keys())
         assert sig_parameters == ["obj"]
 
-    def test_self_parameter_with_duplicated(self, func):
+    def test_self_parameter_with_duplicated(self):
         """Test component parameter with duplicated attribute.
 
         The function should raise an error.

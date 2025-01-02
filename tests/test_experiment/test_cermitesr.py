@@ -1,10 +1,4 @@
-from mrfmsim.component import (
-    SphereMagnet,
-    Grid,
-    Sample,
-    Cantilever,
-    RectangularMagnet,
-)
+from mrfmsim.component import SphereMagnet, Grid, Sample, Cantilever
 from mrfmsim.experiment import CermitESRGroup
 import numpy as np
 import pytest

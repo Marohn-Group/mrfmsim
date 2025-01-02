@@ -1,6 +1,5 @@
 from mrfmsim import formula
-from mrfmsim import Node, Graph, Experiment, ExperimentGroup
-import operator
+from mrfmsim import Node, ExperimentGroup
 from .stdnodes import STANDARD_NODES
 
 node_objects = [

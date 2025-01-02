@@ -2,8 +2,8 @@ from mrfmsim import Experiment, Graph, Node
 from mrfmsim import formula
 import operator
 
-"""For a single experiment, the nodes need to explicitly defined and 
-matched to the graph edges. The shared nodes are not used here."""
+# For a single experiment, the nodes need to explicitly defined and 
+# matched to the graph edges. The shared nodes are not used here.
 
 node_objects = [
     Node(

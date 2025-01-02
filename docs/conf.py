@@ -10,11 +10,12 @@ sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, os.path.abspath("../../mrfmsim"))
 sys.path.insert(0, os.path.abspath(".."))
 
+
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'mrfmsim'
-copyright = '2023 - 2025, Peter Sun'
+# copyright = '2023 - 2025, Peter Sun'
 author = 'Peter Sun'
 release = '0.3.0'
 
@@ -47,7 +48,7 @@ html_static_path = []
 
 from docutils.parsers.rst import Directive
 from docutils import nodes
-import importlib
+import mrfmsim.experiment
 
 class GroupDirective(Directive):
     """Discover all experiments in a group and output their string representation."""
@@ -58,12 +59,11 @@ class GroupDirective(Directive):
 
     def run(self):
 
-        name_list = self.arguments[0].split(".")
-        module = importlib.import_module(".".join(name_list[:-1]))
-        module = getattr(module, name_list[-1])
+        name_list = self.arguments[0].split(".") # e.g. mrfmsim.experiment.exptgroup
+        exptgroup = getattr(mrfmsim.experiment, name_list[-1])
         node_out = []
-        for expt in module.experiments:
-            child_node = nodes.literal_block(text=str(module.experiments[expt]))
+        for expt in exptgroup.experiments:
+            child_node = nodes.literal_block(text=str(exptgroup.experiments[expt]))
             node = nodes.list_item(
                 "", nodes.strong(text=f"{expt}"), child_node
             )
@@ -83,11 +83,10 @@ class ExperimentDirective(Directive):
 
     def run(self):
 
-        name_list = self.arguments[0].split(".")
-        module = importlib.import_module(".".join(name_list[:-1]))
-        module = getattr(module, name_list[-1])
+        name_list = self.arguments[0].split(".") # e.g. mrfmsim.experiment.expt
+        expt = getattr(mrfmsim.experiment, name_list[-1])
 
-        child_node = nodes.literal_block(text=str(module))
+        child_node = nodes.literal_block(text=str(expt))
         # the bullet_list doesn't do anything but create an indentation
         list_node = nodes.bullet_list("", child_node)
         return [list_node]
