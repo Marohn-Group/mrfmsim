@@ -10,20 +10,17 @@ and this project adheres to
 [Unreleased]
 ------------
 
-Changed
+Update the API to use the latest version of the mmodel package (0.8.0+).
+
+Removed
 ^^^^^^^
-- Change the plugin system from implicit to explicit loading. The user must
-  import the plugin package to load the plugin.
-- Change the plugin entry point syntax to allow endpoint and module attributes
-  at the module level.
-- Change the plugin system to lazy import the modules and attributes.
+- Remove the plugin system in favor of direct import of extension packages.
+- Remove the yaml configuration functionalities to the *mrfmsim-yaml* package.
+- Remove the collection module. The functionalities are moved to the group module.
 
 Added
 ^^^^^
-
-- Add the representations of Graph, Experiment, and Collection into yaml strings.
-- Add ConfigBase class to store construction parameters at instantiation.
-
+- Add Marohn group experiments. (From the previous *mrfmsim-marohn* package)
 
 [0.2.0]
 -------------------------
