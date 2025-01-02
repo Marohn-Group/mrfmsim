@@ -1,29 +1,42 @@
 import mmodel
-from mmodel.metadata import MetaDataFormatter, nodeformatter
-from mrfmsim.utility import ConfigBase
+from mmodel.metadata import (
+    MetaDataFormatter,
+    format_value,
+    format_func,
+    format_modifierlist,
+    format_shortdocstring,
+    wrapper80,
+)
 
-_meta_order = [
-    "name",
-    "_",
-    "node_func",
-    "output",
-    "output_unit",
-    "functype",
-    "modifiers",
-    "_",
-    "doc",
-]
-_format_dict = nodeformatter.format_dict.copy()
-# switch display name to return_unit
-_format_dict.update({"output_unit": lambda k, v: [f"return_unit: {v}"] if v else []})
-mrfm_nodeformatter = MetaDataFormatter(
-    _format_dict, _meta_order, nodeformatter.text_wrapper, ["modifiers"]
+nodeformatter = MetaDataFormatter(
+    {
+        "name": format_value,
+        "node_func": format_func,
+        "output": lambda k, value: [f"return: {value}"],
+        "modifiers": format_modifierlist,
+        "output_unit": lambda k, v: [f"return_unit: {v}"] if v else [],
+        "doc": format_shortdocstring,
+    },
+    [
+        "name",
+        "_",
+        "node_func",
+        "output",
+        "output_unit",
+        "functype",
+        "modifiers",
+        "_",
+        "doc",
+    ],
+    wrapper80,
+    ["modifiers"],
 )
 
 
-class Node(mmodel.Node, ConfigBase):
+class Node(mmodel.Node):
+    # class Node(mmodel.Node):
     """Node object with mrfmsim metadata formatting."""
 
     def __str__(self):
         """Modify the string representation to include unit."""
-        return mrfm_nodeformatter(self)
+        return nodeformatter(self)

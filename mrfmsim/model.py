@@ -3,38 +3,52 @@
 The class inherits from ``mmodel.Model`` class to add certain functionality and defaults.
 """
 
-from mmodel import MemHandler, Model
+import mmodel
 from mrfmsim.modifier import replace_component
 import networkx as nx
-from mmodel.metadata import MetaDataFormatter, modelformatter, format_dictargs
-from mrfmsim.utility import ConfigBase
+from mmodel.metadata import (
+    MetaDataFormatter,
+    format_dictargs,
+    format_func,
+    format_modifierlist,
+    format_obj_name,
+    format_returns,
+    format_value,
+    wrapper80,
+)
 import copy
 
-# adjust model formatter for metadata output
-_format_dict = modelformatter.format_dict.copy()
-_format_dict.update({"components": format_dictargs})
-_meta_order = [
-    "self",
-    "returns",
-    "return_units",
-    "collection",
-    "graph",
-    "handler",
-    "handler_kwargs",
-    "modifiers",
-    "components",
-    "_",
-    "doc",
-]
-exptformatter = MetaDataFormatter(
-    _format_dict,
-    _meta_order,
-    modelformatter.text_wrapper,
+
+experimentformatter = MetaDataFormatter(
+    {
+        "self": format_func,
+        "returns": format_returns,
+        "graph": format_obj_name,
+        "handler": format_obj_name,
+        "handler_kwargs": format_dictargs,
+        "modifiers": format_modifierlist,
+        "components": format_dictargs,
+        "doc": format_value,
+    },
+    [
+        "self",
+        "returns",
+        "return_units",
+        "group",
+        "graph",
+        "handler",
+        "handler_kwargs",
+        "modifiers",
+        "components",
+        "_",
+        "doc",
+    ],
+    wrapper80,
     ["modifiers", "components", "handler_kwargs"],
 )
 
 
-class Experiment(Model, ConfigBase):
+class Experiment(mmodel.Model):
     """Experiment class for mrfmsim.
 
     The class inherits from mmodel.Model with minor modifications.
@@ -46,7 +60,7 @@ class Experiment(Model, ConfigBase):
         self,
         name,
         graph,
-        handler=MemHandler,
+        handler=mmodel.MemHandler,
         handler_kwargs: dict = None,
         modifiers: list = None,
         returns: list = None,
@@ -89,10 +103,10 @@ class Experiment(Model, ConfigBase):
     @property
     def components(self):
         """Return a deepcopy of the components.
-        
+
         The values of the dictionary cotain lists.
         """
         return copy.deepcopy(self._components)
 
     def __str__(self):
-        return exptformatter(self)
+        return experimentformatter(self)

@@ -5,7 +5,7 @@ from inspect import Parameter, signature, Signature
 from pprint import pformat
 from string import Formatter
 from collections import defaultdict
-from mmodel.modifier import modifier
+import mmodel
 
 
 def replace_component(replacement: dict, allow_duplicate=False):
@@ -150,7 +150,7 @@ def print_inputs(format_str: str, **pargs):
     The names of the parameters are parsed from the format string.
     """
 
-    @modifier("print_inputs", format_str=format_str, **pargs)
+    @mmodel.modifier.modifier("print_inputs", format_str=format_str, **pargs)
     def stdout_inputs_modifier(func):
         inputs = parse_fields(format_str)
 
@@ -180,7 +180,7 @@ def print_output(format_str: str, **pargs):
     output field is allowed and the field name is used as the return name.
     """
 
-    @modifier("print_output", format_str=format_str, **pargs)
+    @mmodel.modifier.modifier("print_output", format_str=format_str, **pargs)
     def stdout_output_modifier(func):
         output = parse_fields(format_str)[0]
 
@@ -205,7 +205,7 @@ def numba_jit(**kwargs):
     Use the decorator the same way as numba.jit().
     """
 
-    @modifier("numba_jit", **kwargs)
+    @mmodel.modifier.modifier("numba_jit", **kwargs)
     def decorator(func):
         func = nb.jit(**kwargs)(func)
         return func

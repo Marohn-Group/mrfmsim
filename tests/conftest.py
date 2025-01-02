@@ -36,12 +36,12 @@ def modelgraph():
 
     node_objects = [
         add_node,
-        Node("subtract", operator.sub, arglist=["c", "d"], output="e"),
-        Node("power", math.pow, arglist=["c", "f"], output="g"),
+        Node("subtract", operator.sub, inputs=["c", "d"], output="e"),
+        Node("power", math.pow, inputs=["c", "f"], output="g"),
         Node(
-            "multiply", np.multiply, arglist=["e", "g"], output="k", output_unit="m^2"
+            "multiply", np.multiply, inputs=["e", "g"], output="k", output_unit="m^2"
         ),
-        Node("log", math.log, arglist=["c", "b"], output="m"),
+        Node("log", math.log, inputs=["c", "b"], output="m"),
     ]
 
     G = Graph(name="test_graph")
