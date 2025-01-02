@@ -94,7 +94,7 @@ To printout the metadata of the model:
 
     CermitESR(B0, B1, cantilever, f_rf, grid, h, magnet, mw_x_0p, sample)
     returns: df_spin
-    collection: CermitESR
+    group: CermitESR
     graph: CermitESR_graph
     handler: MemHandler
     components:
