@@ -1,9 +1,28 @@
-Plugin features
+Plugins
 =================
 
-Here, we showcase several plugin packages.
-The plugin packages are automatically loaded if they are installed in the same
-environment as the *mrfmsim* package.
+Ancillary features are added to the mrfmsim ecosystem through plugin packages.
+The separation of the core functionality and the plugins allows for an easy mantainance
+of the mrfmsim package. The core functionalities do not depend on the plugins.
+
+Command line interface plugin
+------------------------------
+
+The command line interface is provided by the `mrfmsim-cli
+<https://github.com/Marohn-Group/mrfmsim-cli>`__ plugin. See readme of the
+mrfmsim-cli project for more examples.
+
+To view the CLI options::
+
+    mrfmsim --help
+
+To show the experiment metadata::
+
+    mrfmsim metadata --expt name_of_exp
+
+To draw the experiment graph::
+
+    mrfmsim visualize --expt name_of_exp
 
 Unit Plugin
 ----------------------
@@ -50,25 +69,6 @@ to access the quantity with units.
     50.0 nm
     >>> r ** 2
     2500.0 nm^2
-
-Command line interface plugin
-------------------------------
-
-The command line interface is provided by the `mrfmsim-cli
-<https://github.com/Marohn-Group/mrfmsim-cli>`__ plugin.
-The plugin is installed by default.
-
-To view the CLI options::
-
-    mrfmsim --help
-
-To show the experiment metadata::
-
-    mrfmsim --exp name_of_exp metadata
-
-To draw the experiment graph::
-
-    mrfmsim --exp name_of_exp visualize
 
 Three-dimensional plot plugin
 ------------------------------
