@@ -7,9 +7,9 @@ SphereMagnet
 ------------
 
 All sphere magnets are tested using the parameters:
-r = 50.0 nm
+radius = 50.0 nm
 mu0_Ms = 1800.0 mT
-o = [0, 0, 0] nm
+origin = [0, 0, 0] nm
 
 Bz_method
 ^^^^^^^^^^
@@ -71,14 +71,15 @@ class TestSphereMagnet(MagnetTester):
     """Test SphereManget class."""
 
     magnet_str = """\
-    SphereMagnet(radius=50.0 nm
-    \torigin=[0.0, 0.0, 0.0] nm
-    \tmu0_Ms=1800.000 mT)"""
+    SphereMagnet
+      magnet_radius = 50.0 nm
+      magnet_origin = [0.0, 0.0, 0.0] nm
+      mu0_Ms = 1800.000 mT"""
 
     @pytest.fixture
     def magnet(self):
         """Instantiate a SphereManget instance."""
-        return SphereMagnet(radius=50.0, origin=[0.0, 0.0, 0.0], mu0_Ms=1800.0)
+        return SphereMagnet(magnet_radius=50.0, magnet_origin=[0.0, 0.0, 0.0], mu0_Ms=1800.0)
 
     @pytest.mark.parametrize(
         "x, y, z, theory",
@@ -126,17 +127,18 @@ class TestRectangularMagnet(MagnetTester):
     """Tests RectangularMagnet."""
 
     magnet_str = """\
-    RectangularMagnet(length=[40.0, 60.0, 100.0] nm
-    \torigin=[0.0, 0.0, 0.0] nm
-    \tmu0_Ms=1800.000 mT)"""
+    RectangularMagnet
+      magnet_length = [40.0, 60.0, 100.0] nm
+      magnet_origin = [0.0, 0.0, 0.0] nm
+      mu0_Ms = 1800.000 mT"""
 
     @pytest.fixture
     def magnet(self):
         """Instantiate a RectangularManget instance."""
 
         return RectangularMagnet(
-            length=[40.0, 60.0, 100.0],
-            origin=[0.0, 0.0, 0.0],
+            magnet_length=[40.0, 60.0, 100.0],
+            magnet_origin=[0.0, 0.0, 0.0],
             mu0_Ms=1800.0,
         )
 
@@ -175,7 +177,7 @@ class TestRectangularMagnet(MagnetTester):
         from the center of the magnet. (The unit of B is mT)
         """
         magnet = RectangularMagnet(
-            length=[10.0, 10.0, 1.0], mu0_Ms=1800.0, origin=[0.0, 0.0, 0.0]
+            magnet_length=[10.0, 10.0, 1.0], mu0_Ms=1800.0, magnet_origin=[0.0, 0.0, 0.0]
         )
         assert np.allclose(magnet.Bz_method(0, 0, 2), 134.23, rtol=1e-2)
 

@@ -23,7 +23,7 @@ def test_experiment_str(experiment_mod, experiment):
     modifiers:
     - loop_input(parameter='d')
     components:
-    - replace_obj: [('a', 'a1'), ('b', 'b1')]
+    - replace_obj: ['a', 'b']
 
     Test experiment with components."""
 
@@ -36,17 +36,18 @@ def test_experiment_execution(experiment_mod, experiment):
 
     assert experiment(0, 2, 1, 3, 2) == (8, 1)
 
-    replace_obj = SimpleNamespace(a1=0, b1=2)
+    replace_obj = SimpleNamespace(a=0, b=2)
     assert experiment_mod(d_loop=[1, 2], f=3, replace_obj=replace_obj) == [
         (8, 1),
         (0, 1),
     ]
 
+
 def test_experiment_component_deepcopy(experiment_mod):
     """Test the experiment components are deepcopied."""
 
     components = experiment_mod.components
-    components["replace_obj"].append(("c", "c1"))
+    components["replace_obj"].append("c")
 
-    assert components['replace_obj'] == [('a', 'a1'), ('b', 'b1'), ('c', 'c1')]
-    assert experiment_mod.components['replace_obj'] == [('a', 'a1'), ('b', 'b1')]
+    assert components["replace_obj"] == ["a", "b", "c"]
+    assert experiment_mod.components["replace_obj"] == ["a", "b"]

@@ -1,7 +1,7 @@
 from mrfmsim.group import ExperimentGroup
 from mrfmsim.node import Node
 from mrfmsim import formula
-from .stdnodes import STANDARD_NODES
+from .stdelements import STANDARD_NODES
 
 node_objects = [
     Node("minimum absolute x offset", func=formula.min_abs_offset, output="B_offset"),
@@ -74,9 +74,9 @@ components = {
     "sample": ["J", "Gamma", "spin_density", "temperature", "dB_sat", "dB_hom"],
     "grid": [
         "grid_array",
-        ["grid_shape", "shape"],
-        ["grid_step", "step"],
-        ["grid_voxel", "voxel"],
+        "grid_shape",
+        "grid_step",
+        "grid_voxel",
         "extend_grid_by_length",
     ],
     "cantilever": ["k2f_modulated"],

@@ -118,3 +118,10 @@ STANDARD_NODES = (
         doc="Convert the spring constant shift to frequency shift.",
     ),
 )
+
+STANDARD_COMPONENTS = {
+    "magnet": ["Bz_method", "Bzx_method", "Bzxx_method", "mu0_Ms", "magnet_origin", "magnet_radius"],
+    "sample": ["J", "Gamma", "spin_density", "temperature", "T1", "T2"],
+    "grid": ["grid_array", "grid_voxel", "grid_shape", "grid_step", "extend_grid_by_length"],
+    "cantilever": ["k2f_modulated"],
+}

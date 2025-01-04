@@ -59,9 +59,8 @@ def replace_component(replacement: dict, allow_duplicate=False):
     understand if the obj is the original obj or an attribute to the new obj.
     In this case, a new object name should be used.
 
-
-    :param dict[list | str] replacement: in the format of
-        {component: [[original, replacement], original ...}
+    :param dict[str] replacement: in the format of
+        {component_object: [replacement_attribute1, replacement_attribute2, ...]}
     """
 
     def modifier(func):
@@ -70,37 +69,46 @@ def replace_component(replacement: dict, allow_duplicate=False):
 
         new_params_dict = dict(params)  # mutable
         replacement_dict = defaultdict(list)
-        for comp, rep_list in replacement.items():
 
-            for element in rep_list:
-                if isinstance(element, str):
-                    attr = element
-                    replacement_dict[comp].append((attr, attr))
-                else:
-                    attr = element[0]
-                    replacement_dict[comp].append(element)
-                # check attr
-                # the error is related to the component dictionary
-                # definition, regardless of the target function signature
-                if attr == comp:
-                    raise ValueError(
-                        f"Parameter {repr(comp)} name is the same as attribute."
-                    )
-                new_params_dict.pop(attr, None)
+        # in the event that the duplication is allowed
+        # and the component is already in the signature
+        # the list is maintained for the wrapped function
+        duplicated_copmp = []
+        for comp, rep_attrs in replacement.items():
 
             if not allow_duplicate:
                 # check duplication last
                 assert (
                     comp not in params
-                ), f"Parameter {repr(comp)} is already in the signature."
-            new_params_dict[comp] = Parameter(comp, 1)
+                ), f"parameter {repr(comp)} already in the signature"
+
+            elif comp in params:
+                duplicated_copmp.append(comp)
+            # new_params_dict[comp] = Parameter(comp, 1)
+
+            for attr in rep_attrs:
+                # check attr
+                # the error is related to the component dictionary
+                # definition, regardless of the target function signature
+                if attr == comp:
+                    raise ValueError(
+                        f"attribute name cannot be the same as component {repr(comp)}"
+                    )
+                if attr in params:
+                    replacement_dict[comp].append(attr)
+                    new_params_dict.pop(attr, None)
+                    # overwrite if duplicated
+                    new_params_dict[comp] = Parameter(comp, 1)
 
         @wraps(func)
         def wrapped(**kwargs):
-            for comp, rep_list in replacement_dict.items():
-                comp_obj = kwargs.pop(comp)
-                for param, repl in rep_list:
-                    kwargs[param] = getattr(comp_obj, repl)
+            for comp, rep_attrs in replacement_dict.items():
+                if comp in duplicated_copmp:
+                    comp_obj = kwargs[comp]
+                else:
+                    comp_obj = kwargs.pop(comp)
+                for attr in rep_attrs:
+                    kwargs[attr] = getattr(comp_obj, attr)
 
             return func(**kwargs)
 

@@ -1,6 +1,7 @@
 """Base component class."""
 
 from dataclasses import dataclass, asdict
+import numpy as np
 
 
 @dataclass
@@ -20,11 +21,25 @@ class ComponentBase:
             format_ = self._get_metadata(k).get("format", ".3f")
             if isinstance(v, float):
                 # round the float values
-                str_lines.append(f"\t{k}={v:{format_}} {unit}".rstrip())
+                value = f"{v:{format_}}"
+            elif isinstance(v, (list, np.ndarray)):
+                # with np.set_printoptions(legacy="1.25", precision=3):
+                v = np.array(v)
+                value = np.array2string(
+                    v,
+                    suppress_small=True,
+                    separator=", ",
+                    formatter={"float": lambda x: f"{x:{format_}}"},
+                )
+            elif isinstance(v, str):
+                value = repr(v)
             else:
-                str_lines.append(f"\t{k}={str(v)} {unit}".rstrip())
+                value = v
 
-        return "{}({})".format(self.__class__.__name__, "\n".join(str_lines).strip())
+            str_lines.append(f"{k} = {value} {unit}".rstrip())
+        return "{}\n  {}".format(
+            self.__class__.__name__, "\n  ".join(str_lines).strip()
+        )
 
     def _get_metadata(self, attr):
         """Get the metadata for the attribute.

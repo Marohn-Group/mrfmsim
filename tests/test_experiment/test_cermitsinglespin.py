@@ -39,7 +39,7 @@ class TestCermitSinglespin:
         """Compare the numerical solution with the exact solution."""
 
         ogrid = np.ogrid[0:0:1j, 0:0:1j, 0:0:1j]
-        magnet = SphereMagnet(radius=3300.0, mu0_Ms=440.0, origin=[0, 3000, 0])
+        magnet = SphereMagnet(magnet_radius=3300.0, mu0_Ms=440.0, magnet_origin=[0, 3000, 0])
 
         approx = CermitSingleSpinApprox(
             magnet=magnet,
@@ -64,7 +64,7 @@ class TestCermitSinglespin:
         """Compare the numerical solution with the exact solution."""
 
         ogrid = np.ogrid[0:0:1j, 0:0:1j, 0:0:1j]
-        magnet = SphereMagnet(radius=3300.0, mu0_Ms=440.0, origin=[0, 0, 4000])
+        magnet = SphereMagnet(magnet_radius=3300.0, mu0_Ms=440.0, magnet_origin=[0, 0, 4000])
 
         approx = CermitSingleSpinApprox(
             magnet=magnet,

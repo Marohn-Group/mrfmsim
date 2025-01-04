@@ -16,7 +16,7 @@ class TestReplaceComponent:
         """Return a component modified function."""
 
         return replace_component(
-            {"obj1": ["a", ("b", "b1")], "obj2": [("c", "c2"), "d"]}
+            {"obj1": ["a", "b"], "obj2": ["c", "d"]}
         )
 
     @pytest.fixture
@@ -35,8 +35,8 @@ class TestReplaceComponent:
     def test_execution(self, func, comp_mod):
         """Test component modified function to process the correct input."""
 
-        obj1 = SimpleNamespace(a=1, b1=2)
-        obj2 = SimpleNamespace(c2=3, d=4)
+        obj1 = SimpleNamespace(a=1, b=2)
+        obj2 = SimpleNamespace(c=3, d=4)
 
         assert comp_mod(func)(e=5, f=6, obj1=obj1, obj2=obj2) == 720
 
@@ -44,8 +44,8 @@ class TestReplaceComponent:
         """Test component modified function has the correct metadata."""
 
         assert (
-            comp_mod.metadata == "replace_component({'obj1': ['a', ('b', 'b1')]"
-            ", 'obj2': [('c', 'c2'), 'd']})"
+            comp_mod.metadata == "replace_component({'obj1': ['a', 'b']"
+            ", 'obj2': ['c', 'd']})"
         )
 
     # test name duplication behaviors
@@ -57,7 +57,7 @@ class TestReplaceComponent:
             return a + b, obj
 
         with pytest.raises(
-            AssertionError, match="Parameter 'obj' is already in the signature"
+            AssertionError, match="parameter 'obj' already in the signature"
         ):
             replace_component({"obj": ["a", "b"]})(func)
 
@@ -74,6 +74,11 @@ class TestReplaceComponent:
         sig_parameters = list(inspect.signature(mod(func)).parameters.keys())
         assert sig_parameters == ["obj"]
 
+        obj = SimpleNamespace(a=1, b=2)
+        mod_func = mod(func)
+
+        assert mod(func)(obj=obj) == (3, obj)
+
     def test_self_parameter_with_duplicated(self):
         """Test component parameter with duplicated attribute.
 
@@ -84,12 +89,12 @@ class TestReplaceComponent:
             return a + b, obj
 
         with pytest.raises(
-            ValueError, match="Parameter 'obj' name is the same as attribute."
+            ValueError, match="attribute name cannot be the same as component 'obj'"
         ):
             replace_component({"obj": ["a", "b", "obj"]}, True)(func)
 
         with pytest.raises(
-            ValueError, match="Parameter 'obj' name is the same as attribute."
+            AssertionError, match="parameter 'obj' already in the signature"
         ):
             replace_component({"obj": ["a", "b", "obj"]}, False)(func)
 

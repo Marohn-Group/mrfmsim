@@ -25,11 +25,11 @@ class TestIBMCyclic:
             spin_density=1.0e9,
         )
         x_opt = 27.2507  # optimal lateral location [nm]
-        magnet = SphereMagnet(radius=50.0, mu0_Ms=1800.0, origin=[x_opt, 0.0, 50.0])
+        magnet = SphereMagnet(magnet_radius=50.0, mu0_Ms=1800.0, magnet_origin=[x_opt, 0.0, 50.0])
         grid = Grid(
-            shape=[2, 2, 2],
-            step=[0.5e-3, 0.5e-3, 0.5e-3],
-            origin=[0.0, 0.0, 0.0],
+            grid_shape=[2, 2, 2],
+            grid_step=[0.5e-3, 0.5e-3, 0.5e-3],
+            grid_origin=[0.0, 0.0, 0.0],
         )
 
         _, dF_spin = IBMCyclic(B0, df_fm, f_rf, grid, h, magnet, sample)
@@ -44,12 +44,12 @@ class TestIBMCyclic:
         """
 
         grid = Grid(
-            shape=[201, 201, 201],
-            step=[2.0, 2.0, 0.2],
-            origin=[0, 0, -20],
+            grid_shape=[201, 201, 201],
+            grid_step=[2.0, 2.0, 0.2],
+            grid_origin=[0, 0, -20],
         )
 
-        magnet = SphereMagnet(radius=100.0, mu0_Ms=1800, origin=[0.0, 0.0, 100.0])
+        magnet = SphereMagnet(magnet_radius=100.0, mu0_Ms=1800, magnet_origin=[0.0, 0.0, 100.0])
 
         sample = Sample(spin="1H", temperature=4.2, T1=10, T2=5e-6, spin_density=49.0)
         B0 = 2630.5

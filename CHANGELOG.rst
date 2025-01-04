@@ -22,6 +22,13 @@ Added
 ^^^^^
 - Add Marohn group experiments. (From the previous *mrfmsim-marohn* package)
 
+Changed
+^^^^^^^
+
+- Change the attribute names for ``Grid`` and ``Magnet`` to avoid conflicts.
+- Change the component replacement behavior that requires the replacement attribute
+  name is the same as the object attribute name.
+
 [0.2.0]
 -------------------------
 

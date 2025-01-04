@@ -89,7 +89,6 @@ def loop_shortcut(model, parameter: str, name=None):
     G = model.graph
     name = name or model.name
     modifiers = model.modifiers
-    components = model.components
 
     loop_mod = loop_input(parameter)
 
@@ -105,6 +104,7 @@ def loop_shortcut(model, parameter: str, name=None):
 
     H = G.subgraph(inputs=[parameter])
 
+    # if the nodes are equal, add the loop modifier to the model
     if nodes_equal(G.nodes, H.nodes):
         modifiers = [*modifiers, loop_mod]
 
@@ -136,4 +136,4 @@ def loop_shortcut(model, parameter: str, name=None):
         )
 
     # reset returns to recreate the returns from the subgraphs
-    return model.edit(name=name, graph=G, modifiers=modifiers, components=components)
+    return model.edit(name=name, graph=G, modifiers=modifiers)

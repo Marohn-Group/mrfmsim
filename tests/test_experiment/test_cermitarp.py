@@ -47,9 +47,9 @@ class TestCERMITARP:
         """Setup grid."""
 
         return Grid(
-            shape=[2, 2, 2],
-            step=[0.5e-3, 0.5e-3, 0.5e-3],
-            origin=[0.0, 0.0, 0.0],
+            grid_shape=[2, 2, 2],
+            grid_step=[0.5e-3, 0.5e-3, 0.5e-3],
+            grid_origin=[0.0, 0.0, 0.0],
         )
 
     @pytest.fixture
@@ -67,9 +67,9 @@ class TestCERMITARP:
     def magnet(self):
         """Setup magnet."""
         return SphereMagnet(
-            radius=50.0,  # magnet radius [nm]
+            magnet_radius=50.0,  # magnet radius [nm]
             mu0_Ms=1800.0,  # cobalt [mT]
-            origin=[0.0, 0.0, 50.0],
+            magnet_origin=[0.0, 0.0, 50.0],
         )
 
     def test_cermitarp(self, grid, magnet, sample):
@@ -105,10 +105,10 @@ class TestCERMITARP:
     #         spin_density=0.0241,
     #     )
     #     magnet = RectangularMagnet(
-    #         length=[100.0, 1475.0, 111.0], mu0_Ms=600.0, origin=[0, 1475.0 / 2, 0]
+    #         magnet_length=[100.0, 1475.0, 111.0], mu0_Ms=600.0, grid_origin=[0, 1475.0 / 2, 0]
     #     )
 
-    #     grid = Grid(shape=[51, 11, 5], step=[30, 23, 250], origin=[0, -115, 0])
+    #     grid = Grid(grid_shape=[51, 11, 5], grid_step=[30, 23, 250], grid_origin=[0, -115, 0])
 
     #     B1 = 3.0e-4
     #     B0 = 624.0
@@ -144,11 +144,11 @@ class TestCERMITESRSmallTip:
         Test that in small amplitude conditions, the approximation is the
         same as the small tip, which does not ignore the amplitude."""
 
-        grid = Grid(shape=[41, 41, 11], step=[75, 75, 30], origin=[0, 0, -150])
+        grid = Grid(grid_shape=[41, 41, 11], grid_step=[75, 75, 30], grid_origin=[0, 0, -150])
         magnet = RectangularMagnet(
-            length=[135.0, 80.0, 1500.0],
+            magnet_length=[135.0, 80.0, 1500.0],
             mu0_Ms=1800.0,
-            origin=[0, 0, 750],
+            magnet_origin=[0, 0, 750],
         )
 
         B1 = 2.5
@@ -181,11 +181,11 @@ class TestCERMITESRSmallTip:
             spin_density=49.0,
         )  # polystyrene
 
-        grid = Grid(shape=[41, 41, 11], step=[75, 75, 30], origin=[0, 0, -150])
+        grid = Grid(grid_shape=[41, 41, 11], grid_step=[75, 75, 30], grid_origin=[0, 0, -150])
         magnet = RectangularMagnet(
-            length=[135.0, 80.0, 1500.0],
+            magnet_length=[135.0, 80.0, 1500.0],
             mu0_Ms=1800.0,
-            origin=[0, 0, 750],
+            magnet_origin=[0, 0, 750],
         )
 
         B1 = 2.5

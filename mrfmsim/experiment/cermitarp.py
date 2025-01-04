@@ -1,6 +1,6 @@
 from mrfmsim import formula
 from mrfmsim import Node, ExperimentGroup
-from .stdnodes import STANDARD_NODES
+from .stdelements import STANDARD_NODES
 
 node_objects = [
     Node(
@@ -38,7 +38,7 @@ experiment_recipes = {
 components = {
     "magnet": ["Bz_method", "Bzx_method", "Bzxx_method"],
     "sample": ["J", "Gamma", "spin_density", "temperature"],
-    "grid": ["grid_array", ["grid_voxel", "voxel"]],
+    "grid": ["grid_array", "grid_voxel"],
 }
 
 docstring = """\

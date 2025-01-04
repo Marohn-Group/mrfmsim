@@ -1,6 +1,6 @@
 from mrfmsim import formula
 from mrfmsim import Node, ExperimentGroup
-from .stdnodes import STANDARD_NODES
+from .stdelements import STANDARD_NODES
 
 node_objects = [
     Node("rel_dpol td_sat", formula.rel_dpol_sat_td, output="rel_dpol"),
@@ -46,9 +46,9 @@ components = {
     "sample": ["J", "Gamma", "spin_density", "temperature", "T1", "T2"],
     "grid": [
         "grid_array",
-        ["grid_step", "step"],
-        ["grid_shape", "shape"],
-        ["grid_voxel", "voxel"],
+        "grid_step",
+        "grid_shape",
+        "grid_voxel",
         "extend_grid_by_length",
     ],
     "cantilever": ["k2f_modulated"],

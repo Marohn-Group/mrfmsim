@@ -206,12 +206,12 @@ class TestXTrapzFieldGradient:
         from mrfmsim.component import RectangularMagnet, Grid
 
         magnet = RectangularMagnet(
-            length=[40.0, 60.0, 100.0],
+            magnet_length=[40.0, 60.0, 100.0],
             mu0_Ms=1800.0,
-            origin=[10.0, 0.0, 200.0],
+            magnet_origin=[10.0, 0.0, 200.0],
         )
 
-        grid = Grid(shape=[3, 2, 1], step=[50, 50, 50], origin=[0, 0, 0])
+        grid = Grid(grid_shape=[3, 2, 1], grid_step=[50, 50, 50], grid_origin=[0, 0, 0])
 
         trapz_pts = 32
         x_0p = 0.01
@@ -236,11 +236,11 @@ class TestXTrapzFieldGradient:
         from mrfmsim.component import RectangularMagnet, Grid
 
         magnet = RectangularMagnet(
-            length=[40.0, 60.0, 100.0],
+            magnet_length=[40.0, 60.0, 100.0],
             mu0_Ms=1800.0,
-            origin=[10.0, 0.0, 3000.0],
+            magnet_origin=[10.0, 0.0, 3000.0],
         )
-        grid = Grid(shape=[3, 2, 1], step=[50, 50, 50], origin=[0, 0, 0])
+        grid = Grid(grid_shape=[3, 2, 1], grid_step=[50, 50, 50], grid_origin=[0, 0, 0])
 
         trapz_pts = 32
         x_0p = 50

@@ -46,12 +46,7 @@ experiment_recipes = {
 
 
 components = {
-    "magnet": [
-        ["magnet_radius", "radius"],
-        "mu0_Ms",
-        ["magnet_origin", "origin"],
-        "Bzx_method",
-    ],
+    "magnet": ["magnet_radius", "mu0_Ms", "magnet_origin", "Bzx_method"],
     "sample": ["Gamma", "J"],
 }
 
