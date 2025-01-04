@@ -20,10 +20,11 @@ To print out the cantilever summary:
 .. code-block:: python
 
     >>> print(cantilever)
-    Cantilever(k_c=780 aN/nm
-            f_c=4975 Hz
-            k2f_modulated=1.436e+00 Hz.nm/aN
-            k2f=3.189e+00 Hz.nm/aN)
+    Cantilever
+      k_c = 780 aN/nm
+      f_c = 4975 Hz
+      k2f_modulated = 1.436e+00 Hz.nm/aN
+      k2f = 3.189e+00 Hz.nm/aN
 
 :mod:`cantilever` module
 ------------------------

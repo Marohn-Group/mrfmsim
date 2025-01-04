@@ -28,15 +28,16 @@ Print out the summary of the sample:
 .. code:: python
 
     >>> print(sample)
-    Sample(spin=e
-            T1=1.000e-03 s
-            T2=2.500e-07 s
-            temperature=4.200 K
-            spin_density=0.024 1/nm^3
-            Gamma=1.761e+08 rad/(s.mT)
-            J=0.5
-            dB_hom=0.023 mT
-            dB_sat=0.000 mT)
+    Sample
+      spin = 'e'
+      T1 = 1.000e-03 s
+      T2 = 2.500e-07 s
+      temperature = 4.200 K
+      spin_density = 0.024 1/nm^3
+      Gamma = 1.761e+08 rad/(s.mT)
+      J = 0.5
+      dB_hom = 0.023 mT
+      dB_sat = 0.000 mT
 
 :mod:`sample` module
 --------------------

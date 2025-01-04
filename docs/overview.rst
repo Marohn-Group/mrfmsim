@@ -39,8 +39,8 @@ We define the necessary inputs for the experiment:
         T2=0.45e-6,
         spin_density=0.5,
     )
-    magnet = SphereMagnet(radius=3300.0, mu0_Ms=440.0, origin=[0, 0, 3300])
-    grid = Grid(shape=[400, 1200, 8], step=[25, 25, 25], origin=[0, 0, -100])
+    magnet = SphereMagnet(magnet_radius=3300.0, mu0_Ms=440.0, magnet_origin=[0, 0, 3300])
+    grid = Grid(grid_shape=[400, 1200, 8], grid_step=[25, 25, 25], grid_origin=[0, 0, -100])
     cantilever = Cantilever(k_c=7.8e5, f_c=4.975e6)
 
     # define the input parameters

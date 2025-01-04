@@ -79,7 +79,7 @@ The following is an example of a YAML configuration file:
                 output_unit: m^2
         graph_type: mrfmsim
     components:
-        replace_obj: [[a, a1], [b, b1]]
+        replace_obj: [a, b]
     modifiers: [!import:mmodel.modifier.loop_input {parameter: d}]
     doc: Test experiment with components.
     param_defaults:
@@ -104,7 +104,7 @@ To load the experiment:
     modifiers:
     - loop_input(parameter='d')
     components:
-    - replace_obj: [['a', 'a1'], ['b', 'b1']]
+    - replace_obj: ['a', 'b']
 
     Test experiment with components.
 
@@ -177,7 +177,7 @@ to access the quantity with units.
 
 .. code:: python
 
-    magnet = SphereMagnet(radius=50.0, mu0_Ms=1800.0, origin=[0.0, 0.0, 50.0])
+    magnet = SphereMagnet(magnet_radius=50.0, mu0_Ms=1800.0, magnet_origin=[0.0, 0.0, 50.0])
     r = mureg.getattr(magnet, "radius")
     
     >>> r

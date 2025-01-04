@@ -22,16 +22,17 @@ with a radius of :math:`r = 50 \: \mathrm{nm}`:
 .. code-block:: python
     
     from mrfmsim.component import SphereMagnet
-    magnet = SphereMagnet(radius=50.0, mu0_Ms=800.0, origin=[0.0, 0.0, 0.0])
+    magnet = SphereMagnet(magnet_radius=50.0, mu0_Ms=800.0, magnet_origin=[0.0, 0.0, 0.0])
 
 To display the magnet information:
 
 .. code-block:: python
 
     >>> print(magnet)
-    SphereMagnet(radius=50.0 nm
-            origin=[0.0, 0.0, 0.0] nm
-            mu0_Ms=800.000 mT)
+    SphereMagnet
+      magnet_radius = 50.0 nm
+      magnet_origin = [0.0, 0.0, 0.0] nm
+      mu0_Ms = 800.000 mT
 
 :mod:`magnet` module
 --------------------

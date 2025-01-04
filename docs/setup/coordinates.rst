@@ -21,8 +21,8 @@ For example, with the left figure setup,
 
     from mrfmsim.component import Grid, SphereMagnet
 
-    grid = Grid(shape=[11, 11, 11], step=[20.0, 20.0, 20.0], origin=[0.0, 0.0, -110])
-    magnet = SphereMagnet(radius=50.0, mu0_Ms=1800.0, origin=[0.0, 0.0, 50.0])
+    grid = Grid(grid_shape=[11, 11, 11], grid_step=[20.0, 20.0, 20.0], grid_origin=[0.0, 0.0, -110])
+    magnet = SphereMagnet(magnet_radius=50.0, mu0_Ms=1800.0, magnet_origin=[0.0, 0.0, 50.0])
 
 The grid has a height of 220 nm in :math:`z`-direction, and the magnet has a radius of 50 nm.
 The grid origin is set to be 110 nm below the :math:`xy`-plane, and the magnet origin is set 
@@ -35,8 +35,8 @@ With the right figure setup,
 
     from mrfmsim.component import Grid, RectangularMagnet
 
-    grid = Grid(shape=[11, 11, 11], step=[20.0, 20.0, 20.0], origin=[0.0, -110, 0.0])
-    magnet = RectangularMagnet([70, 70, 1500], mu0_Ms=1800.0, origin=[0.0, 750.0, 0.0])
+    grid = Grid(grid_shape=[11, 11, 11], grid_step=[20.0, 20.0, 20.0], grid_origin=[0.0, -110, 0.0])
+    magnet = RectangularMagnet([70, 70, 1500], mu0_Ms=1800.0, magnet_origin=[0.0, 750.0, 0.0])
 
 The grid has a width of 220 nm in :math:`y`-direction, and the magnet has a height of
 1500 nm. The grid origin is set to be 110 nm below left of the :math:`xz`-plane,

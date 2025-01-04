@@ -28,8 +28,9 @@ the ``ComponentBase`` class and define the attributes as follows:
     >>> cantilever # dataclass output
     Cantilever(f_c=3000, k_c=100.0)
     >>> print(cantilever) # formatted output
-    Cantilever(f_c=3000
-        k_c=100.000)
+    Cantilever
+        f_c = 3000
+        k_c = 100.000
 
 If we want additional attributes through calculation, instead of defining
 ``__init__`` method, we can define a ``__post_init__`` method. To specify
@@ -57,9 +58,10 @@ that these are not instantiation variables, we specify that they are
     31415.926535897932
 
     >>> print(cantilever)
-    Cantilever(f_c=5000
-        k_c=100.000
-        omega=31415.927)
+    Cantilever
+        f_c = 5000
+        k_c = 100.000
+        omega = 31415.927
 
 In the above code, the cantilever frequency defaults to 5000 Hz.
 
@@ -79,6 +81,7 @@ To add units and formatted string output for the attributes, we can add
 
     >>> cantilever = Cantilever(k_c=100.0)
     >>> print(cantilever)
-    Cantilever(k_c=1.000e+02 aN/nm
-        f_c=3000 Hz
-        omega=18849.556 rad/s)
+    Cantilever
+        k_c = 1.000e+02 aN/nm
+        f_c = 3000 Hz
+        omega = 18849.556 rad/s

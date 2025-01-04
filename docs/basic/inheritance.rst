@@ -8,7 +8,6 @@ In most cases these node and models are interchangeable, however it is not recom
 to mix the classes in the experiment definition. For more details,
 see the `mmodel documentation <https://marohn-group.github.io/mmodel-docs/>`__.
 
-
 Node
 ----
 
@@ -18,8 +17,6 @@ Graph
 -----
 
 ``mrfmsim.graph.Graph`` changes the group "graph_type" to "mrfmsim".
-
-
 
 
 Experiment
