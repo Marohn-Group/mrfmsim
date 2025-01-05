@@ -34,7 +34,6 @@ nodeformatter = MetaDataFormatter(
 
 
 class Node(mmodel.Node):
-    # class Node(mmodel.Node):
     """Node object with mrfmsim metadata formatting."""
 
     def __str__(self):
