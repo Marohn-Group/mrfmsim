@@ -1,6 +1,6 @@
 from mrfmsim import formula
 from mrfmsim import Node, ExperimentGroup
-from .stdelements import STANDARD_NODES
+from .stdelements import STANDARD_NODES, STANDARD_COMPONENTS
 
 node_objects = [
     Node("rel_dpol td_sat", formula.rel_dpol_sat_td, output="rel_dpol"),
@@ -41,19 +41,6 @@ experiment_recipes = {
     },
 }
 
-components = {
-    "magnet": ["Bz_method", "Bzx_method", "Bzxx_method"],
-    "sample": ["J", "Gamma", "spin_density", "temperature", "T1", "T2"],
-    "grid": [
-        "grid_array",
-        "grid_step",
-        "grid_shape",
-        "grid_voxel",
-        "extend_grid_by_length",
-    ],
-    "cantilever": ["k2f_modulated"],
-}
-
 docstring = """\
 Simulates a Cornell-style frequency shift magnetic
 resonance force microscope experiment considering the time-dependent
@@ -65,6 +52,6 @@ CermitTDGroup = ExperimentGroup(
     name="CermitTDGroup",
     node_objects=list(STANDARD_NODES) + node_objects,
     experiment_recipes=experiment_recipes,
-    experiment_defaults={"components": components},
+    experiment_defaults={"components": STANDARD_COMPONENTS},
     doc=docstring,
 )

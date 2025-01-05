@@ -1,7 +1,7 @@
 from mrfmsim.group import ExperimentGroup
 from mrfmsim.node import Node
 from mrfmsim import formula
-from .stdelements import STANDARD_NODES
+from .stdelements import STANDARD_NODES, STANDARD_COMPONENTS
 
 node_objects = [
     Node("minimum absolute x offset", func=formula.min_abs_offset, output="B_offset"),
@@ -92,6 +92,6 @@ CermitESRGroup = ExperimentGroup(
     "CermitESRGroup",
     list(STANDARD_NODES) + node_objects,
     experiment_recipes,
-    {"components": components},
+    {"components": STANDARD_COMPONENTS},
     doc=docstring,
 )

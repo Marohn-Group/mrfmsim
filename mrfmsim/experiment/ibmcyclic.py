@@ -1,9 +1,8 @@
 from mrfmsim import Experiment, Graph, Node
 from mrfmsim import formula
 import operator
-from .stdelements import STANDARD_COMPONENTS
 
-# For a single experiment, the nodes need to explicitly defined and 
+# For a single experiment, the nodes need to explicitly defined and
 # matched to the graph edges. The shared nodes are not used here.
 
 node_objects = [
@@ -53,11 +52,11 @@ grouped_edges = [
 
 
 docstring = "Simulate an IBM-style cyclic-inversion magnetic resonance force microscope experiment."
-# components = {
-#     "magnet": ["Bz_method", "Bzx_method"],
-#     "sample": ["J", "Gamma", "spin_density", "temperature"],
-#     "grid": ["grid_array", "grid_voxel"],
-# }
+components = {
+    "magnet": ["Bz_method", "Bzx_method"],
+    "sample": ["J", "Gamma", "spin_density", "temperature"],
+    "grid": ["grid_array", "grid_voxel"],
+}
 
 IBMCyclic_graph = Graph(name="ibm_cyclic_graph")
 IBMCyclic_graph.add_grouped_edges_from(grouped_edges)
@@ -68,5 +67,5 @@ IBMCyclic = Experiment(
     "IBMCyclic",
     IBMCyclic_graph,
     doc=docstring,
-    components=STANDARD_COMPONENTS,
+    components=components,
 )

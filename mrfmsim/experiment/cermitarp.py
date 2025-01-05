@@ -1,6 +1,6 @@
 from mrfmsim import formula
 from mrfmsim import Node, ExperimentGroup
-from .stdelements import STANDARD_NODES
+from .stdelements import STANDARD_NODES, STANDARD_COMPONENTS
 
 node_objects = [
     Node(
@@ -35,12 +35,6 @@ experiment_recipes = {
     },
 }
 
-components = {
-    "magnet": ["Bz_method", "Bzx_method", "Bzxx_method"],
-    "sample": ["J", "Gamma", "spin_density", "temperature"],
-    "grid": ["grid_array", "grid_voxel"],
-}
-
 docstring = """\
 Simulates a Cornell-style frequency-shift magnetic resonance 
 force microscope experiment in which a single frequency-sweep adiabatic 
@@ -51,6 +45,6 @@ CermitARPGroup = ExperimentGroup(
     "CermitARPGroup",
     node_objects=list(STANDARD_NODES) + node_objects,
     experiment_recipes=experiment_recipes,
-    experiment_defaults={"components": components},
+    experiment_defaults={"components": STANDARD_COMPONENTS},
     doc=docstring,
 )
