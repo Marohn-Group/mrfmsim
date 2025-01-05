@@ -1,5 +1,5 @@
-Inherited classes
-=================
+*mrfmsim* custom classes
+=========================
 
 *mrfmsim* adds additional metadata and functionalities to the *mmodel*'s 
 ``Node``, ``Graph``, ``Model``, and ``ModelGroup`` classes.
@@ -16,7 +16,8 @@ Node
 Graph
 -----
 
-``mrfmsim.graph.Graph`` changes the group "graph_type" to "mrfmsim".
+``mrfmsim.graph.Graph`` changes the group "graph_module" to "mrfmsim", and
+"node_type" to ``mrfmsim.node.Node``.
 
 
 Experiment
@@ -27,20 +28,28 @@ The change is that the instantiation takes the additional dictionary
 input "components", used to replace group inputs with component objects.
 
 For example, if the model input arguments are
-``["radius", "origin", "field"]``, 
+``["magnet_radius", "magnet_origin", "field"]``, 
 and a magnet component contains the attributes "radius" and
 "origin", then the magnet component can be used as a replacement
 object with the argument:
 
 .. code:: python
 
-    components = {'magnet': ["radius", "origin"]}
+    components = {'magnet': ["magnet_radius", "magnet_origin"]}
 
-The resulting model inputs are ``["magnet", "field"]``.
+The resulting model inputs are ``["magnet", "field"]``. In the event that
+the target name is different from the component object attribute, a 
+custom object can be defined with the matching attribute name. The design
+is to allow simpler code base.
 
+The components are not showing in the metadata output for simplicity. To
+inspect the components in the experiment, use the ``components`` attribute.
+To inspect the parameter that are replaced (subset of components) use the
+``param_replacements`` attribute. Alternatively, customized metadata formatting
+can be used.
 
-Component
-======================
+Component objects
+-------------------
 
 An MRFM experiment typically consists of several components, such as
 a resonator, a magnet, and a sample. The parameters and related calculations

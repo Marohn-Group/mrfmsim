@@ -2,7 +2,7 @@ Plugins
 =================
 
 Ancillary features are added to the mrfmsim ecosystem through plugin packages.
-The separation of the core functionality and the plugins allows for an easy mantainance
+The separation of the core functionality and the plugins allows for an easy maintenance
 of the mrfmsim package. The core functionalities do not depend on the plugins.
 
 mrfmsim-ymal: YAML configuration plugin
@@ -77,7 +77,7 @@ The following is an example of a YAML configuration file:
                 inputs: [e, g]
                 output: k
                 output_unit: m^2
-        graph_type: mrfmsim
+        graph_module: mrfmsim
     components:
         replace_obj: [a, b]
     modifiers: [!import:mmodel.modifier.loop_input {parameter: d}]
@@ -103,8 +103,6 @@ To load the experiment:
     handler: MemHandler
     modifiers:
     - loop_input(parameter='d')
-    components:
-    - replace_obj: ['a', 'b']
 
     Test experiment with components.
 
