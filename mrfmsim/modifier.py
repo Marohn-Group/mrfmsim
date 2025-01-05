@@ -3,7 +3,7 @@ from functools import wraps
 import numba as nb
 from inspect import Parameter, signature, Signature
 from pprint import pformat
-from string import Formatter
+from copy import deepcopy
 from collections import defaultdict
 import mmodel
 
@@ -14,7 +14,7 @@ def replace_component(replacement: dict, allow_duplicate=False):
     The modifier modifies the internal model function. The wrapper
     function is keyword-only. The function by default does not
     allow duplicated signature. If we want to replace several
-    atrributes with a component, the component name cannot exist
+    attributes with a component, the component name cannot exist
     in the original signature. For example, if we have a function
 
         def func(a, b, obj):
@@ -55,7 +55,7 @@ def replace_component(replacement: dict, allow_duplicate=False):
         func(obj=obj)
 
     We have decided that this behavior is not allowed regardless the flag.
-    Becuase in this case, in an inspection attempt, it is confusing to
+    Because in this case, in an inspection attempt, it is confusing to
     understand if the obj is the original obj or an attribute to the new obj.
     In this case, a new object name should be used.
 
@@ -115,94 +115,12 @@ def replace_component(replacement: dict, allow_duplicate=False):
         wrapped.__signature__ = Signature(
             parameters=sorted(new_params_dict.values(), key=param_sorter)
         )
+        # deepcopy to prevent modification
+        wrapped.param_replacements = deepcopy(replacement_dict)
         return wrapped
 
     modifier.metadata = f"replace_component({pformat(replacement)})"
     return modifier
-
-
-def parse_fields(format_str):
-    """Parse the field from the format string.
-
-    :param str format_str: format string
-    :return: list of fields
-
-    The function parses out the field names in the format string.
-    Some field names have slicers or attribute access, such as
-    B0.value, B0[0], B0[0:2]. The function only returns B0 for all
-    these fields. Since there can be duplicated fields after the
-    name split, the function returns unique elements.
-    """
-
-    # this is an internal function for Formatter
-    # consider rewriting with custom function to prevent breaking
-    # the function ignores slicing and attribute access
-    # B0.value -> B0, B0[0] -> B0
-    from _string import formatter_field_name_split
-
-    fields = [
-        formatter_field_name_split(field)[0]
-        for _, field, _, _ in Formatter().parse(format_str)
-        if field
-    ]
-    return list(set(fields))  # return unique elements
-
-
-def print_inputs(format_str: str, **pargs):
-    """Print the node input to the console.
-
-    :param str stdout_format: format string for input and output
-        The format should be keyword only.
-    :param pargs: keyword arguments for the print function
-
-    The names of the parameters are parsed from the format string.
-    """
-
-    @mmodel.modifier.modifier("print_inputs", format_str=format_str, **pargs)
-    def stdout_inputs_modifier(func):
-        inputs = parse_fields(format_str)
-
-        @wraps(func)
-        def wrapped(**kwargs):
-            """Print input parameter."""
-            input_dict = {k: kwargs[k] for k in inputs}
-            print(format_str.format(**input_dict), **pargs)
-            return func(**kwargs)
-
-        return wrapped
-
-    return stdout_inputs_modifier
-
-
-def print_output(format_str: str, **pargs):
-    """Print the node output to the console.
-
-    :param str stdout_format: format string for input and output
-        The format should be keyword only. The behavior is for keeping the
-        consistency with other print modifiers.
-    :param str end: end of printout
-
-    The names of the parameters are parsed from the format string. The
-    use of the stdout_format is different from the input method, as
-    the modifiers do not know the return name of the node. Only one
-    output field is allowed and the field name is used as the return name.
-    """
-
-    @mmodel.modifier.modifier("print_output", format_str=format_str, **pargs)
-    def stdout_output_modifier(func):
-        output = parse_fields(format_str)[0]
-
-        @wraps(func)
-        def wrapped(**kwargs):
-            """Print output parameter."""
-
-            result = func(**kwargs)
-            print(format_str.format(**{output: result}), **pargs)
-            return result
-
-        return wrapped
-
-    return stdout_output_modifier
 
 
 def numba_jit(**kwargs):
@@ -213,7 +131,7 @@ def numba_jit(**kwargs):
     Use the decorator the same way as numba.jit().
     """
 
-    @mmodel.modifier.modifier("numba_jit", **kwargs)
+    @mmodel.modifier.add_modifier_metadata("numba_jit", **kwargs)
     def decorator(func):
         func = nb.jit(**kwargs)(func)
         return func

@@ -27,7 +27,6 @@ experimentformatter = MetaDataFormatter(
         "handler": format_obj_name,
         "handler_kwargs": format_dictargs,
         "modifiers": format_modifierlist,
-        "components": format_dictargs,
         "doc": format_value,
     },
     [
@@ -39,12 +38,11 @@ experimentformatter = MetaDataFormatter(
         "handler",
         "handler_kwargs",
         "modifiers",
-        "components",
         "_",
         "doc",
     ],
     wrapper80,
-    ["modifiers", "components", "handler_kwargs"],
+    ["modifiers", "handler_kwargs"],
 )
 
 
@@ -91,6 +89,7 @@ class Experiment(mmodel.Model):
             # Add the component modification to modifiers.
             component_mod = replace_component(components, allow_duplicated_components)
             self.model_func = component_mod(self.model_func)
+            self._param_replacements = self.model_func.param_replacements
 
         # add units for return values
         self.return_units = {}
@@ -104,9 +103,18 @@ class Experiment(mmodel.Model):
     def components(self):
         """Return a deepcopy of the components.
 
-        The values of the dictionary cotain lists.
+        The values of the dictionary contains lists.
         """
         return copy.deepcopy(self._components)
+
+    @property
+    def param_replacements(self):
+        """Return a deepcopy of the parameter replacements.
+
+        Components can contain more than the actual parameters being
+        replaced. The param_replacements is the final replacement dictionary.
+        """
+        return copy.deepcopy(self._param_replacements)
 
     def __str__(self):
         return experimentformatter(self)
