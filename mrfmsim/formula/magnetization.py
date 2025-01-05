@@ -4,6 +4,7 @@ import numpy as np
 HBAR = 1.054571628e-7  # aN nm s - reduced Planck constant
 KB = 1.3806504e4  # aN nm K^{-1} - Boltzmann constant
 
+
 @nb.jit(nopython=True, parallel=True)
 def mz_eq(B_tot, Gamma, J, temperature):
     r"""Magnetization per spin at the thermal equilibrium using the Brillouin function.
@@ -75,7 +76,8 @@ def mz_eq(B_tot, Gamma, J, temperature):
     a = (2.0 * J + 1.0) / (2.0 * J)  # unitless
     b = 1.0 / (2.0 * J)  # unitless
     pol_eq = a / np.tanh(a * x) - b / np.tanh(b * x)
-    return mu_z * pol_eq   # [aN.nm/mT]
+    return mu_z * pol_eq  # [aN.nm/mT]
+
 
 def mz2_eq(Gamma, J):
     r"""Compute the magnetization variance per spin.
@@ -86,4 +88,4 @@ def mz2_eq(Gamma, J):
     """
 
     mu = HBAR * Gamma * np.sqrt(J * (J + 1) / 3.0)  # aN.nm/mT
-    return mu ** 2  # aN^2
+    return mu**2  # aN^2

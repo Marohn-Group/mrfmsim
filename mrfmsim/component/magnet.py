@@ -352,30 +352,14 @@ class RectangularMagnet(ComponentBase):
         """
 
         return (
-            -dy1
-            * dz1
-            / (np.sqrt(dx1**2 + dy1**2 + dz1**2) * (dx1**2 + dz1**2))
-            + dy1
-            * dz1
-            / (np.sqrt(dx2**2 + dy1**2 + dz1**2) * (dx2**2 + dz1**2))
-            + dy2
-            * dz1
-            / (np.sqrt(dx1**2 + dy2**2 + dz1**2) * (dx1**2 + dz1**2))
-            - dy2
-            * dz1
-            / (np.sqrt(dx2**2 + dy2**2 + dz1**2) * (dx2**2 + dz1**2))
-            + dy1
-            * dz2
-            / (np.sqrt(dx1**2 + dy1**2 + dz2**2) * (dx1**2 + dz2**2))
-            - dy1
-            * dz2
-            / (np.sqrt(dx2**2 + dy1**2 + dz2**2) * (dx2**2 + dz2**2))
-            - dy2
-            * dz2
-            / (np.sqrt(dx1**2 + dy2**2 + dz2**2) * (dx1**2 + dz2**2))
-            + dy2
-            * dz2
-            / (np.sqrt(dx2**2 + dy2**2 + dz2**2) * (dx2**2 + dz2**2))
+            -dy1 * dz1 / (np.sqrt(dx1**2 + dy1**2 + dz1**2) * (dx1**2 + dz1**2))
+            + dy1 * dz1 / (np.sqrt(dx2**2 + dy1**2 + dz1**2) * (dx2**2 + dz1**2))
+            + dy2 * dz1 / (np.sqrt(dx1**2 + dy2**2 + dz1**2) * (dx1**2 + dz1**2))
+            - dy2 * dz1 / (np.sqrt(dx2**2 + dy2**2 + dz1**2) * (dx2**2 + dz1**2))
+            + dy1 * dz2 / (np.sqrt(dx1**2 + dy1**2 + dz2**2) * (dx1**2 + dz2**2))
+            - dy1 * dz2 / (np.sqrt(dx2**2 + dy1**2 + dz2**2) * (dx2**2 + dz2**2))
+            - dy2 * dz2 / (np.sqrt(dx1**2 + dy2**2 + dz2**2) * (dx1**2 + dz2**2))
+            + dy2 * dz2 / (np.sqrt(dx2**2 + dy2**2 + dz2**2) * (dx2**2 + dz2**2))
         )
 
     def Bzxx_method(self, x, y, z):

@@ -1,4 +1,5 @@
 """Mathematical operations for the MRFM simulation."""
+
 import numpy as np
 
 

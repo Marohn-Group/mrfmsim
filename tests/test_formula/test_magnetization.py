@@ -31,6 +31,7 @@ def test_mz_eq_low_susceptibility(B_tot):
 
     assert pytest.approx(mz_eq_sim, 1.0e-2) == mz_eq_true
 
+
 def test_mz2_eq_H():
     """Test proton magnetization variance at equilibrium."""
 

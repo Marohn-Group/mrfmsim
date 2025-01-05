@@ -35,8 +35,12 @@ class TestCERMITESR:
     def test_cermitesr_SPAM(self, sample, cantilever):
         """Test the result in SPAM geometry, Moore parameters, local peak."""
 
-        magnet = SphereMagnet(magnet_radius=1850.0, mu0_Ms=440.0, magnet_origin=[0, 1850, 0])
-        grid = Grid(grid_shape=[501, 21, 251], grid_step=[8, 10, 8], grid_origin=[0, -100, 0])
+        magnet = SphereMagnet(
+            magnet_radius=1850.0, mu0_Ms=440.0, magnet_origin=[0, 1850, 0]
+        )
+        grid = Grid(
+            grid_shape=[501, 21, 251], grid_step=[8, 10, 8], grid_origin=[0, -100, 0]
+        )
 
         cantilever = Cantilever(k_c=2e4, f_c=3e6)
 
@@ -53,8 +57,12 @@ class TestCERMITESR:
     def test_cermitesr_hangdown(self, sample, cantilever):
         """Test the result in SPAM geometry, Issac parameters."""
 
-        magnet = SphereMagnet(magnet_radius=3300.0, mu0_Ms=440.0, magnet_origin=[0, 0, 3300])
-        grid = Grid(grid_shape=[400, 1200, 8], grid_step=[25, 25, 25], grid_origin=[0, 0, -100])
+        magnet = SphereMagnet(
+            magnet_radius=3300.0, mu0_Ms=440.0, magnet_origin=[0, 0, 3300]
+        )
+        grid = Grid(
+            grid_shape=[400, 1200, 8], grid_step=[25, 25, 25], grid_origin=[0, 0, -100]
+        )
 
         B1 = 1.3e-3
         mw_x_0p = 100

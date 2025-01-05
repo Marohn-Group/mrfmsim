@@ -1,6 +1,5 @@
 """Test the ComponentBase class."""
 
-
 import numpy as np
 from dataclasses import dataclass, field
 from mrfmsim.component import ComponentBase

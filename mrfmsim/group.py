@@ -36,7 +36,9 @@ class ExperimentGroup(mmodel.ModelGroup):
     def __init__(
         self, name, node_objects, experiment_recipes, experiment_defaults=None, doc=""
     ):
-        super().__init__(name, node_objects, experiment_recipes, experiment_defaults, doc)
+        super().__init__(
+            name, node_objects, experiment_recipes, experiment_defaults, doc
+        )
 
     @property
     def experiments(self):

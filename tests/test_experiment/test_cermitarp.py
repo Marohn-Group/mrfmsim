@@ -144,7 +144,9 @@ class TestCERMITESRSmallTip:
         Test that in small amplitude conditions, the approximation is the
         same as the small tip, which does not ignore the amplitude."""
 
-        grid = Grid(grid_shape=[41, 41, 11], grid_step=[75, 75, 30], grid_origin=[0, 0, -150])
+        grid = Grid(
+            grid_shape=[41, 41, 11], grid_step=[75, 75, 30], grid_origin=[0, 0, -150]
+        )
         magnet = RectangularMagnet(
             magnet_length=[135.0, 80.0, 1500.0],
             mu0_Ms=1800.0,
@@ -181,7 +183,9 @@ class TestCERMITESRSmallTip:
             spin_density=49.0,
         )  # polystyrene
 
-        grid = Grid(grid_shape=[41, 41, 11], grid_step=[75, 75, 30], grid_origin=[0, 0, -150])
+        grid = Grid(
+            grid_shape=[41, 41, 11], grid_step=[75, 75, 30], grid_origin=[0, 0, -150]
+        )
         magnet = RectangularMagnet(
             magnet_length=[135.0, 80.0, 1500.0],
             mu0_Ms=1800.0,

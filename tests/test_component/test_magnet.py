@@ -79,7 +79,9 @@ class TestSphereMagnet(MagnetTester):
     @pytest.fixture
     def magnet(self):
         """Instantiate a SphereManget instance."""
-        return SphereMagnet(magnet_radius=50.0, magnet_origin=[0.0, 0.0, 0.0], mu0_Ms=1800.0)
+        return SphereMagnet(
+            magnet_radius=50.0, magnet_origin=[0.0, 0.0, 0.0], mu0_Ms=1800.0
+        )
 
     @pytest.mark.parametrize(
         "x, y, z, theory",
@@ -177,7 +179,9 @@ class TestRectangularMagnet(MagnetTester):
         from the center of the magnet. (The unit of B is mT)
         """
         magnet = RectangularMagnet(
-            magnet_length=[10.0, 10.0, 1.0], mu0_Ms=1800.0, magnet_origin=[0.0, 0.0, 0.0]
+            magnet_length=[10.0, 10.0, 1.0],
+            mu0_Ms=1800.0,
+            magnet_origin=[0.0, 0.0, 0.0],
         )
         assert np.allclose(magnet.Bz_method(0, 0, 2), 134.23, rtol=1e-2)
 

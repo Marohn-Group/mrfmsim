@@ -139,7 +139,7 @@ def test_rel_dpol_periodic_irrad_off_res(sample_e):
         t_off=2e-4,
     )
 
-    assert pytest.approx(rpol_off_res, abs=5e-10) ==  0.0
+    assert pytest.approx(rpol_off_res, abs=5e-10) == 0.0
 
 
 def test_rel_dpol_sat_td(sample_e):

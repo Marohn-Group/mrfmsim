@@ -114,10 +114,7 @@ def singlespin_analytical(
         I_term = (
             Z**3
             / (3.0 * np.pi * (1 + Z**2) ** 3)
-            * (
-                4.0 * (2.0 * Z**4 - 7.0 * Z**2 - 1.0) * ee
-                - 8.0 * (Z**4 - 1.0) * ek
-            )
+            * (4.0 * (2.0 * Z**4 - 7.0 * Z**2 - 1.0) * ee - 8.0 * (Z**4 - 1.0) * ek)
         )
 
     else:
@@ -151,4 +148,4 @@ def neg_sum_of_product(*args):
     the experiments. The approximation of the signal results in a negative
     sign at the front.
     """
-    return - np.sum(reduce(np.multiply, args))
+    return -np.sum(reduce(np.multiply, args))
