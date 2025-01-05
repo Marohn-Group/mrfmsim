@@ -178,15 +178,14 @@ distribution :math:`\mu_z(\vec{r}_j)` in Eq. :eq:`Eq:SmallTipD_F` is
 determined in the same way as in the large-tip experiment.
 
 Eric Moore and co-workers previously implemented Eqs. :eq:`Eq:SmallTipDf` and 
-:eq:`Eq:SmallTipD_F` to calculate the ESR-MRFM signal from a single spin 
+:eq:`Eq:SmallTipD_F` to calculate the ESR-MRFM signal from a single spin. 
 [#Lee2012apra]_ [#Moore2009]_
 
 And to simulate the amplitude dependence of the 
 signal from a single slice whose magnetization has been inverted *via* an 
-adiabatic rapid passage.[#Moore2009dec]_
+adiabatic rapid passage. [#Moore2009dec]_
 
-Reference
-----------
+.. rubric:: References
 
 .. [#Moore2009dec] Moore, E. W.; Lee, S.-G.; Hickman, S. A.; Wright, S. J.; 
     Harrell, L. E.; Borbat, P. P.; Freed, J. H. & Marohn, J. A. "Scanned-Probe 
