@@ -1,12 +1,13 @@
-from mrfmsim.model import Experiment
+from mrfmsim.model import Experiment, experimentformatter
 from mrfmsim.graph import Graph
 import mmodel
+from functools import partial
 from mmodel.metadata import (
     wrapper80,
     format_value,
-    format_dictargs,
     format_dictkeys,
     MetaDataFormatter,
+    format_group_content
 )
 
 
@@ -15,7 +16,7 @@ experimentgroupformatter = MetaDataFormatter(
         "name": format_value,
         "experiments": format_dictkeys,
         "nodes": format_dictkeys,
-        "experiment_defaults": format_dictargs,
+        "experiment_defaults": partial(format_group_content, formatter=experimentformatter),
         "doc": format_value,
     },
     ["name", "experiments", "nodes", "experiment_defaults", "_", "doc"],
