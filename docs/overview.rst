@@ -214,7 +214,7 @@ To loop the "B0" parameter on top of "f_rf"::
     )
     CermitESR_B0_frf_loop.visualize()
 
-.. image:: _static/CermitESR_b0_frf_loop.pdf
+.. image:: _static/CermitESR_b0frf_loop.pdf
     :width: 800px
     :align: center
 

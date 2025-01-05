@@ -75,3 +75,26 @@ def experiment_mod(modelgraph):
         doc="Test experiment with components.",
         param_defaults={"h": 2},
     )
+
+
+@pytest.fixture
+def experiment_group(node_edges):
+
+    grouped_edges, node_objects = node_edges
+
+    experiment_recipes = {
+        "exp1": {
+            "grouped_edges": grouped_edges,
+            "node_objects": node_objects,
+            "doc": "This is a test experiment.",
+        }
+    }
+
+    experiment_defaults = {
+        "components": {"replace_obj": ["a", "b"]},
+        "modifiers": [loop_input(parameter="d")],
+    }
+    doc = "This is a test experiment group."
+    return ExperimentGroup(
+        "Test Group", node_objects, experiment_recipes, experiment_defaults, doc
+    )
