@@ -21,7 +21,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.dependencies]
 python = ">=3.10"
-numpy = ">=2.0.2"
+numpy = ">=1.26.4"
 mmodel = { git = "https://www.github.com/Marohn-Group/mmodel", branch = "feature" }
 numba = ">=0.60.0"
 scipy = ">=1.14.1"
