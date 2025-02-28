@@ -7,8 +7,8 @@ The format is based on
 and this project adheres to
 `Semantic Versioning <https://semver.org/spec/v2.0.0.html>`_
 
-[Unreleased]
-------------
+[0.3.0] - 2025-02-25
+----------------------
 
 Update the API to use the latest version of the mmodel package (0.8.0+).
 
