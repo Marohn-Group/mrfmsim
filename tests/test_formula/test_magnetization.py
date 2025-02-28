@@ -1,7 +1,6 @@
 import pytest
 import numpy as np
 from mrfmsim.formula import mz_eq, HBAR, KB, mz2_eq
-import pytest
 
 
 @pytest.mark.parametrize(

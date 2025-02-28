@@ -1,7 +1,3 @@
-import pytest
-from mrfmsim.group import ExperimentGroup
-from mrfmsim.model import Experiment
-from mrfmsim.graph import Graph
 from textwrap import dedent
 
 

@@ -67,7 +67,6 @@ class TestReplaceComponent:
         assert sig_parameters == ["obj"]
 
         obj = SimpleNamespace(a=1, b=2)
-        mod_func = mod(func)
 
         assert mod(func)(obj=obj) == (3, obj)
 
