@@ -1,6 +1,5 @@
 """Test the ComponentBase class."""
 
-
 import numpy as np
 from dataclasses import dataclass, field
 from mrfmsim.component import ComponentBase
@@ -35,13 +34,14 @@ def test_component_str():
     """
 
     str_no_unit = """\
-    Component(array=[1.e+03 1.e-04 3.e+00]
-    \tfloat=1.000
-    \tlist=[1, 2, 3]
-    \tstr=str
-    \ttuple=(1, 2, 3)
-    \tB0=1.000e+02 mT
-    \tB1=[1, 2, 3])"""
+    Component
+      array = [1000.000, 0.000, 3.000]
+      float = 1.000
+      list = [1, 2, 3]
+      str = 'str'
+      tuple = (1, 2, 3)
+      B0 = 1.000e+02 mT
+      B1 = [1, 2, 3]"""
 
     obj = Component(np.array([1e3, 0.0001, 3]), 1.0, [1, 2, 3], "str", (1, 2, 3))
 

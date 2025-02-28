@@ -9,50 +9,65 @@ License
 
 .. toctree::
    :maxdepth: 2
-   :titlesonly:
-   :hidden:
+   :caption: mrfmsim overview
+
 
    overview
-   features
+   tests
    changelog
 
-.. toctree::
-   :maxdepth: 1
-   :caption: Experiment Setup
-   :hidden:
-
-   coordinates
-   sample
-   grid
-   magnet
-   cantilever
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Experiment
-   :hidden:
-
-   experiment
-   collection
 
 .. toctree::
    :maxdepth: 2
-   :titlesonly:
-   :caption: Experiment Modification
-   :hidden:
+   :caption: mrfmsim basics
 
-   ref_modifier
-   ref_shortcut
+
+   basic/inheritance
+   basic/component
+   basic/modifier
+   basic/plugin
 
 .. toctree::
    :maxdepth: 2
-   :titlesonly:
-   :caption: API Documentation
-   :hidden:
+   :caption: experiment basics
 
-   api_plugin
-   api_component
-   api_configuration
+
+   basic/cermit_protocol.rst
+   basic/geometry.rst
+   basic/tip_size.rst
+   basic/spin_count.rst
+
+
+.. toctree::
+   :maxdepth: 2
+   :caption: experiment Setups
+
+
+   setup/coordinates
+   setup/sample
+   setup/grid
+   setup/magnet
+   setup/cantilever
+
+.. toctree::
+   :maxdepth: 2
+   :caption: experiments
+
+   experiment/IBMCyclic.rst
+   experiment/CermitSat.rst
+   experiment/CermitTD.rst
+   experiment/CermitARP.rst
+   experiment/CermitSingleSpin.rst
+
+.. toctree::
+   :maxdepth: 2
+   :caption: references
+
+   reference/ref_magnetization.rst
+   reference/ref_polarization.rst
+   reference/ref_field.rst
+   reference/ref_math.rst
+   reference/ref_misc.rst
 
 
 Indices and tables

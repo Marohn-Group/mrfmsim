@@ -14,38 +14,39 @@ class TestGrid:
     def grid(self):
         """Standard grid."""
         return Grid(
-            shape=(11, 5, 9),
-            step=[1.10, 0.40, 1.10],
-            origin=[1.0, 1.0, 1.0],
+            grid_shape=(11, 5, 9),
+            grid_step=[1.10, 0.40, 1.10],
+            grid_origin=[1.0, 1.0, 1.0],
         )
 
     def test_str(self, grid):
         """Test grid str."""
 
         grid_str = """\
-        Grid(shape=(11, 5, 9)
-        \tstep=[1.1, 0.4, 1.1] nm
-        \torigin=[1.0, 1.0, 1.0] nm
-        \tvoxel=0.484 nm^3
-        \trange=[11.   1.6  8.8] nm
-        \tlength=[12.1  2.   9.9] nm)"""
+        Grid
+          grid_shape = (11, 5, 9)
+          grid_step = [1.1, 0.4, 1.1] nm
+          grid_origin = [1.0, 1.0, 1.0] nm
+          grid_voxel = 0.484 nm^3
+          grid_range = [11.0, 1.6, 8.8] nm
+          grid_length = [12.1, 2.0, 9.9] nm"""
 
         assert str(grid) == dedent(grid_str)
 
     def test_grid_voxel(self, grid):
         """Test attribute grid voxel."""
 
-        assert grid.voxel == 1.1 * 0.40 * 1.1
+        assert grid.grid_voxel == 1.1 * 0.40 * 1.1
 
     def test_grid_range(self, grid):
         """Test grid range."""
 
-        assert np.array_equal(grid.range, np.array([11.0, 1.6, 8.8]))
+        assert np.array_equal(grid.grid_range, np.array([11.0, 1.6, 8.8]))
 
     def test_grid_length(self, grid):
         """Test grid length."""
 
-        assert np.allclose(grid.length, np.array([12.1, 2.0, 9.9]), rtol=1e-15)
+        assert np.allclose(grid.grid_length, np.array([12.1, 2.0, 9.9]), rtol=1e-15)
 
     def test_grid_array(self, grid):
         """Test grid values.
@@ -70,13 +71,13 @@ class TestGrid:
             grid.grid_array[2], grid_z.reshape(1, 1, 9), rtol=1e-15, atol=1e-15
         )
 
-    def test_grid_extents(self):
+    def test_grid_extents_method(self):
         """Test grid extents calculation as a staticmethod."""
 
         length = np.array([2, 4, 6])
         origin = np.array([3, 4, 5])
         assert np.array_equal(
-            Grid.grid_extents(length, origin), [[2, 4], [2, 6], [2, 8]]
+            Grid.grid_extents_method(length, origin), [[2, 4], [2, 6], [2, 8]]
         )
 
     def test_extend_grid_by_pts(self, grid):

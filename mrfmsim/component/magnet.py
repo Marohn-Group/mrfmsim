@@ -13,8 +13,8 @@ class SphereMagnet(ComponentBase):
     :param float mu0_Ms: saturation magnetization [mT]
     """
 
-    radius: float = field(metadata={"unit": "nm", "format": ".1f"})
-    origin: list[float] = field(metadata={"unit": "nm"})
+    magnet_radius: float = field(metadata={"unit": "nm", "format": ".1f"})
+    magnet_origin: list[float] = field(metadata={"unit": "nm", "format": ".1f"})
     mu0_Ms: float = field(metadata={"unit": "mT"})
 
     def Bz_method(self, x, y, z):
@@ -40,9 +40,9 @@ class SphereMagnet(ComponentBase):
         magnetization in mT.
         """
 
-        dx = (x - self.origin[0]) / self.radius
-        dy = (y - self.origin[1]) / self.radius
-        dz = (z - self.origin[2]) / self.radius
+        dx = (x - self.magnet_origin[0]) / self.magnet_radius
+        dy = (y - self.magnet_origin[1]) / self.magnet_radius
+        dz = (z - self.magnet_origin[2]) / self.magnet_radius
 
         pre_term = self.mu0_Ms / 3.0
 
@@ -71,7 +71,7 @@ class SphereMagnet(ComponentBase):
         )
 
     def Bzx_method(self, x, y, z):
-        r"""Calcualte magnetic field gradient :math:`B_{zx}`.
+        r"""Calculate magnetic field gradient :math:`B_{zx}`.
 
         :math:`B_{zx} \equiv \partial B_z / \partial x`
         [ :math:`\mathrm{mT} \: \mathrm{nm}^{-1}` ].
@@ -92,10 +92,10 @@ class SphereMagnet(ComponentBase):
         :rtype: np.array
         """
 
-        dx = (x - self.origin[0]) / self.radius
-        dy = (y - self.origin[1]) / self.radius
-        dz = (z - self.origin[2]) / self.radius
-        pre_term = self.mu0_Ms / self.radius
+        dx = (x - self.magnet_origin[0]) / self.magnet_radius
+        dy = (y - self.magnet_origin[1]) / self.magnet_radius
+        dz = (z - self.magnet_origin[2]) / self.magnet_radius
+        pre_term = self.mu0_Ms / self.magnet_radius
 
         return pre_term * self._bzx(dx, dy, dz)
 
@@ -144,10 +144,10 @@ class SphereMagnet(ComponentBase):
         :rtype: np.array
         """
 
-        dx = (x - self.origin[0]) / self.radius
-        dy = (y - self.origin[1]) / self.radius
-        dz = (z - self.origin[2]) / self.radius
-        pre_term = self.mu0_Ms / (self.radius**2)
+        dx = (x - self.magnet_origin[0]) / self.magnet_radius
+        dy = (y - self.magnet_origin[1]) / self.magnet_radius
+        dz = (z - self.magnet_origin[2]) / self.magnet_radius
+        pre_term = self.mu0_Ms / (self.magnet_radius**2)
 
         return pre_term * self._bzxx(dx, dy, dz)
 
@@ -188,15 +188,15 @@ class RectangularMagnet(ComponentBase):
         range in the x, y and z direction after the center point to the origin.
     """
 
-    length: list[float] = field(metadata={"unit": "nm"})
-    origin: list[float] = field(metadata={"unit": "nm"})
+    magnet_length: list[float] = field(metadata={"unit": "nm", "format": ".1f"})
+    magnet_origin: list[float] = field(metadata={"unit": "nm", "format": ".1f"})
     mu0_Ms: float = field(metadata={"unit": "mT"})
 
     def __post_init__(self):
         self._range = np.column_stack(
             (
-                -np.array(self.length) / 2 + self.origin,
-                np.array(self.length) / 2 + self.origin,
+                -np.array(self.magnet_length) / 2 + self.magnet_origin,
+                np.array(self.magnet_length) / 2 + self.magnet_origin,
             )
         ).ravel()
         self._pre_term = self.mu0_Ms / (4 * np.pi)
@@ -352,30 +352,14 @@ class RectangularMagnet(ComponentBase):
         """
 
         return (
-            -dy1
-            * dz1
-            / (np.sqrt(dx1**2 + dy1**2 + dz1**2) * (dx1**2 + dz1**2))
-            + dy1
-            * dz1
-            / (np.sqrt(dx2**2 + dy1**2 + dz1**2) * (dx2**2 + dz1**2))
-            + dy2
-            * dz1
-            / (np.sqrt(dx1**2 + dy2**2 + dz1**2) * (dx1**2 + dz1**2))
-            - dy2
-            * dz1
-            / (np.sqrt(dx2**2 + dy2**2 + dz1**2) * (dx2**2 + dz1**2))
-            + dy1
-            * dz2
-            / (np.sqrt(dx1**2 + dy1**2 + dz2**2) * (dx1**2 + dz2**2))
-            - dy1
-            * dz2
-            / (np.sqrt(dx2**2 + dy1**2 + dz2**2) * (dx2**2 + dz2**2))
-            - dy2
-            * dz2
-            / (np.sqrt(dx1**2 + dy2**2 + dz2**2) * (dx1**2 + dz2**2))
-            + dy2
-            * dz2
-            / (np.sqrt(dx2**2 + dy2**2 + dz2**2) * (dx2**2 + dz2**2))
+            -dy1 * dz1 / (np.sqrt(dx1**2 + dy1**2 + dz1**2) * (dx1**2 + dz1**2))
+            + dy1 * dz1 / (np.sqrt(dx2**2 + dy1**2 + dz1**2) * (dx2**2 + dz1**2))
+            + dy2 * dz1 / (np.sqrt(dx1**2 + dy2**2 + dz1**2) * (dx1**2 + dz1**2))
+            - dy2 * dz1 / (np.sqrt(dx2**2 + dy2**2 + dz1**2) * (dx2**2 + dz1**2))
+            + dy1 * dz2 / (np.sqrt(dx1**2 + dy1**2 + dz2**2) * (dx1**2 + dz2**2))
+            - dy1 * dz2 / (np.sqrt(dx2**2 + dy1**2 + dz2**2) * (dx2**2 + dz2**2))
+            - dy2 * dz2 / (np.sqrt(dx1**2 + dy2**2 + dz2**2) * (dx1**2 + dz2**2))
+            + dy2 * dz2 / (np.sqrt(dx2**2 + dy2**2 + dz2**2) * (dx2**2 + dz2**2))
         )
 
     def Bzxx_method(self, x, y, z):

@@ -1,10 +1,4 @@
-from mrfmsim.modifier import (
-    replace_component,
-    print_inputs,
-    print_output,
-    numba_jit,
-    parse_fields,
-)
+from mrfmsim.modifier import replace_component, numba_jit
 import inspect
 import pytest
 from types import SimpleNamespace
@@ -15,9 +9,7 @@ class TestReplaceComponent:
     def comp_mod(self):
         """Return a component modified function."""
 
-        return replace_component(
-            {"obj1": ["a", ("b", "b1")], "obj2": [("c", "c2"), "d"]}
-        )
+        return replace_component({"obj1": ["a", "b"], "obj2": ["c", "d"]})
 
     @pytest.fixture
     def func(self):
@@ -35,8 +27,8 @@ class TestReplaceComponent:
     def test_execution(self, func, comp_mod):
         """Test component modified function to process the correct input."""
 
-        obj1 = SimpleNamespace(a=1, b1=2)
-        obj2 = SimpleNamespace(c2=3, d=4)
+        obj1 = SimpleNamespace(a=1, b=2)
+        obj2 = SimpleNamespace(c=3, d=4)
 
         assert comp_mod(func)(e=5, f=6, obj1=obj1, obj2=obj2) == 720
 
@@ -44,66 +36,58 @@ class TestReplaceComponent:
         """Test component modified function has the correct metadata."""
 
         assert (
-            comp_mod.metadata == "replace_component({'obj1': ['a', ('b', 'b1')]"
-            ", 'obj2': [('c', 'c2'), 'd']})"
+            comp_mod.metadata == "replace_component({'obj1': ['a', 'b']"
+            ", 'obj2': ['c', 'd']})"
         )
 
-    def test_duplicated_parameter(self, func):
+    # test name duplication behaviors
+
+    def test_duplicated_parameter(self):
         """Test component parameter already exists in function."""
 
-        with pytest.raises(AssertionError, match="Parameter 'a' is already in the signature"):
-            replace_component({"a": [("b", "a")]})(func)
+        def func(a, b, obj):
+            return a + b, obj
 
+        with pytest.raises(
+            AssertionError, match="parameter 'obj' already in the signature"
+        ):
+            replace_component({"obj": ["a", "b"]})(func)
 
-class TestPrintModifiers:
-    @pytest.fixture
-    def func(self):
-        def b_tot(b1, b0, bz):
-            return b1 + b0 + bz
+    def test_self_parameter(self):
+        """Test component parameter with duplicated component name.
 
-        return b_tot
+        THe function should allow signature that already exists.
+        """
 
-    def test_parse_field_with_attributes_or_slicers(self):
-        """Test the parse_field that can parse field with attributes or slicers."""
+        def func(a, b, obj):
+            return a + b, obj
 
-        assert sorted(parse_fields("{b0[0]} [mT] b0 {b0[1]:.3e} [mT] {b1.value}")) == [
-            "b0",
-            "b1",
-        ]
+        mod = replace_component({"obj": ["a", "b"]}, True)
+        sig_parameters = list(inspect.signature(mod(func)).parameters.keys())
+        assert sig_parameters == ["obj"]
 
-    def test_parse_field(self):
-        """Test the parse_field function."""
+        obj = SimpleNamespace(a=1, b=2)
 
-        assert sorted(
-            parse_fields("b1 {b1:.3f} [mT] b0 {b0:.3e} [mT] bz {bz} [mT]")
-        ) == [
-            "b0",
-            "b1",
-            "bz",
-        ]
+        assert mod(func)(obj=obj) == (3, obj)
 
-    def test_print_inputs(self, capsys, func):
-        """Test the print_inputs."""
+    def test_self_parameter_with_duplicated(self):
+        """Test component parameter with duplicated attribute.
 
-        mod = print_inputs("b1 {b1:.3f} [mT] b0 {b0:.3e} [mT] bz {bz}", end="--")
-        mod_func = mod(func)
-        mod_func(b1=1, b0=2, bz=3)
-        captured = capsys.readouterr()
-        assert captured.out == "b1 1.000 [mT] b0 2.000e+00 [mT] bz 3--"
-        assert (
-            mod.metadata
-            == "print_inputs('b1 {b1:.3f} [mT] b0 {b0:.3e} [mT] bz {bz}', end='--')"
-        )
+        The function should raise an error.
+        """
 
-    def test_print_output_modifier(self, capsys, func):
-        """Test the stdout_output_modifier."""
+        def func(a, b, obj):
+            return a + b, obj
 
-        mod = print_output("b_tot {b_tot:.1f} [mT]")
-        mod_func = mod(func)
-        mod_func(b1=1, b0=2, bz=3)
-        captured = capsys.readouterr()
-        assert captured.out == "b_tot 6.0 [mT]\n"
-        assert mod.metadata == "print_output('b_tot {b_tot:.1f} [mT]')"
+        with pytest.raises(
+            ValueError, match="attribute name cannot be the same as component 'obj'"
+        ):
+            replace_component({"obj": ["a", "b", "obj"]}, True)(func)
+
+        with pytest.raises(
+            AssertionError, match="parameter 'obj' already in the signature"
+        ):
+            replace_component({"obj": ["a", "b", "obj"]}, False)(func)
 
 
 def test_numba_jit():

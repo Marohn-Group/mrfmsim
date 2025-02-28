@@ -16,10 +16,11 @@ def test_Cantilever_str(cantilever):
     """Test the string representation of a cantilever object."""
 
     cantilever_str = """\
-    Cantilever(k_c=7.800e+02 aN/nm
-    \tf_c=4.975e+06 Hz
-    \tk2f_modulated=1.436e+03 Hz.nm/aN
-    \tk2f=3.189e+03 Hz.nm/aN)"""
+    Cantilever
+      k_c = 7.800e+02 aN/nm
+      f_c = 4.975e+06 Hz
+      k2f_modulated = 1.436e+03 Hz.nm/aN
+      k2f = 3.189e+03 Hz.nm/aN"""
 
     assert str(cantilever) == dedent(cantilever_str)
 

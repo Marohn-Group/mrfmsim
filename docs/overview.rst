@@ -13,26 +13,16 @@ prototyping stages or other groups. To achieve the flexibility,
 we developed `mmodel <https://github.com/Marohn-Group/mmodel>`__ package as a
 backend for *mrfmsim*, allowing us to use directed acyclic 
 graphs (DAG) to define experiments. The graph backend allows modular experiment
-definition and fast modification to existing models. For a detailed explanation of 
-the "graph", "model", "modifier", and "shortcut" functionalities,
-see `mmodel documentation <https://github.com/Marohn-Group/mmodel-docs>`__. 
-The *mrfmsim* package offers additional functionalities for interacting and
-modifying the experiment models, for example,
-scripting using YAML files, creating optimized loops, printing out intermediate
-results, and grouping experiments using experiment collections. The package also
-provides various features through the plugin system, including a command line interface,
-unit system, and three-dimensional plotting capabilities.
+definition and fast modification to existing models. 
+*mrfmsim* extends the *mmodel* framework by adding physical models and calculations
+specific to MRFM experiments.
 
-Examples
+examples
 --------
 
 Here, we use a Cornell-style CERMIT ESR experiment as an example
-(see 
-`mrfmsim-marohn documentation <https://github.com/Marohn-Group/mrfmsim-marohn-docs>`__ 
-for the explanation of the experiment). The notebook with all the codes on this page is
-available at
+The notebook with all the codes on this page is available at
 :download:`mrfmsim_overview </_downloads/mrfmsim_overview.ipynb>`.
-The *mrfmsim-marohn* package is required for the following examples.
 
 
 We define the necessary inputs for the experiment:
@@ -49,8 +39,8 @@ We define the necessary inputs for the experiment:
         T2=0.45e-6,
         spin_density=0.5,
     )
-    magnet = SphereMagnet(radius=3300.0, mu0_Ms=440.0, origin=[0, 0, 3300])
-    grid = Grid(shape=[400, 1200, 8], step=[25, 25, 25], origin=[0, 0, -100])
+    magnet = SphereMagnet(magnet_radius=3300.0, mu0_Ms=440.0, magnet_origin=[0, 0, 3300])
+    grid = Grid(grid_shape=[400, 1200, 8], grid_step=[25, 25, 25], grid_origin=[0, 0, -100])
     cantilever = Cantilever(k_c=7.8e5, f_c=4.975e6)
 
     # define the input parameters
@@ -60,73 +50,75 @@ We define the necessary inputs for the experiment:
     f_rf = 19e9  # microwave frequency [Hz]
     h = [0, 0, 1450]  # tip sample separation [nm]
 
-Graph representation and metadata
+We can view the summary of the Sample object.
+
+.. code:: python
+
+    >>> print(sample)
+    Sample
+      spin = 'e'
+      T1 = 1.300e-03 s
+      T2 = 4.500e-07 s
+      temperature = 11.000 K
+      spin_density = 0.500 1/nm^3
+      Gamma = 1.761e+08 rad/(s.mT)
+      J = 0.5
+      dB_hom = 0.023 mT
+      dB_sat = 0.000 mT
+
+
+graph representation and metadata
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The graph representation of the experiment allows us to visualize the steps of the 
 experiment easily. The metadata shows the experiment's signature, returns, description,
-and more. The *mrfmsim-marohn* package contains standalone experiment models and model
-collections. The standalone experiments can be directly imported, and experiments within
-the collection can be accessed using the experiment name as the key. 
-
-.. note::
-
-    The *mrfmsim-marohn* package is loaded as a plugin of the *mrfmsim* package.
-    The experiments are accessed through the ``mrfmsim.experiment`` module.
+and more. 
 
 To access a standalone experiment model:
 
 .. code:: python
 
-    >>> from mrfmsim.experiment import IBMCyclic
+    from mrfmsim.experiment import IBMCyclic
+    
     >>> print(IBMCyclic)
     IBMCyclic(B0, df_fm, f_rf, grid, h, magnet, sample)
     returns: (dF2_spin, dF_spin)
     graph: ibm_cyclic_graph
     handler: MemHandler
-    components:
-    - magnet: ['Bz_method', 'Bzx_method']
-    - sample: ['J', 'Gamma', 'spin_density', 'temperature']
-    - grid: ['grid_array', ['grid_voxel', 'voxel']]
 
     Simulate an IBM-style cyclic-inversion magnetic resonance force microscope
     experiment.
 
-To access an experiment model from a collection:
+To access an experiment model from a experiment group:
 
 .. code:: python
 
-    # print collection summary
-    # print(CermitESRCollection)
+    # print c summary
+    print(CermitESRGroup)
     # list experiments
-    # print(list(CermitESRCollection.experiments.keys()))
+    print(list(CermitESRGroup.experiments.keys()))
 
-    CermitESR = CermitESRCollection['CermitESR']
+    CermitESR = CermitESRGroup['CermitESR']
 
 To printout the metadata of the model:
-    
+
 .. code:: python
 
-    >>> print(CermitESR)
+    print(CermitESR)
 
     CermitESR(B0, B1, cantilever, f_rf, grid, h, magnet, mw_x_0p, sample)
     returns: df_spin
-    collection: CermitESR
+    group: CermitESR
     graph: CermitESR_graph
     handler: MemHandler
-    components:
-    - magnet: ['Bz_method', 'Bzx_method', 'Bzxx_method']
-    - sample: ['J', 'Gamma', 'spin_density', 'temperature', 'dB_sat', 'dB_hom']
-    - grid: ['grid_array', ['grid_shape', 'shape'], ['grid_step', 'step'], [...]
-    - cantilever: ['k2f_modulated']
 
-        CERMIT ESR experiment for a large tip.
+    CERMIT ESR experiment for a large tip.
 
 To draw the graph of the model:
 
 .. code:: python
 
-    >>> CermitESR.visualize()
+    CermitESR.visualize()
 
 .. image:: _static/CermitESR.pdf
     :width: 800px
@@ -155,11 +147,11 @@ inspect the run time of "minimum absolute x offset" and
 
 .. code:: python
 
-    >>> from mrfmsim.modifier import profile_time
-    >>> mods = CermitESR.get_node_object("rel_dpol").modifiers
-    >>> CermitESR_profile = CermitESR.edit_node("rel_dpol", modifiers=mods + [profile_time(10)])
+    from mmodel.modifier import profile_time
+    mods = CermitESR.get_node_object("rel_dpol sat").modifiers
+    CermitESR_profile = CermitESR.edit_node("rel_dpol sat", modifiers=mods + [profile_time(10)])
+    
     >>> signal = CermitESR_profile(B0, B1, cantilever, f_rf, grid, h, magnet, mw_x_0p, sample)
-
     rel_dpol_sat_steadystate - 10 loops, best of 1: 30.27 ms per loop
 
 Modify returns - output intermediate values
@@ -170,9 +162,9 @@ To output intermediate values, we can directly change the returns.
 To output the intermediate values of "f_rf" and "dk_spin" and the result
 of "df_spin"::
 
-    >>> CermitESR_intermediate = CermitESR.edit(returns=["f_rf", "dk_spin", "df_spin"])
-    >>> CermitESR_intermediate(B0, B1, cantilever, f_rf, grid, h, magnet, mw_x_0p, sample)
+    CermitESR_intermediate = CermitESR.edit(returns=["f_rf", "dk_spin", "df_spin"])
 
+    >>> CermitESR_intermediate(B0, B1, cantilever, f_rf, grid, h, magnet, mw_x_0p, sample)
     (19000000000.0, -0.0024141111050284525, -0.0034656991967769407)
 
 The returned values are in the same order as the returns list.
@@ -206,9 +198,9 @@ to print out the intermediate values):
 
 .. code:: python
 
-    >>> from mrfmsim.shortcut import loop_shortcut
-    >>> CermitESR_frf_loop = loop_shortcut(CermitESR, "f_rf", name="CermitESR_frfLoop")
-    >>> CermitESR_frf_loop.visualize()
+    from mmodel.shortcut import loop_shortcut
+    CermitESR_frf_loop = loop_shortcut(CermitESR, "f_rf", name="CermitESR_frf_Loop")
+    CermitESR_frf_loop.visualize()
 
 .. image:: _static/CermitESR_frf_loop.pdf
     :width: 800px
@@ -217,12 +209,12 @@ to print out the intermediate values):
 |br|
 To loop the "B0" parameter on top of "f_rf"::
 
-    >>> CermitESR_B0_frf_loop = loop_shortcut(
-            CermitESR_frf_loop, "B0", name="CermitESR_b0frfLoop"
-        )
-    >>> CermitESR_B0_frf_loop.visualize()
+    CermitESR_B0_frf_loop = loop_shortcut(
+        CermitESR_frf_loop, "B0", name="CermitESR_B0frf_Loop"
+    )
+    CermitESR_B0_frf_loop.visualize()
 
-.. image:: _static/CermitESR_b0_frf_loop.pdf
+.. image:: _static/CermitESR_b0frf_loop.pdf
     :width: 800px
     :align: center
 
@@ -231,9 +223,10 @@ The model can be executed by supplying lists for "B0" and "f_rf":
 
 .. code:: python
 
-    >>> import numpy as np
-    >>> B0_list = np.arange(500, 900, 200)  # external field [mT]
-    >>> f_rf_list = np.arange(18.5e9, 19.5e9, 0.5e9)  # microwave frequency [Hz]
+    import numpy as np
+    B0_list = np.arange(500, 900, 200)  # external field [mT]
+    f_rf_list = np.arange(18.5e9, 19.5e9, 0.5e9)  # microwave frequency [Hz]
+
     >>> CermitESR_B0_frf_loop(
             B0_loop=B0_list,
             B1=B1,
@@ -245,7 +238,6 @@ The model can be executed by supplying lists for "B0" and "f_rf":
             mw_x_0p=mw_x_0p,
             sample=sample,
         )
-
     [[-0.005362279436110155, -0.003465699196776941],
      [0.0071300149234139135, 0.02300114588870745]]
 
@@ -291,16 +283,15 @@ the execution:
 
 .. code:: python
 
-    >>> from mrfmsim.shortcut import print_shortcut
-    >>> print_model = print_shortcut(
-            CermitESR, ["B0={B0:.2f} mT", "f_rf={f_rf:.2f} GHz", "df_spin={df_spin:.2e} Hz"]
-        )
+    from mmodel.shortcut import print_shortcut
+    print_model = print_shortcut(
+        CermitESR, ["B0 = {B0:.2f} mT", "f_rf = {f_rf:.2f} Hz", "df_spin = {df_spin:.2e} Hz"]
+    )
 
     >>> signal = print_model(B0, B1, cantilever, f_rf, grid, h, magnet, mw_x_0p, sample)
-        
-    B0=500.00 mT
-    f_rf=19000000000.00 GHz
-    df_spin=-3.47e-03 Hz
+    B0 = 500.00 mT
+    f_rf = 1.90e+10 Hz
+    df_spin = -3.47e-03 Hz
 
 .. Note::
 

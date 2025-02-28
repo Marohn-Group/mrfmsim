@@ -3,18 +3,64 @@ from functools import wraps
 import numba as nb
 from inspect import Parameter, signature, Signature
 from pprint import pformat
-from string import Formatter
+from copy import deepcopy
 from collections import defaultdict
+import mmodel
 
 
-def replace_component(replacement: dict):
+def replace_component(replacement: dict, allow_duplicate=False):
     """Modify the signature with components.
 
     The modifier modifies the internal model function. The wrapper
-    function is keyword-only.
+    function is keyword-only. The function by default does not
+    allow duplicated signature. If we want to replace several
+    attributes with a component, the component name cannot exist
+    in the original signature. For example, if we have a function
 
-    :param dict[list | str] replacement: in the format of
-        {component: [[original, replacement], original ...}
+        def func(a, b, obj):
+            return a + b, obj
+
+    and we want to replace a and b with a component, we cannot
+    name the component "obj".
+
+    In rares that we do want to replace a, b with a component,
+
+        def func(obj):
+            return obj.a + obj.b, obj
+
+        func(obj=obj)
+
+    we would have to use "obj_obj" as the component name. The
+    result function is equivalent to
+
+        def func(obj_obj, obj):
+            return obj_obj.a + obj_obj.b + obj
+
+        func(obj_obj=obj, obj=obj)
+
+    The behavior is very confusing to users. The solution is to
+    replace the components, but leave the original "obj" signature
+    as it is. In the final signature, the duplicated signatures
+    are combined into one. The solution here is to add a boolean
+    flag allow_duplicate. If the flag is set to True, the function
+    allows duplicated signatures.
+
+    The solution, however, leaves another ambiguity. If we indeed
+    want to replace the component with the same name, but use
+    the original name with an attribute:
+
+        def func(obj):
+            return obj.a + obj.b, obj.obj
+
+        func(obj=obj)
+
+    We have decided that this behavior is not allowed regardless the flag.
+    Because in this case, in an inspection attempt, it is confusing to
+    understand if the obj is the original obj or an attribute to the new obj.
+    In this case, a new object name should be used.
+
+    :param dict[str] replacement: in the format of
+        {component_object: [replacement_attribute1, replacement_attribute2, ...]}
     """
 
     def modifier(func):
@@ -23,123 +69,58 @@ def replace_component(replacement: dict):
 
         new_params_dict = dict(params)  # mutable
         replacement_dict = defaultdict(list)
-        for comp, rep_list in replacement.items():
-            assert (
-                comp not in params
-            ), f"Parameter {repr(comp)} is already in the signature."
-            new_params_dict[comp] = Parameter(comp, 1)
 
-            for element in rep_list:
-                if isinstance(element, str):
-                    attr = element
-                    replacement_dict[comp].append((attr, attr))
-                else:
-                    attr = element[0]
-                    replacement_dict[comp].append(element)
-                new_params_dict.pop(attr, None)
+        # in the event that the duplication is allowed
+        # and the component is already in the signature
+        # the list is maintained for the wrapped function
+        duplicated_copmp = []
+        for comp, rep_attrs in replacement.items():
+
+            if not allow_duplicate:
+                # check duplication last
+                assert (
+                    comp not in params
+                ), f"parameter {repr(comp)} already in the signature"
+
+            elif comp in params:
+                duplicated_copmp.append(comp)
+            # new_params_dict[comp] = Parameter(comp, 1)
+
+            for attr in rep_attrs:
+                # check attr
+                # the error is related to the component dictionary
+                # definition, regardless of the target function signature
+                if attr == comp:
+                    raise ValueError(
+                        f"attribute name cannot be the same as component {repr(comp)}"
+                    )
+                if attr in params:
+                    replacement_dict[comp].append(attr)
+                    new_params_dict.pop(attr, None)
+                    # overwrite if duplicated
+                    new_params_dict[comp] = Parameter(comp, 1)
 
         @wraps(func)
         def wrapped(**kwargs):
-            for comp, rep_list in replacement_dict.items():
-                comp_obj = kwargs.pop(comp)
-                for param, repl in rep_list:
-                    kwargs[param] = getattr(comp_obj, repl)
+            for comp, rep_attrs in replacement_dict.items():
+                if comp in duplicated_copmp:
+                    comp_obj = kwargs[comp]
+                else:
+                    comp_obj = kwargs.pop(comp)
+                for attr in rep_attrs:
+                    kwargs[attr] = getattr(comp_obj, attr)
 
             return func(**kwargs)
 
         wrapped.__signature__ = Signature(
             parameters=sorted(new_params_dict.values(), key=param_sorter)
         )
+        # deepcopy to prevent modification
+        wrapped.param_replacements = deepcopy(replacement_dict)
         return wrapped
 
     modifier.metadata = f"replace_component({pformat(replacement)})"
     return modifier
-
-
-def parse_fields(format_str):
-    """Parse the field from the format string.
-
-    :param str format_str: format string
-    :return: list of fields
-
-    The function parses out the field names in the format string.
-    Some field names have slicers or attribute access, such as
-    B0.value, B0[0], B0[0:2]. The function only returns B0 for all
-    these fields. Since there can be duplicated fields after the
-    name split, the function returns unique elements.
-    """
-
-    # this is a internal function for Formatter
-    # consider rewrite with custom function to prevent breaking
-    # the function ignores slicing and attribute access
-    # B0.value -> B0, B0[0] -> B0
-    from _string import formatter_field_name_split
-
-    fields = [
-        formatter_field_name_split(field)[0]
-        for _, field, _, _ in Formatter().parse(format_str)
-        if field
-    ]
-    return list(set(fields))  # return unique elements
-
-
-def print_inputs(stdout_format: str, **pargs):
-    """Print the node input to the console.
-
-    :param str stdout_format: format string for input and output
-        The format should be keyword only.
-    :param pargs: keyword arguments for the print function
-
-    The names of the parameters are parsed from the format string.
-    """
-
-    def stdout_inputs_modifier(func):
-        inputs = parse_fields(stdout_format)
-
-        @wraps(func)
-        def wrapped(**kwargs):
-            """Print input parameter."""
-            input_dict = {k: kwargs[k] for k in inputs}
-            print(stdout_format.format(**input_dict), **pargs)
-            return func(**kwargs)
-
-        return wrapped
-
-    params = [repr(stdout_format)] + [f"{k}={repr(v)}" for k, v in pargs.items()]
-    stdout_inputs_modifier.metadata = f"print_inputs({', '.join(params)})"
-    return stdout_inputs_modifier
-
-
-def print_output(stdout_format: str, **pargs):
-    """Print the node output to the console.
-
-    :param str stdout_format: format string for input and output
-        The format should be keyword only. The behavior is for keeping the
-        consistency with other print modifiers.
-    :param str end: end of printout
-
-    The names of the parameters are parsed from the format string. The
-    use of the stdout_format is different from the input method, as
-    the modifiers do not know the return name of the node. Only one
-    output field is allowed and the field name is used as the return name.
-    """
-
-    def stdout_output_modifier(func):
-        output = parse_fields(stdout_format)[0]
-
-        @wraps(func)
-        def wrapped(**kwargs):
-            """Print output parameter."""
-
-            result = func(**kwargs)
-            print(stdout_format.format(**{output: result}), **pargs)
-            return result
-
-        return wrapped
-
-    params = [repr(stdout_format)] + [f"{k}={repr(v)}" for k, v in pargs.items()]
-    stdout_output_modifier.metadata = f"print_output({', '.join(params)})"
-    return stdout_output_modifier
 
 
 def numba_jit(**kwargs):
@@ -150,10 +131,9 @@ def numba_jit(**kwargs):
     Use the decorator the same way as numba.jit().
     """
 
+    @mmodel.modifier.add_modifier_metadata("numba_jit", **kwargs)
     def decorator(func):
         func = nb.jit(**kwargs)(func)
         return func
 
-    meta = ", ".join(f"{k}={v}" for k, v in kwargs.items())
-    decorator.metadata = f"numba_jit({meta})"
     return decorator

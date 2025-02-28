@@ -1,20 +1,44 @@
-"""Configuration for testing
+"""Configuration for testing.
 
 The configuration file provides several default graph fixtures
-and test functions
+and test functions.
 """
-
 
 import pytest
 import math
 from mmodel.modifier import loop_input
-from mrfmsim import Experiment, Graph, Node
+from mrfmsim import Experiment, Graph, Node, ExperimentGroup
 import numpy as np
 import operator
 
 
 @pytest.fixture
-def modelgraph():
+def node_edges():
+    """Nodes and edges for creating graph."""
+    grouped_edges = [
+        ("add", ["subtract", "power", "log"]),
+        (["subtract", "power"], "multiply"),
+    ]
+
+    # Lambda node object
+    add = lambda a, h: a + h
+    add.__expr__ = "lambda a, h: a + h"
+    add.__name__ = "add"
+    add_node = Node("add", add, output="c")
+
+    node_objects = [
+        add_node,
+        Node("subtract", operator.sub, inputs=["c", "d"], output="e"),
+        Node("power", math.pow, inputs=["c", "f"], output="g"),
+        Node("multiply", np.multiply, inputs=["e", "g"], output="k", output_unit="m^2"),
+        Node("log", math.log, inputs=["c", "b"], output="m"),
+    ]
+
+    return grouped_edges, node_objects
+
+
+@pytest.fixture
+def modelgraph(node_edges):
     """Model graph for creating experiment and model.
 
     The results are:
@@ -24,18 +48,7 @@ def modelgraph():
     h defaults to 2
     """
 
-    grouped_edges = [
-        ("add", ["subtract", "power", "log"]),
-        (["subtract", "power"], "multiply"),
-    ]
-
-    node_objects = [
-        Node("add", np.add, inputs=["a", "h"], output="c"),
-        Node("subtract", operator.sub, inputs=["c", "d"], output="e"),
-        Node("power", math.pow, inputs=["c", "f"], output="g"),
-        Node("multiply", np.multiply, inputs=["e", "g"], output="k", output_unit="m^2"),
-        Node("log", math.log, inputs=["c", "b"], output="m"),
-    ]
+    grouped_edges, node_objects = node_edges
 
     G = Graph(name="test_graph")
     G.add_grouped_edges_from(grouped_edges)
@@ -47,7 +60,7 @@ def modelgraph():
 @pytest.fixture
 def experiment(modelgraph):
     """Test experiment instance with default settings."""
-    return Experiment("test_experiment_plain", modelgraph, defaults={"h": 2})
+    return Experiment("test_experiment_plain", modelgraph, param_defaults={"h": 2})
 
 
 @pytest.fixture
@@ -57,8 +70,31 @@ def experiment_mod(modelgraph):
     return Experiment(
         "test_experiment",
         modelgraph,
-        components={"component": [("a", "a1"), ("b", "b1")]},
+        components={"replace_obj": ["a", "b"]},
         modifiers=[loop_input(parameter="d")],
         doc="Test experiment with components.",
-        defaults={"h": 2},
+        param_defaults={"h": 2},
+    )
+
+
+@pytest.fixture
+def experiment_group(node_edges):
+
+    grouped_edges, node_objects = node_edges
+
+    experiment_recipes = {
+        "exp1": {
+            "grouped_edges": grouped_edges,
+            "node_objects": node_objects,
+            "doc": "This is a test experiment.",
+        }
+    }
+
+    experiment_defaults = {
+        "components": {"replace_obj": ["a", "b"]},
+        "modifiers": [loop_input(parameter="d")],
+    }
+    doc = "This is a test experiment group."
+    return ExperimentGroup(
+        "Test Group", node_objects, experiment_recipes, experiment_defaults, doc
     )

@@ -11,14 +11,15 @@ def test_sample_str():
     sample = Sample(spin="1H", T1=1e-6, T2=5e-6, spin_density=49.0, temperature=4.2)
 
     sample_str = """\
-    Sample(spin=1H
-    \tT1=1.000e-06 s
-    \tT2=5.000e-06 s
-    \ttemperature=4.200 K
-    \tspin_density=49.000 1/nm^3
-    \tGamma=2.675e+05 rad/(s.mT)
-    \tJ=0.5
-    \tdB_hom=0.748 mT
-    \tdB_sat=1.672 mT)"""
+    Sample
+      spin = '1H'
+      T1 = 1.000e-06 s
+      T2 = 5.000e-06 s
+      temperature = 4.200 K
+      spin_density = 49.000 1/nm^3
+      Gamma = 2.675e+05 rad/(s.mT)
+      J = 0.5
+      dB_hom = 0.748 mT
+      dB_sat = 1.672 mT"""
 
     assert str(sample) == dedent(sample_str)
