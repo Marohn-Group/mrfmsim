@@ -98,7 +98,7 @@ To access an experiment model from a experiment group:
     # list experiments
     print(list(CermitESRGroup.experiments.keys()))
 
-    CermitESR = CermitESRGroup['CermitESR']
+    CermitESR = CermitESRGroup.experiments["CermitESR"]
 
 To printout the metadata of the model:
 
@@ -108,7 +108,7 @@ To printout the metadata of the model:
 
     CermitESR(B0, B1, cantilever, f_rf, grid, h, magnet, mw_x_0p, sample)
     returns: df_spin
-    group: CermitESR
+    group: CermitESRGroup
     graph: CermitESR_graph
     handler: MemHandler
 
@@ -207,7 +207,9 @@ to print out the intermediate values):
     :align: center
 
 |br|
-To loop the "B0" parameter on top of "f_rf"::
+To loop the "B0" parameter on top of "f_rf":
+
+.. code:: python
 
     CermitESR_B0_frf_loop = loop_shortcut(
         CermitESR_frf_loop, "B0", name="CermitESR_B0frf_Loop"

@@ -7,6 +7,12 @@ The format is based on
 and this project adheres to
 `Semantic Versioning <https://semver.org/spec/v2.0.0.html>`_
 
+[unreleased]
+------------
+
+Minor fixes to documentation.
+
+
 [0.3.0] - 2025-02-25
 ----------------------
 
