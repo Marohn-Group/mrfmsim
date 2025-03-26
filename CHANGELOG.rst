@@ -12,6 +12,11 @@ and this project adheres to
 
 Minor fixes to documentation.
 
+Changed
+^^^^^^^
+
+- Change the CERMITD experiment graph to avoid output duplication.
+
 
 [0.3.0] - 2025-02-25
 ----------------------
