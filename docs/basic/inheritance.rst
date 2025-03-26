@@ -63,8 +63,6 @@ of a parameter as a ``dataclass`` field. Python
 is used to simplify the definition process.
 
 
-
-
 ExperimentGroup
 ----------------
 

@@ -17,7 +17,7 @@ definition and fast modification to existing models.
 *mrfmsim* extends the *mmodel* framework by adding physical models and calculations
 specific to MRFM experiments.
 
-examples
+Examples
 --------
 
 Here, we use a Cornell-style CERMIT ESR experiment as an example
@@ -67,7 +67,7 @@ We can view the summary of the Sample object.
       dB_sat = 0.000 mT
 
 
-graph representation and metadata
+Graph representation and metadata
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The graph representation of the experiment allows us to visualize the steps of the 
