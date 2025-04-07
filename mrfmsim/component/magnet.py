@@ -2,6 +2,9 @@ import numpy as np
 import numba as nb
 from dataclasses import dataclass, field
 from mrfmsim.component import ComponentBase
+import sympy as sp
+from sympy import elliptic_k, elliptic_pi
+from scipy.special import elliprf, ellipk, elliprj, ellipe
 
 
 @dataclass
@@ -459,3 +462,150 @@ class RectangularMagnet(ComponentBase):
             * (3.0 * dx2**2 + 2.0 * dy2**2 + 3.0 * dz2**2)
             / ((dx2**2 + dy2**2 + dz2**2) ** 1.5 * (dx2**2 + dz2**2) ** 2)
         )
+
+
+
+class CylinderMagnet:
+    def __init__(self, Radius, Length, magnet_origin, mu0):
+        self.Radius = Radius
+        self.Length = Length
+        self.magnet_origin = magnet_origin
+        self.mu0 = mu0
+
+        def ellipiticPi(n, m):
+            return elliprf(0., 1. - m, 1.) + (n / 3.) * elliprj(0., 1. - m, 1., 1. - n)
+        
+        r, Z, R, L = sp.symbols('r Z R L')
+
+        g = (r-R)/(r+R)
+
+        eps1 = Z+L
+        eps2 = Z-L
+
+        alpha1 = 1/sp.sqrt(eps1**2+(r+R)**2)
+        alpha2 = 1/sp.sqrt(eps2**2+(r+R)**2)
+
+        k1 = (eps1**2 + (r - R)**2)/(eps1**2 + (r + R)**2)
+        k2 = (eps2**2 + (r - R)**2)/(eps2**2 + (r + R)**2)
+        n = 1-g**2
+
+
+        # 定义第三完全椭圆积分
+        P21 = -g/(1 - g**2)*(elliptic_pi(n, sp.sqrt(1 - k1)) - elliptic_k(sp.sqrt(1 - k1))) - 1/(1 - g**2)*(g**2*elliptic_pi(n, 1 - k1) - elliptic_k(1 - k1))
+        P22 = -g/(1 - g**2)*(elliptic_pi(n, sp.sqrt(1 - k2)) - elliptic_k(sp.sqrt(1 - k2))) - 1/(1 - g**2)*(g**2*elliptic_pi(n, 1 - k2) - elliptic_k(1 - k2))
+
+        Bz = (P21*alpha1*eps1-P22*eps2*alpha2)*R/(r+R)/sp.pi
+
+        Bzr = sp.diff(Bz,r)
+        Bzrr = sp.diff(Bzr,r)
+
+
+
+        # 定义所有需要的特殊函数的映射
+        special_functions = {
+            'elliptic_k': ellipk,
+            'elliptic_e': ellipe,
+            'elliptic_pi': ellipiticPi,
+            'sqrt': np.sqrt,
+            'pi': np.pi
+        }
+
+        # 使用自定义模块进行转换
+        self.Bz_np = sp.lambdify((r, Z, R, L), Bz, modules=[special_functions, 'numpy'])
+        self.Bzr_np = sp.lambdify((r, Z, R, L), Bzr, modules=[special_functions, 'numpy'])
+        self.Bzrr_np = sp.lambdify((r, Z, R, L), Bzrr, modules=[special_functions, 'numpy'])
+        
+
+    def Bz_method(self, x, y, z):
+        r"""Calculate magnetic field :math:`B_z` [mT].
+
+                The magnetic field is calculated as
+
+        .. math::
+            can be found in the paper:https://doi.org/10.1016/j.jmmm.2018.02.003.(https://www.sciencedirect.com/science/article/pii/S0304885317334662)
+
+        :param float x: x coordinate of sample grid [nm]
+        :param float y: y coordinate of sample grid [nm]
+        :param float z: z coordinate of sample grid [nm]
+
+
+        Here :math:`(x,y,z)` is the location at which we want to know the field;
+        :math:`r` is the radius of the magnet; :math:`r**2 = x**2 + y**2`;
+        :math 'dx = x-x_0'
+        :math 'dy = y-y_0'
+        :math 'dz = z-z_0'
+        distances to the center of the magnet;
+        :math:`\mu_0 M_s` is the magnetic sphere's saturation
+        magnetization in mT.
+        """
+
+        dr = np.sqrt((x - self.magnet_origin[0])**2+(y - self.magnet_origin[1])**2)
+        dz = (z - self.magnet_origin[2]) 
+
+        pre_term = self.mu0
+
+        return pre_term * self.Bz_np(dr,dz,self.Radius,self.Length/2)  
+
+
+      
+
+    def Bzr_method(self, x, y, z):
+        r"""Calculate magnetic field :math:`B_z` [mT].
+
+                The magnetic field is calculated as
+
+        .. math:
+            using sympy directly calculate the derivative of Bz
+
+        :param float x: x coordinate of sample grid [nm]
+        :param float y: y coordinate of sample grid [nm]
+        :param float z: z coordinate of sample grid [nm]
+
+
+        Here :math:`(x,y,z)` is the location at which we want to know the field;
+        :math:`r` is the radius of the magnet; :math:`r**2 = x**2 + y**2`;
+        :math 'dx = x-x_0'
+        :math 'dy = y-y_0'
+        :math 'dz = z-z_0'
+        distances to the center of the magnet;
+        :math:`\mu_0 M_s` is the magnetic sphere's saturation
+        magnetization in mT.
+        """
+
+        dr = np.sqrt((x - self.magnet_origin[0])**2+(y - self.magnet_origin[1])**2)
+        dz = (z - self.magnet_origin[2]) 
+
+        pre_term = self.mu0
+
+        return pre_term * self.Bzr_np(dr,dz,self.Radius,self.Length/2)
+
+    
+    def Bzrr_method(self, x, y, z):
+        r"""Calculate magnetic field :math:`B_z` [mT].
+
+                The magnetic field is calculated as
+
+        .. math:
+            using sympy directly calculate the derivative of Bzr
+
+        :param float x: x coordinate of sample grid [nm]
+        :param float y: y coordinate of sample grid [nm]
+        :param float z: z coordinate of sample grid [nm]
+
+
+        Here :math:`(x,y,z)` is the location at which we want to know the field;
+        :math:`r` is the radius of the magnet; :math:`r**2 = x**2 + y**2`;
+        :math 'dx = x-x_0'
+        :math 'dy = y-y_0'
+        :math 'dz = z-z_0'
+        distances to the center of the magnet;
+        :math:`\mu_0 M_s` is the magnetic sphere's saturation
+        magnetization in mT.
+        """
+
+        dr = np.sqrt((x - self.magnet_origin[0])**2+(y - self.magnet_origin[1])**2)
+        dz = (z - self.magnet_origin[2]) 
+
+        pre_term = self.mu0
+
+        return pre_term * self.Bzrr_np(dr,dz,self.Radius,self.Length/2)   
