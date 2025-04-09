@@ -40,8 +40,8 @@ class CylinderMagnet(ComponentBase):
 
 
         # 定义第三完全椭圆积分
-        P21 = -g/(1 - g**2)*(elliptic_pi(n, sp.sqrt(1 - k1)) - elliptic_k(sp.sqrt(1 - k1))) - 1/(1 - g**2)*(g**2*elliptic_pi(n, sp.sqrt(1 - k1)) - elliptic_k(sp.sqrt(1 - k1)))
-        P22 = -g/(1 - g**2)*(elliptic_pi(n, sp.sqrt(1 - k2)) - elliptic_k(sp.sqrt(1 - k2))) - 1/(1 - g**2)*(g**2*elliptic_pi(n, sp.sqrt(1 - k2)) - elliptic_k(sp.sqrt(1 - k2)))
+        P21 = -g/(1 - g**2)*(elliptic_pi(n, 1 - k1) - elliptic_k(1 - k1)) - 1/(1 - g**2)*(g**2*elliptic_pi(n, 1 - k1) - elliptic_k(1 - k1))
+        P22 = -g/(1 - g**2)*(elliptic_pi(n, 1 - k2) - elliptic_k(1 - k2)) - 1/(1 - g**2)*(g**2*elliptic_pi(n, 1 - k2) - elliptic_k(1 - k2))
 
         Bz = (P21*alpha1*eps1-P22*eps2*alpha2)*R/(r+R)/sp.pi
 
@@ -77,6 +77,7 @@ class CylinderMagnet(ComponentBase):
         :param float y: y coordinate of sample grid [nm]
         :param float z: z coordinate of sample grid [nm]
 
+        Note that the definition of the elliptic integral is different from the paper.
 
         Here :math:`(x,y,z)` is the location at which we want to know the field;
         :math:`r` is the radius of the magnet; :math:`r**2 = x**2 + y**2`;
