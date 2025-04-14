@@ -7,7 +7,7 @@ from mrfmsim.component import ComponentBase
 
 
 @dataclass
-class CylinderMagnet2(ComponentBase):    
+class CylinderMagnet(ComponentBase):    
     Radius: float = field(default=100, metadata={"units": "nm"})
     Length: float = field(default=100, metadata={"units": "nm"})
     magnet_origin: tuple[float, float, float] = field(default=(0, 0, 0), metadata={"units": "nm"})
