@@ -6,12 +6,21 @@ from dataclasses import dataclass, field
 from mrfmsim.component import ComponentBase
 
 
+
 @dataclass
-class CylinderMagnet(ComponentBase):    
-    Radius: float = field(default=100, metadata={"units": "nm"})
-    Length: float = field(default=100, metadata={"units": "nm"})
-    magnet_origin: tuple[float, float, float] = field(default=(0, 0, 0), metadata={"units": "nm"})
-    mu0_Ms: float = field(default=4*np.pi*1e-7, metadata={"units": "H/m"})
+class CylinderMagnet(ComponentBase):   
+    """Cylinder magnet object with its Bz, Bzx, Bzxx calculations.
+
+    :param float radius: cylinder magnet radius [nm] !!!There would ba a singularity when x^2+y^2=R^2, so set a small difference to R!!!
+    :param float length: cylinder magnet length [nm]
+    :param tuple origin: the position of the magnet origin (x, y, z)
+    :param float mu0_Ms: permeability of free space [H/m]
+    """
+
+    magnet_radius: float = field(metadata={"unit": "nm","format": ".1f"})
+    magnet_length: float = field( metadata={"unit": "nm","format": ".1f"})
+    magnet_origin: tuple[float, float, float] = field(metadata={"unit": "nm","format": ".1f"})
+    mu0_Ms: float = field(metadata={"unit": "mT"})
 
     def __post_init__(self):
 
@@ -94,7 +103,7 @@ class CylinderMagnet(ComponentBase):
         :param float y: y coordinate of sample grid [nm]
         :param float z: z coordinate of sample grid [nm]
 
-        Note that the n in the def of elliptic function is different from the def in the papaer.
+
         Here :math:`(x,y,z)` is the location at which we want to know the field;
         :math:`r` is the radius of the magnet; :math:`r**2 = x**2 + y**2`;
         :math 'dx = x-x_0'
@@ -108,12 +117,12 @@ class CylinderMagnet(ComponentBase):
             return elliprf(0., 1. - m, 1.) + (n / 3.) * elliprj(0., 1. - m, 1., 1. - n)
         dr = np.sqrt((x - self.magnet_origin[0])**2+(y - self.magnet_origin[1])**2)
         dz = (z - self.magnet_origin[2]) 
-        L = self.Length/2
-        g = (dr - self.Radius) / (dr + self.Radius)
+        L = self.magnet_length/2
+        g = (dr - self.magnet_radius) / (dr + self.magnet_radius)
         eps1 = z + L
         eps2 = z - L
-        k1 = (eps1**2 + (dr - self.Radius)**2) / (eps1**2 + (dr + self.Radius)**2)
-        k2 = (eps2**2 + (dr - self.Radius)**2) / (eps2**2 + (dr + self.Radius)**2)
+        k1 = (eps1**2 + (dr - self.magnet_radius)**2) / (eps1**2 + (dr + self.magnet_radius)**2)
+        k2 = (eps2**2 + (dr - self.magnet_radius)**2) / (eps2**2 + (dr + self.magnet_radius)**2)
         n = 1 - g**2
 
         # 然后分别计算：
@@ -129,12 +138,12 @@ class CylinderMagnet(ComponentBase):
 
         if zero_coords.size > 0:
             dr[zero_coords[0][0]][zero_coords[0][1]][zero_coords[0][2]] = np.nan
-            BZ = self.mu0_Ms * self.Bz_np(r=dr,Z=dz,R=self.Radius,L=L,ep11=ep11, ep21=ep21, ep31=ep31, ep12=ep12, ep22=ep22, ep32=ep32) 
-            BZ[zero_coords[0][0]][zero_coords[0][1]][:] = self.mu0_Ms/2*((dz+self.Length/2)/np.sqrt((dz+self.Length/2)**2+(self.Radius)**2)-(dz-self.Length/2)/np.sqrt((dz-self.Length/2)**2+(self.Radius)**2))
+            BZ = self.mu0_Ms * self.Bz_np(r=dr,Z=dz,R=self.magnet_radius,L=L,ep11=ep11, ep21=ep21, ep31=ep31, ep12=ep12, ep22=ep22, ep32=ep32) 
+            BZ[zero_coords[0][0]][zero_coords[0][1]][:] = self.mu0_Ms/2*((dz+self.magnet_length/2)/np.sqrt((dz+self.magnet_length/2)**2+(self.magnet_radius)**2)-(dz-self.magnet_length/2)/np.sqrt((dz-self.magnet_length/2)**2+(self.magnet_radius)**2))
             return BZ   
 
         else:
-            return self.mu0_Ms * self.Bz_np(r=dr,Z=dz,R=self.Radius,L=L,ep11=ep11, ep21=ep21, ep31=ep31, ep12=ep12, ep22=ep22, ep32=ep32) 
+            return self.mu0_Ms * self.Bz_np(r=dr,Z=dz,R=self.magnet_radius,L=L,ep11=ep11, ep21=ep21, ep31=ep31, ep12=ep12, ep22=ep22, ep32=ep32) 
     
       
 
@@ -165,12 +174,12 @@ class CylinderMagnet(ComponentBase):
         dz = (z - self.magnet_origin[2]) 
         zero_coords = np.argwhere(dr == 0)
 
-        L = self.Length/2
-        g = (dr - self.Radius) / (dr + self.Radius)
+        L = self.magnet_length/2
+        g = (dr - self.magnet_radius) / (dr + self.magnet_radius)
         eps1 = z + L
         eps2 = z - L
-        k1 = (eps1**2 + (dr - self.Radius)**2) / (eps1**2 + (dr + self.Radius)**2)
-        k2 = (eps2**2 + (dr - self.Radius)**2) / (eps2**2 + (dr + self.Radius)**2)
+        k1 = (eps1**2 + (dr - self.magnet_radius)**2) / (eps1**2 + (dr + self.magnet_radius)**2)
+        k2 = (eps2**2 + (dr - self.magnet_radius)**2) / (eps2**2 + (dr + self.magnet_radius)**2)
         n = 1 - g**2
 
         # 然后分别计算：
@@ -185,12 +194,12 @@ class CylinderMagnet(ComponentBase):
     
         if zero_coords.size > 0:
             dr[zero_coords[0][0]][zero_coords[0][1]][zero_coords[0][2]] = np.nan
-            BZr = self.mu0_Ms * self.Bzr_np(r=dr,Z=dz,R=self.Radius,L=L,ep11=ep11, ep21=ep21, ep31=ep31, ep12=ep12, ep22=ep22, ep32=ep32)*(x - self.magnet_origin[0])/dr
+            BZr = self.mu0_Ms * self.Bzr_np(r=dr,Z=dz,R=self.magnet_radius,L=L,ep11=ep11, ep21=ep21, ep31=ep31, ep12=ep12, ep22=ep22, ep32=ep32)*(x - self.magnet_origin[0])/dr
             BZr[zero_coords[0][0]][zero_coords[0][1]][:] = np.zeros(len(dz))
             return BZr     
 
         else:
-            return self.mu0_Ms * self.Bzr_np(r=dr,Z=dz,R=self.Radius,L=L,ep11=ep11, ep21=ep21, ep31=ep31, ep12=ep12, ep22=ep22, ep32=ep32) *(x - self.magnet_origin[0])/dr
+            return self.mu0_Ms * self.Bzr_np(r=dr,Z=dz,R=self.magnet_radius,L=L,ep11=ep11, ep21=ep21, ep31=ep31, ep12=ep12, ep22=ep22, ep32=ep32) *(x - self.magnet_origin[0])/dr
 
     
     def Bzxx_method(self, x, y, z):
@@ -222,12 +231,12 @@ class CylinderMagnet(ComponentBase):
 
         zero_coords = np.argwhere(dr == 0)
 
-        L = self.Length/2
-        g = (dr - self.Radius) / (dr + self.Radius)
+        L = self.magnet_length/2
+        g = (dr - self.magnet_radius) / (dr + self.magnet_radius)
         eps1 = z + L
         eps2 = z - L
-        k1 = (eps1**2 + (dr - self.Radius)**2) / (eps1**2 + (dr + self.Radius)**2)
-        k2 = (eps2**2 + (dr - self.Radius)**2) / (eps2**2 + (dr + self.Radius)**2)
+        k1 = (eps1**2 + (dr - self.magnet_radius)**2) / (eps1**2 + (dr + self.magnet_radius)**2)
+        k2 = (eps2**2 + (dr - self.magnet_radius)**2) / (eps2**2 + (dr + self.magnet_radius)**2)
         n = 1 - g**2
 
         # 然后分别计算：
@@ -241,10 +250,11 @@ class CylinderMagnet(ComponentBase):
 
         if zero_coords.size > 0:
             dr[zero_coords[0][0]][zero_coords[0][1]][zero_coords[0][2]] = np.nan
-            BZxx = self.mu0_Ms * self.Bzrr_np(r=dr,Z=dz,R=self.Radius,L=L,ep11=ep11, ep21=ep21, ep31=ep31, ep12=ep12, ep22=ep22, ep32=ep32)* (x - self.magnet_origin[0])**2/dr**2 - self.mu0_Ms * self.Bzr_np(r=dr,Z=dz,R=self.Radius,L=L,ep11=ep11, ep21=ep21, ep31=ep31, ep12=ep12, ep22=ep22, ep32=ep32)*(y-self.magnet_origin[1])**2/dr**3 
+            BZxx = self.mu0_Ms * self.Bzrr_np(r=dr,Z=dz,R=self.magnet_radius,L=L,ep11=ep11, ep21=ep21, ep31=ep31, ep12=ep12, ep22=ep22, ep32=ep32)* (x - self.magnet_origin[0])**2/dr**2 - self.mu0_Ms * self.Bzr_np(r=dr,Z=dz,R=self.magnet_radius,L=L,ep11=ep11, ep21=ep21, ep31=ep31, ep12=ep12, ep22=ep22, ep32=ep32)*(y-self.magnet_origin[1])**2/dr**3 
             BZxx[zero_coords[0][0]][zero_coords[0][1]][:] = np.zeros(len(dz))
             return BZxx   
         
         else:
-            return self.mu0_Ms * self.Bzrr_np(r=dr,Z=dz,R=self.Radius,L=L,ep11=ep11, ep21=ep21, ep31=ep31, ep12=ep12, ep22=ep22, ep32=ep32)* (x - self.magnet_origin[0])**2/dr**2 - self.mu0_Ms * self.Bzr_np(r=dr,Z=dz,R=self.Radius,L=L,ep11=ep11, ep21=ep21, ep31=ep31, ep12=ep12, ep22=ep22, ep32=ep32)*(y-self.magnet_origin[1])**2/dr**3 
-   
+            return self.mu0_Ms * self.Bzrr_np(r=dr,Z=dz,R=self.magnet_radius,L=L,ep11=ep11, ep21=ep21, ep31=ep31, ep12=ep12, ep22=ep22, ep32=ep32)* (x - self.magnet_origin[0])**2/dr**2 - self.mu0_Ms * self.Bzr_np(r=dr,Z=dz,R=self.magnet_radius,L=L,ep11=ep11, ep21=ep21, ep31=ep31, ep12=ep12, ep22=ep22, ep32=ep32)*(y-self.magnet_origin[1])**2/dr**3 
+
+    

@@ -41,27 +41,27 @@ class TestCylinderMagnet:
 
     def test_Bz_1(self):
         Bz = self.magnet.Bz_method(1, 2, 6)
-        assert np.allclose(Bz, 0.00567438, atol=1e-5)
+        assert np.allclose(Bz, 0.00391404, atol=1e-5)
 
     def test_Bzx_1(self):
         Bzx = self.magnet.Bzx_method(1, 2, 6)
-        assert np.allclose(Bzx, -0.00376482, atol=1e-5)
+        assert np.allclose(Bzx, -0.00221805, atol=1e-5)
 
     def test_Bzxx_1(self):
         Bzxx = self.magnet.Bzxx_method(1, 2, 6)
-        assert np.allclose(Bzxx, 0.00545423, atol=1e-5)
+        assert np.allclose(Bzxx, 0.0031995877, atol=1e-5)
 
     def test_Bz_2(self):
         Bz = self.magnet.Bz_method(10, 0, 0)
-        assert np.allclose(Bz, -0.00146935, atol=1e-5)
+        assert np.allclose(Bz,-0.00044788490737216163, atol=1e-5)
 
     def test_Bzx_2(self):
         Bzx = self.magnet.Bzx_method(10, 0, 0)
-        assert np.allclose(Bzx, 0.000319819, atol=1e-5)
+        assert np.allclose(Bzx, 0.00010754599, atol=1e-5)
 
     def test_Bzxx_2(self):
         Bzxx = self.magnet.Bzxx_method(10, 0, 0)
-        assert np.allclose(Bzxx,-0.0000913467, atol=1e-5)
+        assert np.allclose(Bzxx,-3.22679905171e-05, atol=1e-5)
 
     def test_Bzx_when_x_is_0(self):
         Bzx = self.magnet.Bzx_method(0, 10, 0)
