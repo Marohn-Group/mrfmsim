@@ -8,8 +8,8 @@ from mrfmsim.component import ComponentBase
 class SphereMagnet(ComponentBase):
     """Spherical magnet object with its Bz, Bzx, Bzxx calculations.
 
-    :param float radius: sphere magnet radius [nm]
-    :param list origin: the position of the magnet origin (x, y, z)
+    :param float magnet_radius: sphere magnet radius [nm]
+    :param list magnet_origin: the position of the magnet origin (x, y, z)
     :param float mu0_Ms: saturation magnetization [mT]
     """
 
@@ -60,7 +60,7 @@ class SphereMagnet(ComponentBase):
         :param dx: normalized distances to the center of the magnet in x
         :param dx: normalized distances to the center of the magnet in y
         :param dx: normalized distances to the center of the magnet in z
-        :type: np.array
+
         :return: bz without pre-term
         :rtype: np.array
         """
@@ -111,7 +111,7 @@ class SphereMagnet(ComponentBase):
         :param dx: normalized distances to the center of the magnet in x
         :param dy: normalized distances to the center of the magnet in y
         :param dz: normalized distances to the center of the magnet in z
-        :type: np.array
+
         :return: bzx without pre-term
         :rtype: np.array
         """
@@ -163,7 +163,7 @@ class SphereMagnet(ComponentBase):
         :param dx: normalized distances to the center of the magnet in x
         :param dy: normalized distances to the center of the magnet in y
         :param dz: normalized distances to the center of the magnet in z
-        :type: np.array
+
         :return: bzxx without pre-term
         :rtype: np.array
         """
@@ -180,12 +180,9 @@ class SphereMagnet(ComponentBase):
 class RectangularMagnet(ComponentBase):
     """Rectangular magnet object with the bz, bzx, bzxx calculations.
 
-    :param list length: length of rectangular magnet in (x, y, z) direction [nm]
-    :param list origin: the position of the magnet origin (x, y, z)
+    :param list magnet_length: length of rectangular magnet in (x, y, z) direction [nm]
+    :param list magnet_origin: the position of the magnet origin (x, y, z)
     :param float mu0_Ms: saturation magnetization [mT]
-    :ivar np.array _range:
-        [-xrange, +xrange, -yrange, +yrange, -zrange, zrange]
-        range in the x, y and z direction after the center point to the origin.
     """
 
     magnet_length: list[float] = field(metadata={"unit": "nm", "format": ".1f"})

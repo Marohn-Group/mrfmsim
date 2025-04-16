@@ -14,18 +14,18 @@ class Grid(ComponentBase):
     The grid array uses numpy's open mesh-grid, which has speed and storage
     benefits.
 
-    :param np.array length: array of lengths along (x, y, z)
-    :param np.array step: a list of step sizes
-    :param np.array origin: the grid origin
-
     :param tuple[int] shape: grid dimension
         (number of points in x, y, z direction)
-    :param list step: grid setup size in x, y, z direction
-    :param list origin: grid origin
-    :param float voxel: the volume of each grid voxel
-    :param np.array range: range in (x, y, z direction), shape (3, 2)
-    :param np.array length: actual lengths of the grid. This is recalculated
+    :param ndarray grid_step: grid setup size in x, y, z direction
+    :param ndarray grid_origin: the grid origin
+
+    :ivar ndarray grid_length: array of lengths along (x, y, z)
+    :ivar float grid_voxel: the volume of each grid voxel
+    :ivar ndarray grid_range: range in (x, y, z direction), shape (3, 2)
+    :ivar ndarray grid_length: actual lengths of the grid. This is recalculated
         based on the rounded value of grid shape and step size.
+    :ivar ndarray grid_extents: the grid extents in (x, y, z direction), shape (3, 2)
+    :ivar ndarray grid_array: the grid array in (x, y, z direction), shape (3, n)
     """
 
     grid_shape: tuple[int]
@@ -91,7 +91,7 @@ class Grid(ComponentBase):
         This is used to extend the grid by the cantilever motion.
         The length needs to be more than the step size to count.
 
-        :param int ext_pts: distance (one side) to extend along x direction
+        :param int ext_length: distance (one side) to extend along x direction
             (cantilever motion direction). The length should be a list of
             three dimensions.
         """
