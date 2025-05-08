@@ -245,9 +245,10 @@ def rel_dpol_sat_td(Bzx, B1, ext_B_offset, ext_pts, Gamma, T2, tip_v):
     div = np.divide(atan_omega_f - atan_omega_i, Bzx)
 
     # adjust for the center slice of the discontinuous issue
-    center_index = div.shape[0] // 2  # if the grid is even it should not be a problem
-    if np.all(np.isnan(div[center_index])):
-        div[center_index] = (div[center_index + 1] + div[center_index - 1]) / 2
+    nan_indices = np.where(np.isnan(div))[0]
+    if len(nan_indices) > 0:  # get the first nan element x index
+        div[nan_indices[0]] = (div[nan_indices[0] + 1])
+
 
     rt = Gamma * B1**2 * np.abs(div) / tip_v
     dpol = np.exp(-rt)
