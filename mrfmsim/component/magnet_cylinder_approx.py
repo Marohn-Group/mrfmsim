@@ -11,7 +11,7 @@ class CylinderMagnetApproxByRectangularMagnet(ComponentBase):
     :param float radius: cylinder magnet radius [nm] 
     :param float length: cylinder magnet length [nm]
     :param tuple origin: the position of the magnet origin (x, y, z)
-    :param float mu0_Ms: permeability of free space [H/m]
+    :param float mu0_Ms: saturation magnetization [mT]
     """
 
     magnet_radius: float = field(metadata={"unit": "nm", "format": ".1f"})

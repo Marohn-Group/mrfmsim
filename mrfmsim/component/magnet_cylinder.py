@@ -12,7 +12,7 @@ class CylinderMagnet(ComponentBase):
     :param float radius: cylinder magnet radius [nm] !!!There would ba a singularity when x^2+y^2=R^2, so set a small difference to R!!! Also when x^2+y^2=0, B_zxx would run into a singularity, try to avoid this point.
     :param float length: cylinder magnet length [nm]
     :param tuple origin: the position of the magnet origin (x, y, z)
-    :param float mu0_Ms: permeability of free space [H/m]
+    :param float mu0_Ms: saturation magnetization [mT]
     """
 
     magnet_radius: float = field(metadata={"unit": "nm", "format": ".1f"})
