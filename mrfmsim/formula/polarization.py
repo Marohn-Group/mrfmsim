@@ -289,3 +289,40 @@ def rel_dpol_multipulse(rel_dpol, T1, dt_pulse):
     rel_dpol_avg = (np.exp(t_r) - 1) * rel_dpol / t_r / (np.exp(t_r) - pol)
 
     return rel_dpol_avg
+
+
+def masked_rel_dpol_sat_td_gridwithpol(Bzx, B1, ext_B_offset, ext_pts, Gamma, T2, grid_array,tip_v,void_mask):
+    """Relative change in polarization for time-dependent saturation.
+
+    The result is not a steady-state solution because it ignores T1 relaxation.
+
+    Binarizing the polarization with 0 and 1, then retrun the girds that has pol with 1 (pol>0.5). 
+    """
+    # ignore division error the Exp takes care of the inf, and nan
+    np.seterr(divide="ignore", invalid="ignore")
+
+    omega_offset_atan = np.arctan(ext_B_offset * Gamma * T2)
+
+    atan_omega_i = omega_offset_atan[: -ext_pts * 2]
+    atan_omega_f = omega_offset_atan[ext_pts * 2 :]
+
+    div = np.divide(atan_omega_f - atan_omega_i, Bzx)
+
+    # adjust for the center slice of the discontinuous issue
+    nan_indices = np.where(np.isnan(div))[0]
+    if len(nan_indices) > 0:  # get the first nan element x index
+        div[nan_indices[0]] = (div[nan_indices[0] + 1])
+
+
+    rt = Gamma * B1**2 * np.abs(div) / tip_v*void_mask
+    dpol = np.exp(-rt)
+
+    indices = np.where(dpol < 0.5)
+
+    x = grid_array[0].flatten()
+    y = grid_array[1].flatten()
+    z = grid_array[2].flatten()
+
+    grid_pol = np.array([x[indices[0][:]],y[indices[1][:]],z[indices[2][:]]])
+
+    return grid_pol.T

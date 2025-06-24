@@ -2,6 +2,45 @@ import pytest
 import numpy as np
 from mrfmsim.component import CylinderMagnet, CylinderMagnetApproxByRectangularMagnet
 
+"""Test CylinderMagnetApproxByRectangularMagnet module in mrfmsim.component.
+
+CylinderMagnet & CylinderMagnetApproxByRectangularMagnet
+------------
+
+All sphere magnets are tested using the parameters:
+radius = 0.5 nm
+length = 10 nm
+mu0_Ms = 1 mT
+origin = [0, 0, 0] nm
+
+Bz_method
+^^^^^^^^^^
+
+1. Test Bz's output has the same shape as the input grid
+2. Test Bz's output is symmetric along x-axis
+3. Test Bz in the near field is close to the exact value
+4. Test Bz in the far field is close to the exact value
+
+Bzx_method
+^^^^^^^^^^
+
+1. Test Bzx's output has the same shape as the input grid
+2. Test Bzx's output is symmetric along x-axis
+3. Test Bzx in the near field is close to the exact value
+4. Test Bzx in the far field is close to the exact value
+5. Test Bzx when x is 0, Bzx is 0
+
+
+Bzxx_method
+^^^^^^^^^^
+
+1. Test Bzxx's output has the same shape as the input grid
+2. Test Bzxx's output is symmetric along x-axis
+3. Test Bzxx in the near field is close to the exact value
+4. Test Bzxx in the far field is close to the exact value
+
+
+"""
 
 class TestCylinderMagnet:
     def setup_method(self):

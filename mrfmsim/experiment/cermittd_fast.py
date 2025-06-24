@@ -3,21 +3,20 @@ from mrfmsim import Node, ExperimentGroup
 from .stdelements import STANDARD_NODES, STANDARD_COMPONENTS
 
 node_objects = [
-    Node("rel_dpol td_sat", formula.rel_dpol_sat_td, output="rel_dpol"),
-    Node("rel_dpol small_steps", formula.rel_dpol_sat_td_smallsteps, output="rel_dpol"),
+    Node("rel_dpol td_sat", formula.masked_rel_dpol_sat_td_gridwithpol, output="grid_pol"),
     Node("rel_dpol averaged", formula.rel_dpol_multipulse, output="rel_dpol_avg"),
     Node(
         "spring constant shift td",
         formula.neg_sum_of_product,
-        inputs=["Bzxx", "rel_dpol_avg", "mz_eq", "spin_density", "grid_voxel"],
+        inputs=["Bzxx_pol", "rel_dpol_avg", "mz_eq", "spin_density", "grid_voxel"],
         output="dk_spin",
         doc="Calculate dk_spin account for the negative sign in the approximation.",
     ),
     Node(
-        "spring constant shift trapz td",
-        formula.sum_of_product,
-        inputs=["Bzxx_trapz", "rel_dpol_avg", "mz_eq", "spin_density", "grid_voxel"],
-        output="dk_spin",
+        "Bzxx_pol",
+        formula.field_func,
+        inputs=["Bzxx_method", "grid_pol", "h"],
+        output="Bzxx_pol",
     ),
 ]
 
