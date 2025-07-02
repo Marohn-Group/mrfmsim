@@ -246,8 +246,9 @@ def rel_dpol_sat_td(Bzx, B1, ext_B_offset, ext_pts, Gamma, T2, tip_v):
 
     # adjust for the center slice of the discontinuous issue
     nan_indices = np.where(np.isnan(div))[0]
-    if len(nan_indices) > 0:  # get the first nan element x index
-        div[nan_indices[0]] = (div[nan_indices[0] + 1])
+    unique_nan_indices = list(set(nan_indices))
+    for i in  unique_nan_indices:
+        div[i] = (div[i + 1]+div[i - 1])/2
 
 
     rt = Gamma * B1**2 * np.abs(div) / tip_v
