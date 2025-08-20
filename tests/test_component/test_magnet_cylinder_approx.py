@@ -2,7 +2,9 @@ import pytest
 import numpy as np
 from mrfmsim.component import CylinderMagnet, CylinderMagnetApproxByRect
 
+
 """Test CylinderMagnetApproxByRect module in mrfmsim.component.
+
 
 CylinderMagnet & CylinderMagnetApproxByRect
 ------------

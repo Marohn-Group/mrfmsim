@@ -3,7 +3,9 @@ import numpy as np
 from mrfmsim.component import CylinderMagnet
 
 
+
 """Test CylinderMagnet module in mrfmsim.component.
+
 
 CylinderMagnet
 ------------
