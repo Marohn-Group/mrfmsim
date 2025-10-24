@@ -190,7 +190,8 @@ def test_rel_dpol_sat_td_NaN(sample_e):
     rpol_b = pol.rel_dpol_sat_td(
         Bzx, 1.0, ext_B_offset_b, 1, sample_e.Gamma, sample_e.T2, 2000
     )
-    assert (not np.isnan(rpol_a)) and (not np.isnan(rpol_b))
+    assert not np.any(np.isnan(rpol_a))
+    assert not np.any(np.isnan(rpol_b))
 
 
 def test_rel_dpol_sat_td_without_td(sample_e):
