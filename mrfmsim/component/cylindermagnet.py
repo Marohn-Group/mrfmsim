@@ -5,8 +5,8 @@ from mrfmsim.component import ComponentBase
 
 
 @dataclass
-class CylinderMagnetApproxByRect(ComponentBase):
-    """Cylinder magnet object with its Bz, Bzx, Bzxx calculations.
+class CylinderMagnetApprox(ComponentBase):
+    """Cylinder magnet object approximated by Rectangular Magnets.
 
     :param float radius: cylinder magnet radius [nm] 
     :param float length: cylinder magnet length [nm]
