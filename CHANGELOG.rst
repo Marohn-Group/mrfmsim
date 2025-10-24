@@ -7,6 +7,17 @@ The format is based on
 and this project adheres to
 `Semantic Versioning <https://semver.org/spec/v2.0.0.html>`_
 
+[unreleased]
+------------
+
+Minor fixes to documentation.
+
+Changed
+^^^^^^^
+
+- Change the CERMITD experiment graph to avoid output duplication.
+
+
 [0.3.0] - 2025-02-25
 ----------------------
 

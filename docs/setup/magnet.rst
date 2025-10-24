@@ -12,6 +12,7 @@ Currently, the two types of magnets supported are
 
     mrfmsim.component.magnet.SphereMagnet
     mrfmsim.component.magnet.RectangularMagnet
+    mrfmsim.component.magnet_cylinder_approx.CylinderMagnetApproxByRect
 
 Example Usage
 -------------

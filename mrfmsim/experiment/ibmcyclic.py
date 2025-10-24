@@ -60,7 +60,7 @@ components = {
 
 IBMCyclic_graph = Graph(name="ibm_cyclic_graph")
 IBMCyclic_graph.add_grouped_edges_from(grouped_edges)
-IBMCyclic_graph.set_node_objects_from(node_objects)
+IBMCyclic_graph.add_node_objects_from(node_objects)
 
 
 IBMCyclic = Experiment(
