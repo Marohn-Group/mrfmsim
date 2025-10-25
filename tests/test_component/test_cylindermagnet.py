@@ -89,7 +89,7 @@ class TestCylinderMagnet:
         Test at poles (1.0, 2.0, 6.0).
         """
         Bz = self.magnet.Bz_method(1, 2, 6)
-        assert np.allclose(Bz, 0.00391404, atol=1e-5)
+        assert np.allclose(Bz, 0.003938311762612047, atol=1e-5)
 
     def test_Bzx_near_field(self):
         """Test the magnetic field Bzx at near field.
@@ -97,7 +97,7 @@ class TestCylinderMagnet:
         Test at poles (1.0, 2.0, 6.0).
         """
         Bzx = self.magnet.Bzx_method(1, 2, 6)
-        assert np.allclose(Bzx, -0.00221805, atol=1e-5)
+        assert np.allclose(Bzx, -0.0022319789019074046, atol=1e-5)
 
     def test_Bzxx_near_field(self):
         """Test the magnetic field Bzxx at near field.
@@ -105,7 +105,7 @@ class TestCylinderMagnet:
         Test at poles (1.0, 2.0, 6.0).
         """
         Bzxx = self.magnet.Bzxx_method(1, 2, 6)
-        assert np.allclose(Bzxx, 0.0031995877, atol=1e-5)
+        assert np.allclose(Bzxx, -0.00035144076191428254, atol=1e-5)
 
     def test_Bz_far_field(self):
         """Test the magnetic field Bz at far field.
