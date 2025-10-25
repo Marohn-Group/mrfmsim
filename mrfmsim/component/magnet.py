@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 from mrfmsim.component import ComponentBase
 
 
+
 @dataclass
 class SphereMagnet(ComponentBase):
     """Spherical magnet object with its Bz, Bzx, Bzxx calculations.
@@ -456,3 +457,6 @@ class RectangularMagnet(ComponentBase):
             * (3.0 * dx2**2 + 2.0 * dy2**2 + 3.0 * dz2**2)
             / ((dx2**2 + dy2**2 + dz2**2) ** 1.5 * (dx2**2 + dz2**2) ** 2)
         )
+
+
+
