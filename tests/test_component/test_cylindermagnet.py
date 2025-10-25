@@ -60,7 +60,7 @@ class TestCylinderMagnet:
         assert Bzx.shape == (2, 5, 10)
 
     def test_Bzxx_shape(self):
-        '''Test the shape of the magnetic field Bzxx to be the same as the input grid.'''
+        """Test the shape of the magnetic field Bzxx to be the same as the input grid."""
         grid = np.ogrid[-1:1:2j, -1:1:5j, -1:1:10j]
         Bzxx = self.magnet.Bzxx_method(grid[0], grid[1], grid[2])
         assert Bzxx.shape == (2, 5, 10)
