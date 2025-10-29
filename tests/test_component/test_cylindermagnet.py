@@ -17,16 +17,16 @@ origin = [0, 0, 0] nm
 Bz_method
 ^^^^^^^^^^
 
-1. Test Bz's output has the same shape as the input grid
-2. Test Bz's output is symmetric along x-axis
+1. Test Bz output has the same shape as the input grid
+2. Test Bz output is symmetric along x-axis
 3. Test Bz in the near field is close to the exact value
 4. Test Bz in the far field is close to the exact value
 
 Bzx_method
 ^^^^^^^^^^
 
-1. Test Bzx's output has the same shape as the input grid
-2. Test Bzx's output is symmetric along x-axis
+1. Test Bzx output has the same shape as the input grid
+2. Test Bzx output is symmetric along x-axis
 3. Test Bzx in the near field is close to the exact value
 4. Test Bzx in the far field is close to the exact value
 5. Test Bzx when x is 0, Bzx is 0
@@ -34,8 +34,8 @@ Bzx_method
 Bzxx_method
 ^^^^^^^^^^^
 
-1. Test Bzxx's output has the same shape as the input grid
-2. Test Bzxx's output is symmetric along x-axis
+1. Test Bzxx output has the same shape as the input grid
+2. Test Bzxx output is symmetric along x-axis
 3. Test Bzxx in the near field is close to the exact value
 4. Test Bzxx in the far field is close to the exact value
 """
@@ -85,7 +85,7 @@ class TestCylinderMagnet:
 
     def test_Bz_near_field(self):
         """Test the magnetic field Bz at near field.
-        
+
         Test at poles (1.0, 2.0, 6.0).
         """
         Bz = self.magnet.Bz_method(1, 2, 6)
@@ -93,7 +93,7 @@ class TestCylinderMagnet:
 
     def test_Bzx_near_field(self):
         """Test the magnetic field Bzx at near field.
-        
+
         Test at poles (1.0, 2.0, 6.0).
         """
         Bzx = self.magnet.Bzx_method(1, 2, 6)
@@ -101,7 +101,7 @@ class TestCylinderMagnet:
 
     def test_Bzxx_near_field(self):
         """Test the magnetic field Bzxx at near field.
-        
+
         Test at poles (1.0, 2.0, 6.0).
         """
         Bzxx = self.magnet.Bzxx_method(1, 2, 6)
@@ -109,7 +109,7 @@ class TestCylinderMagnet:
 
     def test_Bz_far_field(self):
         """Test the magnetic field Bz at far field.
-        
+
         Test at (10.0, 0.0, 0.0).
         """
         Bz = self.magnet.Bz_method(10, 0, 0)
@@ -117,7 +117,7 @@ class TestCylinderMagnet:
 
     def test_Bzx_far_field(self):
         """Test the magnetic field Bzx at far field.
-        
+
         Test at (10.0, 0.0, 0.0).
         """
         Bzx = self.magnet.Bzx_method(10, 0, 0)
@@ -125,7 +125,7 @@ class TestCylinderMagnet:
 
     def test_Bzxx_far_field(self):
         """Test the magnetic field Bzxx at far field.
-        
+
         Test at (10.0, 0.0, 0.0).
         """
         Bzxx = self.magnet.Bzxx_method(10, 0, 0)
@@ -133,7 +133,7 @@ class TestCylinderMagnet:
 
     def test_Bzx_x_is_0(self):
         """Test the magnetic field Bzx when x is 0.
-        
+
         Test at (0.0, 10.0, 0.0).
         """
         Bzx = self.magnet.Bzx_method(0, 10, 0)

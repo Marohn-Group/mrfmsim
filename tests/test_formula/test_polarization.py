@@ -177,8 +177,11 @@ def test_rel_dpol_sat_td_symmetry(sample_e):
     )
     assert np.array_equal(rpol_a, rpol_b)
 
-def test_rel_dpol_sat_td_NaN(sample_e):
-    """Test rel_dpol_sat_td will not return Nan when Bzx is 0 and B_offset is symmetric.
+
+def test_rel_dpol_sat_td_nan(sample_e):
+    """Test rel_dpol_sat_td does not return nan.
+
+    When Bzx is 0 and B_offset is symmetric, the result should not be nan.
     """
     Bzx = np.array([1, 0, -1])
     ext_B_offset_a = np.array([2, 0, 0, 0, 2])
