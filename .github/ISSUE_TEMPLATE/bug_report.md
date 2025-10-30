@@ -31,7 +31,7 @@ assignees: ''
 
 <!-- Please complete the following information -->
 
-- **OS:** [e.g., macOS 13.0, Ubuntu 22.04, Windows 11]
+- **OS:** [e.g., macOS 26.0, Ubuntu 22.04, Windows 11]
 - **Python Version:** [e.g., 3.9.7, 3.10.5]
 - **mrfmsim Version:** [e.g., 0.1.0, or commit hash if installed from source]
 - **Installation Method:** [e.g., pip, conda, from source]
