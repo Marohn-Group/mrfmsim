@@ -93,7 +93,7 @@ To access an experiment model from a experiment group:
 
 .. code:: python
 
-    # print c summary
+    # print a summary
     print(CermitESRGroup)
     # list experiments
     print(list(CermitESRGroup.experiments.keys()))
@@ -184,7 +184,7 @@ can be very computationally intensive.
 
 If we want to simulate the change of the signal over a wide range of 
 external field (:math:`B_0`) and microwave frequency 
-(:math:`f_\mathrm{rf}``), we would want to avoid repeated
+(:math:`f_\mathrm{rf}`), we would want to avoid repeated
 calculations of unnecessary components that are independent of the
 two parameters.
 
@@ -263,7 +263,7 @@ This is equivalent to the result from the following loops:
 
 .. note::
 
-    Note that for individual parameters, the loop shortcut can achieve
+    For individual parameters, the loop shortcut can achieve
     optimal looping. However, for multiple parameters, users must decide
     which parameter to loop first. Since all nodes that are
     dependent on "f_rf" also depend on "B_0", we loop "f_rf" first. 

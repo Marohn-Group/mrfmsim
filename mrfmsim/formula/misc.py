@@ -9,7 +9,10 @@ HBAR = 1.054571628e-7  # aN nm s - reduced Planck constant
 def convert_grid_pts(distance, grid_step):
     """Convert distance to ext points.
 
-    :param int distance: distance in the x direction.
+    :param float distance: distance in the :math:`x` direction [nm]
+    :param list[float] grid_step: grid step size [nm]
+    :return: number of grid points
+    :rtype: int
     """
     return math.floor(distance / grid_step[0])
 
@@ -76,16 +79,18 @@ def singlespin_analytical(
         \frac{4\hat{y}^3}{3\pi(1+\hat{y}^2)^2}[(1+\hat{y}^2)E(-1/\hat{y}^2)
         - (\hat{y}^2 -1)K(-1/\hat{y}^2)
 
-    :param float Gamma: the gyromagnetic ratio
+    :param float Gamma: the gyromagnetic ratio [rad/s.mT]
+    :param str geometry: experiment geometry ('spam' or 'hangdown')
     :param float J: the spin angular momentum
-    :param array magnet_origin: the origin of the magnet
-    :param float magnet_radius: the radius of the magnet
-    :param float mu0_Ms: the saturation magnetization of the magnet
-    :param float mu_z: the spin magnetic moment
-    :param float magnet_spin_distance: magnet-spin distance
+    :param float magnet_spin_dist: magnet-spin distance [nm]
+    :param list magnet_origin: the origin of the magnet [nm]
+    :param float magnet_radius: the radius of the magnet [nm]
+    :param float mu0_Ms: the saturation magnetization of the magnet [mT]
+    :param float x_0p: zero-to-peak amplitude of the cantilever [nm]
 
-    :return: The analytical solution for a single spin (effective force).
+    :return: The analytical solution for a single spin (effective force) [aN].
         The spin constant shift is the effective force divided by the 0 to peak amplitude.
+    :rtype: float
     """
 
     mu_z = HBAR * Gamma * J

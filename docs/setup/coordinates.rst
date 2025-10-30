@@ -39,8 +39,8 @@ With the right figure setup,
     magnet = RectangularMagnet([70, 70, 1500], mu0_Ms=1800.0, magnet_origin=[0.0, 750.0, 0.0])
 
 The grid has a width of 220 nm in :math:`y`-direction, and the magnet has a height of
-1500 nm. The grid origin is set to be 110 nm below left of the :math:`xz`-plane,
-and the magnet origin is set to be 750 nm right to the :math:`xz`-plane. The magnet and the 
+1500 nm. The grid origin is set to be 110 nm to the left of the :math:`xz`-plane,
+and the magnet origin is set to be 750 nm to the right of the :math:`xz`-plane. The magnet and the 
 grid are flush, and the tip-sample separation is 0 nm.
 
 .. note::

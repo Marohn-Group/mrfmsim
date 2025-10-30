@@ -101,7 +101,7 @@ in the Table below.
 ======================================== =================================================
 
 Variables appearing in eqs. :eq:`eq:x`, :eq:`eq:x-vars`, and subsequent equations. 
-he magnetic field :math:`B_0` is applied along the :math:`z` axis,
+The magnetic field :math:`B_0` is applied along the :math:`z` axis,
 and the equilibrium magnetization :math:`M_0` also lies along the :math:`z` axis.
 
 Steady-state solution

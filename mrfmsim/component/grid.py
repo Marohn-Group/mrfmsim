@@ -14,10 +14,10 @@ class Grid(ComponentBase):
     The grid array uses numpy's open mesh-grid, which has speed and storage
     benefits.
 
-    :param tuple[int] shape: grid dimension
+    :param tuple[int, int, int] grid_shape: grid dimension
         (number of points in x, y, z direction)
-    :param ndarray grid_step: grid setup size in x, y, z direction
-    :param ndarray grid_origin: the grid origin
+    :param list[float] grid_step: grid step size in x, y, z direction [nm]
+    :param list[float] grid_origin: the grid origin [nm]
 
     :ivar ndarray grid_length: array of lengths along (x, y, z)
     :ivar float grid_voxel: the volume of each grid voxel

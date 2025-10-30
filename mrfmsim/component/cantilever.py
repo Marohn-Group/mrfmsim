@@ -14,7 +14,7 @@ class Cantilever(ComponentBase):
     :param float f_c: mechanical resonance frequency [Hz]
 
     :ivar float k2f_modulated: spring constant to frequency ratio for modulated
-        cantilever (lockin) [Hz.nm/aN]p
+        cantilever (lockin) [Hz.nm/aN]
     :ivar float k2f: spring constant to frequency ratio for non-modulated
         cantilever [Hz.nm/aN]
     """

@@ -28,9 +28,9 @@ class Sample(ComponentBase):
     :param float temperature: the sample temperature [K]
     :param float spin_density: the sample spin density :math:`\rho` [1/nm^3]
     :param float Gamma: spin gyromagnetic ratio [rad/s.mT]
-        defaults to None if spin_type is one of the preset
-    :param float L: spin angular momentum [unitless]
-        default to None if spin_type is one of the preset
+        defaults to None if spin is one of the preset types
+    :param float J: spin angular momentum [unitless]
+        defaults to None if spin is one of the preset types
     :param float dB_hom: homogeneous linewidth [mT]
     :param float dB_sat: saturation linewidth [mT]
     """

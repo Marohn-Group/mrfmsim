@@ -5,13 +5,13 @@ Ancillary features are added to the mrfmsim ecosystem through plugin packages.
 The separation of the core functionality and the plugins allows for an easy maintenance
 of the mrfmsim package. The core functionalities do not depend on the plugins.
 
-mrfmsim-ymal: YAML configuration plugin
+mrfmsim-yaml: YAML configuration plugin
 ---------------------------------------
 
 mrfmsim classes can be fully defined using YAML configuration files. The plugin
 creates a ``MrfmSimLoader`` and a ``MrfmSimDumper`` that can be used to load and
 dump the mrfmsim classes to and from YAML files. For detailed usage of the package
-see the `mrfmsim-ymal <https://github.com/Marohn-Group/mrfmsim-yaml>`_.
+see the `mrfmsim-yaml <https://github.com/Marohn-Group/mrfmsim-yaml>`_.
 
 To define an experiment or experiment group with YAML files, the available tags are:
 "!func", "!import", "!nodes", "!Graph", "!Experiment", and "!ExperimentGroup".
