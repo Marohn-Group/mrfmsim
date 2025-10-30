@@ -12,8 +12,7 @@ assignees: ''
 
 ## Problem/Motivation
 
-<!-- Is your feature request related to a problem? Please describe.
-     Example: I'm always frustrated when [...] -->
+<!-- Is your feature request related to a problem? Please describe. -->
 
 ## Proposed Solution
 
