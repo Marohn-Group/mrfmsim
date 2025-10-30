@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 # Peter Sun
 
-"""Collection of calculations of relative changes in polarization.
-"""
+"""Collection of calculations of relative changes in polarization."""
 
 import numba
 import numpy as np
@@ -244,10 +243,9 @@ def rel_dpol_sat_td(Bzx, B1, ext_B_offset, ext_pts, Gamma, T2, tip_v):
 
     div = np.divide(atan_omega_f - atan_omega_i, Bzx)
 
-    # adjust for the center slice of the discontinuous issue
-    center_index = div.shape[0] // 2  # if the grid is even it should not be a problem
-    if np.all(np.isnan(div[center_index])):
-        div[center_index] = (div[center_index + 1] + div[center_index - 1]) / 2
+    # adjust the nan values to the average of the surrounding values
+    for idx in np.where(np.isnan(div))[0]:
+        div[idx] = (div[idx + 1] + div[idx - 1]) / 2
 
     rt = Gamma * B1**2 * np.abs(div) / tip_v
     dpol = np.exp(-rt)
