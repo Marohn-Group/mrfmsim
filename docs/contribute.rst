@@ -30,7 +30,7 @@ Development Guidelines
 Code Style
 ~~~~~~~~~~
 
-- Follow PEP 8 style guidelines for Python code
+- Follow PEP 8 style guidelines for Python code (use ``Black`` formatter's default settings)
 - Use meaningful variable and function names
 - Keep functions focused and modular
 - Add type hints where appropriate

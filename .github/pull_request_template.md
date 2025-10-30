@@ -40,7 +40,7 @@
 
 <!-- Describe the testing you have performed to verify your changes -->
 
-- [ ] All existing tests pass (`tox` or `pytest`)
+- [ ] All existing tests pass (`tox`)
 - [ ] Added new tests for new functionality
 - [ ] Manual testing performed (describe below)
 
@@ -62,7 +62,7 @@
 
 <!-- Check all that apply -->
 
-- [ ] Code follows PEP 8 style guidelines
+- [ ] Code follows PEP 8 style guidelines (use ``Black`` formatter's default settings)
 - [ ] Used meaningful variable and function names
 - [ ] Code is modular and readable
 
