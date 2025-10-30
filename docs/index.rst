@@ -15,6 +15,7 @@ License
    overview
    tests
    changelog
+   contribute
 
 
 .. toctree::
