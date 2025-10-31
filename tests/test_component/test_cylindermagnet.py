@@ -8,7 +8,7 @@ from mrfmsim.component import CylinderMagnetApprox
 CylinderMagnetApprox
 --------------------
 
-All sphere magnets are tested using the parameters:
+All cylinder magnets are tested using the parameters:
 radius = 0.5 nm
 length = 10 nm
 mu0_Ms = 1 mT
