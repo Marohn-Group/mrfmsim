@@ -14,8 +14,8 @@ To create a grid object:
     grid = Grid(grid_shape=[21, 11, 101], grid_step=[20.0, 4.0, 20.0], grid_origin=[0.0, 0.0, 0.0])
 
 The resulting grid is rectangular with the shape of (21, 11, 101), the distance between
-two edge grid points in each direction are (200, 40, 2000) nm, and the full grid size
-is (220 :math:`\times` 44 :math:`\times` 2020) nm. 
+two edge grid points in each direction are (400, 40, 2000) nm, and the full grid size
+is (420 :math:`\times` 44 :math:`\times` 2020) nm. 
 The returned grid points are numpy "ogrid" points: 
 `np.ogrid <https://numpy.org/devdocs/reference/generated/numpy.ogrid.html>`__.
 

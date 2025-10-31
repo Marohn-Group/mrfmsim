@@ -12,6 +12,7 @@ Currently, the two types of magnets supported are
 
     mrfmsim.component.magnet.SphereMagnet
     mrfmsim.component.magnet.RectangularMagnet
+    mrfmsim.component.cylindermagnet.CylinderMagnetApprox
 
 Example Usage
 -------------
@@ -38,6 +39,15 @@ To display the magnet information:
 --------------------
 
 .. automodule:: mrfmsim.component.magnet
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+:mod:`cylindermagnet` module
+----------------------------
+
+.. automodule:: mrfmsim.component.cylindermagnet
     :members:
     :undoc-members:
     :show-inheritance:

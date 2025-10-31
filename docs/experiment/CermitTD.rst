@@ -26,7 +26,7 @@ At low-:math:`B_1` region, we can determine numerically the final magnetization 
 .. math::
     :label: eq:Mz(tau0)
 
-    M_z^\mathrm{finial} 
+    M_z^\mathrm{final} 
     \approx e^{-R(\tau_i, \tau_f)} M_z^\mathrm{initial}
     
 

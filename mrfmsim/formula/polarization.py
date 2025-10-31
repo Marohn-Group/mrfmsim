@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 # Peter Sun
 
-"""Collection of calculations of relative changes in polarization.
-"""
+"""Collection of calculations of relative changes in polarization."""
 
 import numba
 import numpy as np
@@ -233,6 +232,10 @@ def rel_dpol_sat_td(Bzx, B1, ext_B_offset, ext_pts, Gamma, T2, tip_v):
     """Relative change in polarization for time-dependent saturation.
 
     The result is not a steady-state solution because it ignores T1 relaxation.
+    In the case where Bzx is 0, and B_offset is symmetric, the division will be nan.
+    Here we try to adjust the nan values to the average of the surrounding values.
+    However, if the resulting value is still nan or there are nan values at the boundary,
+    an ValueError is raised.
     """
     # ignore division error the Exp takes care of the inf, and nan
     np.seterr(divide="ignore", invalid="ignore")
@@ -244,10 +247,19 @@ def rel_dpol_sat_td(Bzx, B1, ext_B_offset, ext_pts, Gamma, T2, tip_v):
 
     div = np.divide(atan_omega_f - atan_omega_i, Bzx)
 
-    # adjust for the center slice of the discontinuous issue
-    center_index = div.shape[0] // 2  # if the grid is even it should not be a problem
-    if np.all(np.isnan(div[center_index])):
-        div[center_index] = (div[center_index + 1] + div[center_index - 1]) / 2
+    # adjust the nan values to the average of the surrounding values
+    for idx in np.where(np.isnan(div))[0]:
+        if idx == 0 or idx == len(div) - 1:
+            raise ValueError(
+                "Nan values at the boundary, check the Bzx and B_offset values."
+            )
+        value = (div[idx + 1] + div[idx - 1]) / 2
+
+        if np.isnan(value):
+            raise ValueError(
+                "Nan value from division, check the Bzx and B_offset values."
+            )
+        div[idx] = value
 
     rt = Gamma * B1**2 * np.abs(div) / tip_v
     dpol = np.exp(-rt)

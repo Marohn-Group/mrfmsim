@@ -178,6 +178,47 @@ def test_rel_dpol_sat_td_symmetry(sample_e):
     assert np.array_equal(rpol_a, rpol_b)
 
 
+def test_rel_dpol_sat_td_nan(sample_e):
+    """Test rel_dpol_sat_td does not return nan.
+
+    When Bzx is 0 and B_offset is symmetric, the result should not be nan.
+    """
+    Bzx = np.array([1, 0, -1])
+    ext_B_offset_a = np.array([2, 0, 0, 0, 2])
+    ext_B_offset_b = np.array([0, 2, 2, 2, 0])
+
+    rpol_a = pol.rel_dpol_sat_td(
+        Bzx, 1.0, ext_B_offset_a, 1, sample_e.Gamma, sample_e.T2, 2000
+    )
+    rpol_b = pol.rel_dpol_sat_td(
+        Bzx, 1.0, ext_B_offset_b, 1, sample_e.Gamma, sample_e.T2, 2000
+    )
+    assert not np.any(np.isnan(rpol_a))
+    assert not np.any(np.isnan(rpol_b))
+
+
+def test_rel_dpol_sat_td_nan_boundary(sample_e):
+    """Test rel_dpol_sat_td raises an error if nan values are at the boundary."""
+    Bzx = np.array([0, 0, -1])
+    ext_B_offset = np.array([0, 0, 0, 0, 2])
+
+    with pytest.raises(ValueError, match="Nan values at the boundary"):
+        pol.rel_dpol_sat_td(
+            Bzx, 1.0, ext_B_offset, 1, sample_e.Gamma, sample_e.T2, 2000
+        )
+
+
+def test_rel_dpol_sat_td_nan_division(sample_e):
+    """Test rel_dpol_sat_td raises an error if nan values are from division."""
+    Bzx = np.array([2, 0, 0, -1])
+    ext_B_offset = np.array([1, 0, 0, 0, 0, 1])
+
+    with pytest.raises(ValueError, match="Nan value from division"):
+        pol.rel_dpol_sat_td(
+            Bzx, 1.0, ext_B_offset, 1, sample_e.Gamma, sample_e.T2, 2000
+        )
+
+
 def test_rel_dpol_sat_td_without_td(sample_e):
     """Test rel_dpol_sat_td completely saturate spins if no td component.
 

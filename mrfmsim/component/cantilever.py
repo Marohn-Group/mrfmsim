@@ -10,8 +10,13 @@ from mrfmsim.component import ComponentBase
 class Cantilever(ComponentBase):
     """Cantilever object.
 
-    :param float k: spring constant [aN/nm]
-    :param float f: mechanical resonance frequency [Hz]
+    :param float k_c: spring constant [aN/nm]
+    :param float f_c: mechanical resonance frequency [Hz]
+
+    :ivar float k2f_modulated: spring constant to frequency ratio for modulated
+        cantilever (lockin) [Hz.nm/aN]
+    :ivar float k2f: spring constant to frequency ratio for non-modulated
+        cantilever [Hz.nm/aN]
     """
 
     k_c: float = field(metadata={"unit": "aN/nm", "format": ".3e"})

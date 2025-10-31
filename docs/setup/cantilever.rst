@@ -9,11 +9,11 @@ Example Usage
 ^^^^^^^^^^^^^
 
 Create a cantilever object with a spring constant of 780 aN/nm and
-frequency of 4795 Hz:
+frequency of 4975 Hz:
 
 .. code-block:: python
 
-    cantilever = Cantilever(k_c=780, f_c=4795)
+    cantilever = Cantilever(k_c=780, f_c=4975)
 
 To print out the cantilever summary:
 

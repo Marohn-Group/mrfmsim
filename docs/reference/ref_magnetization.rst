@@ -43,7 +43,7 @@ the equilibrium magnetization
 tends towards the Curie-Weiss law,
 
 .. math::
-    mu_z^{\text{eq}}
+    \mu_z^{\text{eq}}
     \approx \dfrac{\hbar^2 \gamma^2 \: J (J + 1)}{3 \: k_b T} B_0
 
 

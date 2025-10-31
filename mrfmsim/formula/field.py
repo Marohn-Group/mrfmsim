@@ -1,4 +1,4 @@
-"""Cacluations related to the magnetic field."""
+"""Calculations related to the magnetic field."""
 
 import numpy as np
 import numba as nb

@@ -1,9 +1,9 @@
 Experiment geometry
 =============================
 
-For experiments in the *mrfmsim*, two experimental geometry
+For experiments in the *mrfmsim*, two experimental geometries
 are used: "hangdown" and SPAM (springiness preservation by aligning magnetization).
-The two geometry are shown in the figure below.
+The two geometries are shown in the figure below.
 
 .. image:: ../_static/mrfm-setups.pdf
     :width: 800px

@@ -34,7 +34,7 @@ as the MRFM signal. For :math:`n` independent configurations of the spin ensembl
 the sample variance :math:`s^2_{\Delta N}` is
 
 .. math::
-    s^2_{\Delta N} = \frac{1}{n-1} \sum^n_{j=1} (\Delta N_j - \overline{\Delta N})
+    s^2_{\Delta N} = \frac{1}{n-1} \sum^n_{j=1} (\Delta N_j - \overline{\Delta N})^2
 
 
 where :math:`\overline{\Delta N}` is the Boltzmann polarization.

@@ -65,6 +65,11 @@ To test in different environments::
     tox
 
 
+Contributing
+^^^^^^^^^^^^
+
+We welcome contributions! Please see our `Contributing Guide <docs/contribute.rst>`_ for details on how to follow our development guidelines and submit pull requests.
+
 .. rubric:: References
 
 .. [#Sidles1995jan] Sidles, J. A.; Garbini, J. J.; Bruland, K. J.; Rugar, D.; 

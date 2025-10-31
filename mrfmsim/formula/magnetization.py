@@ -9,13 +9,10 @@ KB = 1.3806504e4  # aN nm K^{-1} - Boltzmann constant
 def mz_eq(B_tot, Gamma, J, temperature):
     r"""Magnetization per spin at the thermal equilibrium using the Brillouin function.
 
-    :param float gamma: the gyromagnetic ratio. [rad/s.mT]
-    :param float j: total spin angular momentum
+    :param float B_tot: total magnetic field [mT]
+    :param float Gamma: the gyromagnetic ratio [rad/s.mT]
+    :param float J: total spin angular momentum
     :param float temperature: the spin temperature [K]
-    :param float spin_density: the sample spin
-            density :math:`\rho` [1/nm^3]
-    :param float b0: the external magnetic field [mT]
-    :param float bz: tip magnetic field in z [mT]
     :return: equilibrium per-spin magnetization [aN.nm/mT]
 
     The outputs are calculated from the sample properties
@@ -82,9 +79,10 @@ def mz_eq(B_tot, Gamma, J, temperature):
 def mz2_eq(Gamma, J):
     r"""Compute the magnetization variance per spin.
 
-    :param float gamma: the gyromagnetic ratio. [rad/s.mT]
+    :param float Gamma: the gyromagnetic ratio [rad/s.mT]
     :param float J: total spin angular momentum
-    :return: Mz2_eq, rhoMz_eq
+    :return: magnetization variance per spin [aN^2.nm^2/mT^2]
+    :rtype: float
     """
 
     mu = HBAR * Gamma * np.sqrt(J * (J + 1) / 3.0)  # aN.nm/mT

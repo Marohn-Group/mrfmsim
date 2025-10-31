@@ -36,8 +36,8 @@ Magnet Test
 The RectMagnet is tested through its symmetry factors: it is symmetric in the :math:`z` direction
 when x and y are 0. The gradient functions are tested against a numerical derivative calculation
 from the field. :math:`B_z` is an even function in the :math:`x` direction,
-:math:`B_{zx}` is an odd function in the x-direction and
-:math: `B_{zxx}` is an even function in the :math:`x` direction.
+:math:`B_{zx}` is an odd function in the :math:`x` direction, and
+:math:`B_{zxx}` is an even function in the :math:`x` direction.
 
 
 Polarization Test
@@ -68,7 +68,7 @@ Note to see the notebook and examples go to the
   the effect of amplitude is also small
   (There is a comparison in "test-micrometertip_smallampapprox_vs_exactsol.ipynb"
   on small amplitude, however, the result is unchecked).
-- CmeritSingleSpinESR_Approx is compared with CermitARP_SmallTip.
+- CermitSingleSpinESR_Approx is compared with CermitARP_SmallTip.
 - SingleSpinESR
     - The approximation is tested against both SPAM and hangdown geometry of the analytical solution
 
