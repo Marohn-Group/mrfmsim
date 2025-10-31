@@ -232,6 +232,10 @@ def rel_dpol_sat_td(Bzx, B1, ext_B_offset, ext_pts, Gamma, T2, tip_v):
     """Relative change in polarization for time-dependent saturation.
 
     The result is not a steady-state solution because it ignores T1 relaxation.
+    In the case where Bzx is 0, and B_offset is symmetric, the division will be nan.
+    Here we try to adjust the nan values to the average of the surrounding values.
+    However, if the resulting value is still nan or there are nan values at the boundary,
+    an ValueError is raised.
     """
     # ignore division error the Exp takes care of the inf, and nan
     np.seterr(divide="ignore", invalid="ignore")
@@ -245,7 +249,17 @@ def rel_dpol_sat_td(Bzx, B1, ext_B_offset, ext_pts, Gamma, T2, tip_v):
 
     # adjust the nan values to the average of the surrounding values
     for idx in np.where(np.isnan(div))[0]:
-        div[idx] = (div[idx + 1] + div[idx - 1]) / 2
+        if idx == 0 or idx == len(div) - 1:
+            raise ValueError(
+                "Nan values at the boundary, check the Bzx and B_offset values."
+            )
+        value = (div[idx + 1] + div[idx - 1]) / 2
+
+        if np.isnan(value):
+            raise ValueError(
+                "Nan value from division, check the Bzx and B_offset values."
+            )
+        div[idx] = value
 
     rt = Gamma * B1**2 * np.abs(div) / tip_v
     dpol = np.exp(-rt)

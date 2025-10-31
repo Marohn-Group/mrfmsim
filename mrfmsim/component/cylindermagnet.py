@@ -10,7 +10,8 @@ class CylinderMagnetApprox(ComponentBase):
 
     :param float magnet_radius: cylinder magnet radius [nm]
     :param float magnet_length: cylinder magnet length [nm]
-    :param tuple magnet_origin: the position of the magnet origin (x, y, z)
+    :param tuple magnet_origin: the position of the magnet origin
+        :math:`(x, y, z)` [nm]
     :param float mu0_Ms: saturation magnetization [mT]
     """
 
