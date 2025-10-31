@@ -7,8 +7,8 @@ The format is based on
 and this project adheres to
 `Semantic Versioning <https://semver.org/spec/v2.0.0.html>`_
 
-[unreleased]
-------------
+[0.4.0] - 2025-10-31
+---------------------
 
 Added Cylinder Magnet and minor fixes to docstrings and documentation.
 
