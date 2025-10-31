@@ -43,7 +43,7 @@ To display the magnet information:
     :undoc-members:
     :show-inheritance:
 
-    
+
 :mod:`cylindermagnet` module
 ----------------------------
 
