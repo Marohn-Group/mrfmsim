@@ -216,8 +216,8 @@ class RectangularMagnet(ComponentBase):
         The magnetic field is calculated following Ravaud2009 [#]_.
 
         The magnet is set up so that the
-        :math:`x` and :math:`y`  dimensions are centered about the zero point. 
-        The translation in :math:`z` shifts the tip of the magnet in the 
+        :math:`x` and :math:`y`  dimensions are centered about the zero point.
+        The translation in :math:`z` shifts the tip of the magnet in the
         :math:`z`-direction to be the given distance from the surface.
 
         Using the Coulombian model, assuming a uniform magnetization throughout
