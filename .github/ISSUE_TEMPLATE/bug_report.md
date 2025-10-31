@@ -33,7 +33,7 @@ assignees: ''
 
 - **OS:** [e.g., macOS 26.0, Ubuntu 22.04, Windows 11]
 - **Python Version:** [e.g., 3.9.7, 3.10.5]
-- **mrfmsim Version:** [e.g., 0.1.0, or commit hash if installed from source]
+- **mrfmsim Version:** [e.g., 0.1.0]
 - **Installation Method:** [e.g., pip, conda, from source]
 
 ## Error Messages/Stack Traces
@@ -54,4 +54,5 @@ Paste error message here
 
 ## Possible Solution
 
-<!-- If you have suggestions on how to fix the bug, please share them here -->
+<!-- If you have suggestions on how to fix the bug,
+please share them here -->
