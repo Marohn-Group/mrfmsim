@@ -126,7 +126,7 @@ class CylinderMagnetApprox(ComponentBase):
         these rectangular blocks are arranged side by side.
 
         The magnetic field of each rectangular magnet is calculated following the
-        method described in Ravaud2009 [1]_.  The magnet is set up so that the
+        method described in Ravaud2009 [#]_.  The magnet is set up so that the
         :math:`x` and :math:`y`  dimensions are centered about the zero point. 
         The translation in :math:`z` shifts the tip of the magnet in the 
         :math:`z`-direction to be the given distance from the surface.
@@ -152,7 +152,7 @@ class CylinderMagnetApprox(ComponentBase):
 
         where :math:`\mu_0 M_s` is the magnet's saturation magnetization in mT.
 
-        .. [1] Ravaud, R. and Lemarquand, G. "Magnetic field produced by a
+        .. [#] Ravaud, R. and Lemarquand, G. "Magnetic field produced by a
            parallelepipedic magnet of various and uniform polarization" ,
            *PIER*, **2009**, *98*, 207-219
            [`10.2528/PIER09091704 <http://dx.doi.org/10.2528/PIER09091704>`__].

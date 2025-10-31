@@ -213,7 +213,7 @@ class RectangularMagnet(ComponentBase):
     def Bz_method(self, x, y, z):
         r"""Calculate magnetic field :math:`B_z` [mT].
 
-        The magnetic field is calculated following Ravaud2009 [1]_.
+        The magnetic field is calculated following Ravaud2009 [#]_.
 
         The magnet is set up so that the
         :math:`x` and :math:`y`  dimensions are centered about the zero point. 
@@ -243,7 +243,7 @@ class RectangularMagnet(ComponentBase):
 
         where :math:`\mu_0 M_s` is the magnet's saturation magnetization in mT.
 
-        .. [1] Ravaud, R. and Lemarquand, G. "Magnetic field produced by a
+        .. [#] Ravaud, R. and Lemarquand, G. "Magnetic field produced by a
            parallelepipedic magnet of various and uniform polarization" ,
            *PIER*, **2009**, *98*, 207-219
            [`10.2528/PIER09091704 <http://dx.doi.org/10.2528/PIER09091704>`__].
