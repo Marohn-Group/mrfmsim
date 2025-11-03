@@ -247,15 +247,17 @@ def rel_dpol_sat_td(Bzx, B1, ext_B_offset, ext_pts, Gamma, T2, tip_v):
 
     div = np.divide(atan_omega_f - atan_omega_i, Bzx)
 
-    # adjust the nan values to the average of the surrounding values
+    # adjust the nan values to the average of the surrounding values in x direction
     for idx in np.where(np.isnan(div))[0]:
+
         if idx == 0 or idx == len(div) - 1:
             raise ValueError(
                 "Nan values at the boundary, check the Bzx and B_offset values."
             )
         value = (div[idx + 1] + div[idx - 1]) / 2
 
-        if np.isnan(value):
+        # value can be a value or an array
+        if np.any(np.isnan(value)):
             raise ValueError(
                 "Nan value from division, check the Bzx and B_offset values."
             )
