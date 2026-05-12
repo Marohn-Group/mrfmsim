@@ -66,6 +66,12 @@ requires = tox-conda
 envlist = py310, py311, coverage, docs
 isolated_build = True
 
+[gh-actions]
+python =
+    3.10: py310, coverage, docs
+    3.11: py311
+    3.12: py312
+
 [testenv:py310]
 deps = 
     pytest >= 7.1.1
