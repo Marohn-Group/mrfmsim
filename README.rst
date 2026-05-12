@@ -30,10 +30,21 @@ Quickstart
 Installation
 ^^^^^^^^^^^^^
 
+*mrfmsim* installation
+***********************
+
+To install the package, run::
+
+    pip install mrfmsim
+
+For development from a cloned repository, run::
+
+    pip install .
+
 *Graphviz* installation
 ***********************
 
-To view the graph, Graphviz needs to be installed:
+Graphviz is required only for graph visualization:
 `Graphviz Installation <https://graphviz.org/download/>`_
 For Windows installation, please choose "add Graphviz to the
 system PATH for all users/current users" during the setup.
@@ -45,12 +56,14 @@ with conda::
     conda install -c conda-forge pygraphviz
 
 
-*mrfmsim* installation
-***********************
+Examples and documentation
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To install the package, run::
-
-    pip install .
+The full documentation is available at
+`mrfmsim documentation <https://marohn-group.github.io/mrfmsim-docs/>`_.
+Step-by-step examples are available in the `overview documentation <docs/overview.rst>`_,
+including a downloadable `overview notebook <docs/_downloads/mrfmsim_overview.ipynb>`_.
+Detailed experiment examples are documented in the `experiment pages <docs/experiment/>`_.
 
 
 Tests
