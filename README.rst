@@ -1,7 +1,7 @@
 MrfmSim
 =======
 
-|GitHub version| |Unit tests| |DOI|
+|GitHub version| |Unit tests|
 
 *mrfmsim* is a Python framework for simulating magnetic resonance force microscopy (MRFM)
 experiments. The package is based on the
@@ -136,6 +136,3 @@ We welcome contributions! Please see our `Contributing Guide <docs/contribute.rs
 
 .. .. |Docs| image:: https://img.shields.io/badge/Documentation--brightgreen.svg
 ..     :target: https://github.com/Marohn-Group/mrfmsim-docs/
-
-.. |DOI| image:: https://zenodo.org/badge/534295792.svg
-   :target: https://zenodo.org/badge/latestdoi/534295792
