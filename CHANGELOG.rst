@@ -7,6 +7,15 @@ The format is based on
 and this project adheres to
 `Semantic Versioning <https://semver.org/spec/v2.0.0.html>`_
 
+[0.4.2] - 2026-05-12
+---------------------
+
+Changed
+^^^^^^^
+- Update the README.rst to improve the installation instructions.
+- Change the numpy version requirement to <2.4.
+- Improve the github tox action workflow.
+
 [0.4.1] - 2025-11-03
 ---------------------
 
